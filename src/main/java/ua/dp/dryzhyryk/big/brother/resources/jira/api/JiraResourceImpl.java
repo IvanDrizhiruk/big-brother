@@ -1,95 +1,114 @@
 package ua.dp.dryzhyryk.big.brother.resources.jira.api;
 
-import java.text.DateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.atlassian.jira.rest.client.api.domain.SearchResult;
 import com.atlassian.jira.rest.client.api.domain.TimeTracking;
-
+import com.atlassian.jira.rest.client.api.domain.Worklog;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import ua.dp.dryzhyryk.big.brother.core.model.Task;
+import ua.dp.dryzhyryk.big.brother.core.model.TaskWorkLog;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 
-@Resource
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+@Repository
 public class JiraResourceImpl implements JiraResource {
 
-	private static final DateTimeFormatter DATA_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-	private final JiraRestClient jiraRestClient;
+    private static final DateTimeFormatter DATA_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+    private static final int ONE_STEP_SIZE = 5;
+    private static final int TIMOUT_IN_SECONDS = 10;
+    private static final long REQUEST_RETRIES_NUMBER = 3;
 
-	@Autowired
-	public JiraResourceImpl(JiraRestClient jiraRestClient) {
-		this.jiraRestClient = jiraRestClient;
-	}
-
-	@Override
-	public List<Task> loadDayForProject(String projectKey, LocalDate date) {
+    private final JiraRestClient jiraRestClient;
 
 
+    @Autowired
+    public JiraResourceImpl(JiraRestClient jiraRestClient) {
+        this.jiraRestClient = jiraRestClient;
+    }
 
-		String jql = String.format("project = %s  AND worklogDate >=  '%s'", projectKey, date.format(DATA_FORMATTER));
+    @Override
+    public List<Task> loadDayForProject(String projectKey, LocalDate date) {
 
-		List<Issue> rootIssues = loadRootIssues(jql);
+        String jql = String.format("project = %s  AND worklogDate >=  '%s'", projectKey, date.format(DATA_FORMATTER));
 
-		String issueKeykey = issue.getKey();
-		//				issue.getSubtasks().forEach(sub -> {
-		//					printIssue(jiraRestClient, dateFormatter, sub.getIssueKey(), "              ");
-		//
-		//				});
-	}
+        List<Issue> rootIssues = loadRootIssues(jql);
 
-	private List<Issue> loadRootIssues(String jql) {
-		int oneStepSize = 5;
-		int index = 0;
+        return rootIssues.stream()
+                .map(issue -> loadIssueFully(issue.getKey()))
+                .map(fullIssue -> {
+                    List<Task> subIssues = StreamSupport.stream(fullIssue.getSubtasks().spliterator(), false)
+                            .map(subIssue -> loadIssueFully(subIssue.getIssueKey()))
+                            .map(this::toTask)
+                            .collect(Collectors.toList());
 
-		List<Issue> rootIssues = new ArrayList<>();
-		do {
-			SearchResult result = jiraRestClient.getSearchClient()
-					.searchJql(jql, oneStepSize, index * oneStepSize, null).claim();
+                    return toTask(fullIssue)
+                            .toBuilder()
+                            .subTasks(subIssues)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
 
-			index++;
+    private List<Issue> loadRootIssues(String jql) {
 
-			result.getIssues().forEach(issue -> {
-				rootIssues.add(issue);
-				printIssue(jiraRestClient, dateFormatter, issueKeykey, "");
-			});
+        return Flux.<Issue, Integer>generate(() -> 0, (index, sink) -> {
+            //TODO add retry on exception
+            SearchResult result = jiraRestClient.getSearchClient()
+                    .searchJql(jql, ONE_STEP_SIZE, index, null).claim();
 
-			if (!result.getIssues().iterator().hasNext()) {
-				break;
-			}
-		}
-		while (true);
-		return null;
-	}
+            Iterable<Issue> issues = result.getIssues();
+            if (issues.iterator().hasNext()) {
+                issues.forEach(sink::next);
+            } else {
+                sink.complete();
+            }
+            return index + ONE_STEP_SIZE;
+        }).retry(REQUEST_RETRIES_NUMBER)
+                .toStream()
+                .collect(Collectors.toList());
+    }
 
-	private void printIssue(JiraRestClient jiraRestClient, DateFormat dateFormatter, String key, String prefix) {
+    private Issue loadIssueFully(String issueKey) {
+        try {
+            //TODO add retry on exception
+            return jiraRestClient.getIssueClient().getIssue(issueKey).get(TIMOUT_IN_SECONDS, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-		Issue fullIssue = jiraRestClient.getIssueClient().getIssue(key).claim();
+    private Task toTask(Issue issue) {
+        TimeTracking timeTracking = issue.getTimeTracking();
 
-		System.out.println(prefix + key + "     " + fullIssue.getSummary());
-		TimeTracking timeTracking = fullIssue.getTimeTracking();
-		System.out.println(prefix
-				+ minutesToHours(timeTracking.getOriginalEstimateMinutes()) + "     "
-				+ minutesToHours(timeTracking.getRemainingEstimateMinutes()) + "     "
-				+ minutesToHours(timeTracking.getTimeSpentMinutes()));
-		//		System.out.println(prefix + dateFormatter.format(fullIssue.getCreationDate().toDate())
-		//				+ "  =>   " + dateFormatter.format(fullIssue.getUpdateDate().toDate())
-		//				+ "  =>   " + (null != fullIssue.getDueDate() ? dateFormatter.format(fullIssue.getDueDate().toDate()) : ""));
+        List<TaskWorkLog> taskWorkLogs = StreamSupport.stream(issue.getWorklogs().spliterator(), false)
+                .map(this::toTaskWorkLog)
+                .collect(Collectors.toList());
 
-		fullIssue.getWorklogs().forEach(worklog -> {
-			System.out.println("		"
-					+ prefix
-					+ dateFormatter.format(worklog.getUpdateDate().toDate()) + "   "
-					+ dateFormatter.format(worklog.getStartDate().toDate()) + "   "
-					+ worklog.getUpdateAuthor().getName() + "  "
-					+ minutesToHours(worklog.getMinutesSpent()));
-		});
-	}
+        return Task.builder()
+                .name(issue.getSummary())
+                .originalEstimateMinutes(timeTracking.getOriginalEstimateMinutes())
+                .remainingEstimateMinutes(timeTracking.getRemainingEstimateMinutes())
+                .timeSpentMinutes(timeTracking.getTimeSpentMinutes())
+                .workLogs(taskWorkLogs)
+                .build();
+    }
+
+    private TaskWorkLog toTaskWorkLog(Worklog worklog) {
+        return TaskWorkLog
+                .builder()
+                .person(worklog.getUpdateAuthor().getName())
+                .startDateTime(LocalDateTime.parse(worklog.getStartDate().toDateTime().toString()))
+                .minutesSpent(worklog.getMinutesSpent())
+                .build();
+    }
 }

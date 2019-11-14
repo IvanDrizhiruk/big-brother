@@ -22,18 +22,23 @@ public class BigJiraBrother {
 		this.jiraInformationHolder = jiraInformationHolder;
 	}
 
-	public TasksTreeView prepareTaskView(Set<String> projectsKeys, LocalDate startDate, LocalDate endDate) {
+	public List<TasksTreeView> prepareTaskView(Set<String> projectsKeys, LocalDate startDate, LocalDate endDate) {
 
-		List<TasksTree> tasksTree = projectsKeys.stream()
+		List<TasksTree> tasksTrees = projectsKeys.stream()
 				.map(projectKey -> jiraInformationHolder.getTasksAsTree(projectKey, startDate, endDate))
 				.collect(Collectors.toList());
 
 		TasksTreeViewAggregator tasksTreeViewAggregator = new TasksTreeViewAggregator();
 
-		return tasksTreeViewAggregator.prepareTasksTreeView(tasksTree);
+		return tasksTrees.stream()
+				.map(tasksTreeViewAggregator::prepareTasksTreeView)
+				.collect(Collectors.toList());
 	}
 
-	public PeopleView preparePeopleViewView() {
+	public PeopleView preparePeopleView() {
 		return new PeopleView();
+	}
+
+	public void prepareDayView() {
 	}
 }
