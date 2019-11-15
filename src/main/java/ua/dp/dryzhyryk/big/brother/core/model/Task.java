@@ -9,6 +9,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class Task {
 
+    private final String id;
     private final String name;
 
     private final Integer originalEstimateMinutes;

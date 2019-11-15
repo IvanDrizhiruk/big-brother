@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.dp.dryzhyryk.big.brother.core.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.model.TasksTree;
+import ua.dp.dryzhyryk.big.brother.core.model.search.SprintSearchConditions;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -19,9 +19,9 @@ public class JiraInformationHolder {
         this.jiraInformationCache = jiraInformationCache;
     }
 
-    public TasksTree getTasksAsTree(String projectsKey, LocalDate startDate, LocalDate endDate) {
+    public TasksTree getTasksAsTree(SprintSearchConditions sprintSearchConditions) {
 
-        List<Task> rootTasks = jiraInformationCache.getRootTasks(projectsKey, startDate, endDate);
+        List<Task> rootTasks = jiraInformationCache.getRootTasks(sprintSearchConditions);
 
         return TasksTree.builder()
                 .rootTasks(rootTasks)
