@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
@@ -18,9 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrother;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationCache;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
+import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.TasksTree;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
+import ua.dp.dryzhyryk.big.brother.core.ports.JiraStorage;
 import ua.dp.dryzhyryk.big.brother.data.extractor.jira.JiraDataExtractor;
 
 @Slf4j
@@ -44,7 +47,17 @@ public class BigBrotherConsoleApplication {
 		JiraRestClient jiraRestClient = jiraRestClientFactory.createWithBasicHttpAuthentication(uri, username, password);
 
 		JiraResource jiraResource = new JiraDataExtractor(jiraRestClient);
-		JiraInformationCache jiraInformationCache = new JiraInformationCache(jiraResource);
+		JiraStorage jiraStorage = new JiraStorage() {
+			@Override
+			public void saveProjectSprint(SprintSearchConditions sprintSearchConditions, List<Task> tasks) {
+			}
+
+			@Override
+			public List<Task> loadProjectSprint(SprintSearchConditions sprintSearchConditions) {
+				return null;
+			}
+		};
+		JiraInformationCache jiraInformationCache = new JiraInformationCache(jiraResource, jiraStorage);
 		JiraInformationHolder jiraInformationHolder = new JiraInformationHolder(jiraInformationCache);
 		BigJiraBrother bigJiraBrother = new BigJiraBrother(jiraInformationHolder);
 
