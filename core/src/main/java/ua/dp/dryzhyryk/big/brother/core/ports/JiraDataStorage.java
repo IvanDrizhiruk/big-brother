@@ -5,7 +5,7 @@ import java.util.List;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchConditions;
 
-public interface JiraStorage {
+public interface JiraDataStorage {
 	void saveProjectSprint(SprintSearchConditions sprintSearchConditions, List<Task> tasks);
 	List<Task> loadProjectSprint(SprintSearchConditions sprintSearchConditions);
 }

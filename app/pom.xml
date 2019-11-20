@@ -16,23 +16,24 @@
             <artifactId>big-brother-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>ua.dp.dryzhyryk</groupId>
             <artifactId>big-brother-jira-extractor</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>ua.dp.dryzhyryk</groupId>
+            <artifactId>big-brother-jira-data-storage</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

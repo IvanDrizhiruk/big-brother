@@ -3,20 +3,20 @@ package ua.dp.dryzhyryk.big.brother.core.data.source;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
-import ua.dp.dryzhyryk.big.brother.core.ports.JiraStorage;
+import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
 
 import java.util.*;
 
 public class JiraInformationCache {
 
     private final JiraResource jiraResource;
-    private final JiraStorage jiraStorage;
+    private final JiraDataStorage jiraDataStorage;
 
     private final Map<SprintSearchConditions, List<Task>> tasksByProjectKeyAndDate = new HashMap<>();
 
-    public JiraInformationCache(JiraResource jiraResource, JiraStorage jiraStorage) {
+    public JiraInformationCache(JiraResource jiraResource, JiraDataStorage jiraDataStorage) {
         this.jiraResource = jiraResource;
-        this.jiraStorage = jiraStorage;
+        this.jiraDataStorage = jiraDataStorage;
     }
 
     public List<Task> getRootTasks(SprintSearchConditions sprintSearchConditions) {
@@ -24,7 +24,7 @@ public class JiraInformationCache {
     }
 
     private List<Task> loadProjectSprintTasks(SprintSearchConditions sprintSearchConditions) {
-        List<Task> tasksFromStorage = jiraStorage.loadProjectSprint(sprintSearchConditions);
+        List<Task> tasksFromStorage = jiraDataStorage.loadProjectSprint(sprintSearchConditions);
         if (null != tasksFromStorage) {
             return tasksFromStorage;
         }
@@ -32,7 +32,7 @@ public class JiraInformationCache {
         List<Task> loadedTaskFromResources = jiraResource.loadProjectSprint(sprintSearchConditions);
         List<Task> tasksFromResource = Optional.ofNullable(loadedTaskFromResources).orElse(Collections.emptyList());
 
-        jiraStorage.saveProjectSprint(sprintSearchConditions, tasksFromResource);
+        jiraDataStorage.saveProjectSprint(sprintSearchConditions, tasksFromResource);
 
         return tasksFromResource;
     }

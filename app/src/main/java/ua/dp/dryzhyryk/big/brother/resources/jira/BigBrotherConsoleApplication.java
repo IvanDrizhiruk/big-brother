@@ -1,11 +1,11 @@
 package ua.dp.dryzhyryk.big.brother.resources.jira;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
@@ -19,12 +19,12 @@ import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrother;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationCache;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.TasksTree;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
-import ua.dp.dryzhyryk.big.brother.core.ports.JiraStorage;
+import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
 import ua.dp.dryzhyryk.big.brother.data.extractor.jira.JiraDataExtractor;
+import ua.dp.dryzhyryk.big.brother.data.storage.jira.JiraFileDataStorage;
 
 @Slf4j
 public class BigBrotherConsoleApplication {
@@ -46,18 +46,12 @@ public class BigBrotherConsoleApplication {
 		AsynchronousJiraRestClientFactory jiraRestClientFactory = new AsynchronousJiraRestClientFactory();
 		JiraRestClient jiraRestClient = jiraRestClientFactory.createWithBasicHttpAuthentication(uri, username, password);
 
-		JiraResource jiraResource = new JiraDataExtractor(jiraRestClient);
-		JiraStorage jiraStorage = new JiraStorage() {
-			@Override
-			public void saveProjectSprint(SprintSearchConditions sprintSearchConditions, List<Task> tasks) {
-			}
+		File storageRoot = new File(configDir.orElse("./"), "../storage");
+		storageRoot.mkdirs();
 
-			@Override
-			public List<Task> loadProjectSprint(SprintSearchConditions sprintSearchConditions) {
-				return null;
-			}
-		};
-		JiraInformationCache jiraInformationCache = new JiraInformationCache(jiraResource, jiraStorage);
+		JiraResource jiraResource = new JiraDataExtractor(jiraRestClient);
+		JiraDataStorage jiraDataStorage = new JiraFileDataStorage(storageRoot.getPath());
+		JiraInformationCache jiraInformationCache = new JiraInformationCache(jiraResource, jiraDataStorage);
 		JiraInformationHolder jiraInformationHolder = new JiraInformationHolder(jiraInformationCache);
 		BigJiraBrother bigJiraBrother = new BigJiraBrother(jiraInformationHolder);
 
@@ -122,7 +116,7 @@ public class BigBrotherConsoleApplication {
 	}
 
 	private static Properties loadProperties(String fileName) {
-		try (InputStream input = new FileInputStream("/home/idryzhyruk/workspace/luxoft/big-brother/config/jira.properties")) {
+		try (InputStream input = new FileInputStream(fileName)) {
 
 			if (input == null) {
 				log.error("Sorry, unable to find {}", fileName);
