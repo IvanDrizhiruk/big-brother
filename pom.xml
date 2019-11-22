@@ -38,6 +38,7 @@
         <module>core</module>
         <module>extractors</module>
         <module>jira-data-storage</module>
+        <module>excel-report-generator</module>
         <module>app</module>
     </modules>
 

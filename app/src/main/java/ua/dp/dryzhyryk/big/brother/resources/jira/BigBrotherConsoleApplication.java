@@ -29,6 +29,7 @@ import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 import ua.dp.dryzhyryk.big.brother.data.extractor.jira.JiraDataExtractor;
 import ua.dp.dryzhyryk.big.brother.data.storage.jira.JiraFileDataStorage;
+import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
 
 @Slf4j
 public class BigBrotherConsoleApplication {
@@ -66,6 +67,13 @@ public class BigBrotherConsoleApplication {
 		SprintSearchConditions sprintSearchConditions = loadJson(serchFilePath, SprintSearchConditions.class);
 
 		TasksTree tasksTree = bigJiraBrother.prepareTaskView(sprintSearchConditions);
+
+
+		File reportRoot = new File(configDir.orElse("./"), "../reports");
+		reportRoot.mkdirs();
+		ExcelReportGenerator reportGenerator = new ExcelReportGenerator(reportRoot.getAbsolutePath());
+		reportGenerator.generate(tasksTree);
+
 
 		List<Task> rootTasks = tasksTree.getRootTasks();
 		Map<String, TaskMetrics> taskMetricsByTaskId = tasksTree.getTaskMetricsByTaskId();

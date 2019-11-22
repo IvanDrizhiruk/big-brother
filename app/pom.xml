@@ -27,6 +27,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>ua.dp.dryzhyryk</groupId>
+            <artifactId>big-brother-excel-report-generator</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
