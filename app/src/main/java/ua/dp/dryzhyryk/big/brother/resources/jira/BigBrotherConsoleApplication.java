@@ -87,7 +87,7 @@ public class BigBrotherConsoleApplication {
 							" Remaining " + convertMinutesToHour(taskMetric.getTimeMetrics().getRemainingEstimateMinutes()) +
 							"  TC 			==> " + taskMetric.getTimeMetrics().getTimeCoefficient());
 
-			taskMetric.getDailyWorkLog().forEach(dayWorkLog -> {
+			taskMetric.getWorkLogByDay().forEach(dayWorkLog -> {
 
 				System.out.println(dayWorkLog.getWorkDate());
 				dayWorkLog.getPersonWorkLogs().forEach(personWorkLog -> {
@@ -108,7 +108,7 @@ public class BigBrotherConsoleApplication {
 						" Remaining " + convertMinutesToHour(subMaskMetric.getTimeMetrics().getRemainingEstimateMinutes()) +
 						"  TC 			==> " + subMaskMetric.getTimeMetrics().getTimeCoefficient());
 
-				subMaskMetric.getDailyWorkLog().forEach(dayWorkLog -> {
+				subMaskMetric.getWorkLogByDay().forEach(dayWorkLog -> {
 
 					System.out.println("          " + dayWorkLog.getWorkDate());
 					dayWorkLog.getPersonWorkLogs().forEach(personWorkLog -> {

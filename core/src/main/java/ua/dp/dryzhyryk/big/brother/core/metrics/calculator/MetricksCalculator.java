@@ -11,10 +11,11 @@ import java.util.stream.Stream;
 
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.TaskWorkLog;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.DayWorkLog;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.WorkLogByDay;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PersonWorkLog;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskMetrics;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskTimeMetrics;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.WorkLogByPerson;
 
 public class MetricksCalculator {
 
@@ -36,12 +37,14 @@ public class MetricksCalculator {
 	private TaskMetrics calculateMetricsForTask(Task task) {
 		TaskTimeMetrics timeMetrics = calculateTaskTimeMetrics(task);
 
-		List<DayWorkLog> dailyWorkLog = aggregateWorklog(task.getWorkLogs());
+		List<WorkLogByDay> workLogByDay = aggregateWorklogByDay(task.getWorkLogs());
+		List<WorkLogByPerson> workLogByPerson = aggregateWorklogByPerson(task.getWorkLogs());
 
 		return TaskMetrics.builder()
 				.taskId(task.getId())
 				.timeMetrics(timeMetrics)
-				.dailyWorkLog(dailyWorkLog)
+				.workLogByDay(workLogByDay)
+				.workLogByPerson(workLogByPerson)
 				.build();
 	}
 
@@ -64,7 +67,7 @@ public class MetricksCalculator {
 				.build();
 	}
 
-	private List<DayWorkLog> aggregateWorklog(List<TaskWorkLog> workLogs) {
+	private List<WorkLogByDay> aggregateWorklogByDay(List<TaskWorkLog> workLogs) {
 
 		Map<LocalDate, Map<String, Integer>> timeByDateAndUser = workLogs.stream()
 				.collect(Collectors.groupingBy(
@@ -76,13 +79,28 @@ public class MetricksCalculator {
 
 		return timeByDateAndUser.entrySet().stream()
 				.sorted(Comparator.comparing(Map.Entry::getKey))
-				.map(entry -> DayWorkLog.builder()
+				.map(entry -> WorkLogByDay.builder()
 						.workDate(entry.getKey())
 						.personWorkLogs(toPersonsWorkLog(entry.getValue()))
 						.build())
 				.collect(Collectors.toList());
-
 	}
+
+	private List<WorkLogByPerson> aggregateWorklogByPerson(List<TaskWorkLog> workLogs) {
+		Map<String, Integer> timeByUser = workLogs.stream()
+				.collect(Collectors.groupingBy(
+						TaskWorkLog::getPerson,
+						Collectors.summingInt(TaskWorkLog::getMinutesSpent))
+				);
+
+		return timeByUser.entrySet().stream()
+				.map(entry -> WorkLogByPerson.builder()
+						.person(entry.getKey())
+						.minutesSpent(entry.getValue())
+						.build())
+				.collect(Collectors.toList());
+	}
+
 
 	private List<PersonWorkLog> toPersonsWorkLog(Map<String, Integer> minutesSpentByPerson) {
 		return minutesSpentByPerson.entrySet().stream()

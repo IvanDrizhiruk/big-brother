@@ -8,8 +8,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class DayWorkLog {
-
-	private final LocalDate workDate;
-	private final List<PersonWorkLog> personWorkLogs;
+public class WorkLogByPerson {
+	private final String person;
+	private final int minutesSpent;
 }

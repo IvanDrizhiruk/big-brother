@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -21,10 +20,11 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import lombok.extern.slf4j.Slf4j;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.DayWorkLog;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.WorkLogByDay;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskMetrics;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskTimeMetrics;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksTree;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.WorkLogByPerson;
 
 @Slf4j
 public class ExcelReportGenerator {
@@ -103,7 +103,7 @@ public class ExcelReportGenerator {
 					rowMetric.createCell(2).setCellValue(convertMinutesToHour(timeMetrics.getTimeSpentMinutes()));
 					rowMetric.createCell(3).setCellValue(timeMetrics.getTimeCoefficient());
 
-					List<DayWorkLog> dailyWorkLogMetrics = taskMetrics.getDailyWorkLog();
+					List<WorkLogByDay> dailyWorkLogMetrics = taskMetrics.getWorkLogByDay();
 					if (!dailyWorkLogMetrics.isEmpty()) {
 						newRowSeparator(sheet, rowNum);
 
@@ -118,6 +118,21 @@ public class ExcelReportGenerator {
 								rowDailyWorkLogMetrics.createCell(1).setCellValue(personWorkLog.getPerson());
 								rowDailyWorkLogMetrics.createCell(2).setCellValue(convertMinutesToHour(personWorkLog.getMinutesSpent()));
 							});
+						});
+					}
+
+					List<WorkLogByPerson> workLogByDayMetrics = taskMetrics.getWorkLogByPerson();
+					if (!workLogByDayMetrics.isEmpty()) {
+						newRowSeparator(sheet, rowNum);
+
+						Row rowWorkLogByDayMetricsHeader = sheet.createRow(rowNum.getAndIncrement());
+						rowWorkLogByDayMetricsHeader.createCell(0).setCellValue("Person");
+						rowWorkLogByDayMetricsHeader.createCell(1).setCellValue("Spent hours");
+
+						workLogByDayMetrics.forEach(personWorkLog -> {
+							Row rowWorkLogByDayMetrics = sheet.createRow(rowNum.getAndIncrement());
+							rowWorkLogByDayMetrics.createCell(0).setCellValue(personWorkLog.getPerson());
+							rowWorkLogByDayMetrics.createCell(1).setCellValue(convertMinutesToHour(personWorkLog.getMinutesSpent()));
 						});
 					}
 
@@ -150,7 +165,7 @@ public class ExcelReportGenerator {
 
 								newRowSeparator(sheet, rowNum);
 
-								List<DayWorkLog> subDailyWorkLogMetrics = subTaskMetrics.getDailyWorkLog();
+								List<WorkLogByDay> subDailyWorkLogMetrics = subTaskMetrics.getWorkLogByDay();
 								if (!subDailyWorkLogMetrics.isEmpty()) {
 									newRowSeparator(sheet, rowNum);
 									Row rowSubDailyWorkLogMetricsHeader = sheet.createRow(rowNum.getAndIncrement());
@@ -165,6 +180,21 @@ public class ExcelReportGenerator {
 											rowSubDailyWorkLogMetrics.createCell(4)
 													.setCellValue(convertMinutesToHour(subPersonWorkLog.getMinutesSpent()));
 										});
+									});
+								}
+
+								List<WorkLogByPerson> workSubLogByDayMetrics = subTaskMetrics.getWorkLogByPerson();
+								if (!workSubLogByDayMetrics.isEmpty()) {
+									newRowSeparator(sheet, rowNum);
+
+									Row rowSubWorkLogByDayMetricsHeader = sheet.createRow(rowNum.getAndIncrement());
+									rowSubWorkLogByDayMetricsHeader.createCell(2).setCellValue("Person");
+									rowSubWorkLogByDayMetricsHeader.createCell(3).setCellValue("Spent hours");
+
+									workSubLogByDayMetrics.forEach(personWorkLog -> {
+										Row rowSubWorkLogByDayMetrics = sheet.createRow(rowNum.getAndIncrement());
+										rowSubWorkLogByDayMetrics.createCell(2).setCellValue(personWorkLog.getPerson());
+										rowSubWorkLogByDayMetrics.createCell(3).setCellValue(convertMinutesToHour(personWorkLog.getMinutesSpent()));
 									});
 								}
 

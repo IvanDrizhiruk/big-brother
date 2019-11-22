@@ -11,5 +11,6 @@ public class TaskMetrics {
 
 	private final String taskId;
 	private final TaskTimeMetrics timeMetrics;
-	private final List<DayWorkLog> dailyWorkLog;
+	private final List<WorkLogByDay> workLogByDay;
+	private final List<WorkLogByPerson> workLogByPerson;
 }
