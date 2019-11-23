@@ -5,7 +5,7 @@ import java.util.List;
 
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksTree;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksTreeView;
 
 public final class TestDoublesForProjectSprintMega {
 
@@ -23,7 +23,7 @@ public final class TestDoublesForProjectSprintMega {
 		return Collections.emptyList();
 	}
 
-	public static TasksTree newTaskViewForProjectSprintMega() {
+	public static TasksTreeView newTaskViewForProjectSprintMega() {
 		return null;
 	}
 }

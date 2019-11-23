@@ -17,7 +17,7 @@ import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskMetrics;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskTimeMetrics;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.WorkLogByPerson;
 
-public class MetricksCalculator {
+public class TasksTreeViewMetricsCalculator {
 
 	public Map<String, TaskMetrics> calculateFor(List<Task> tasksTree) {
 		return tasksTree.stream()

@@ -6,8 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
@@ -20,11 +18,13 @@ import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrother;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.MetricksCalculator;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskMetrics;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksTree;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.PeopleViewMetricsCalculator;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.SprintViewMetricsCalculator;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.TasksTreeViewMetricsCalculator;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.SprintView;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksTreeView;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 import ua.dp.dryzhyryk.big.brother.data.extractor.jira.JiraDataExtractor;
@@ -57,8 +57,11 @@ public class BigBrotherConsoleApplication {
 		JiraResource jiraResource = new JiraDataExtractor(jiraRestClient);
 		JiraDataStorage jiraDataStorage = new JiraFileDataStorage(storageRoot.getPath());
 		JiraInformationHolder jiraInformationHolder = new JiraInformationHolder(jiraResource, jiraDataStorage);
-		MetricksCalculator metricksCalculator = new MetricksCalculator();
-		BigJiraBrother bigJiraBrother = new BigJiraBrother(jiraInformationHolder, metricksCalculator);
+		TasksTreeViewMetricsCalculator tasksTreeViewMetricsCalculator = new TasksTreeViewMetricsCalculator();
+		PeopleViewMetricsCalculator peopleViewMetricsCalculator = new PeopleViewMetricsCalculator();
+		SprintViewMetricsCalculator sprintViewMetricsCalculator = new SprintViewMetricsCalculator();
+		BigJiraBrother bigJiraBrother = new BigJiraBrother(jiraInformationHolder, tasksTreeViewMetricsCalculator, peopleViewMetricsCalculator,
+				sprintViewMetricsCalculator);
 
 		String serchFilePath = configDir
 				.map(path -> path + "/search.json")
@@ -66,63 +69,15 @@ public class BigBrotherConsoleApplication {
 
 		SprintSearchConditions sprintSearchConditions = loadJson(serchFilePath, SprintSearchConditions.class);
 
-		TasksTree tasksTree = bigJiraBrother.prepareTaskView(sprintSearchConditions);
+		TasksTreeView tasksTreeView = bigJiraBrother.prepareTaskView(sprintSearchConditions);
+		PeopleView peopleView = bigJiraBrother.preparePeopleView(sprintSearchConditions);
+		SprintView sprintView = bigJiraBrother.prepareSprintView(sprintSearchConditions);
 
 
 		File reportRoot = new File(configDir.orElse("./"), "../reports");
 		reportRoot.mkdirs();
 		ExcelReportGenerator reportGenerator = new ExcelReportGenerator(reportRoot.getAbsolutePath());
-		reportGenerator.generate(tasksTree);
-
-
-		List<Task> rootTasks = tasksTree.getRootTasks();
-		Map<String, TaskMetrics> taskMetricsByTaskId = tasksTree.getTaskMetricsByTaskId();
-		rootTasks.forEach(task -> {
-			System.out.println(task.getId() + " " + task.getName());
-
-			TaskMetrics taskMetric = taskMetricsByTaskId.get(task.getId());
-			System.out.println(
-					"Estimated " + convertMinutesToHour(taskMetric.getTimeMetrics().getOriginalEstimateMinutes()) +
-							" Real " + convertMinutesToHour(taskMetric.getTimeMetrics().getTimeSpentMinutes()) +
-							" Remaining " + convertMinutesToHour(taskMetric.getTimeMetrics().getRemainingEstimateMinutes()) +
-							"  TC 			==> " + taskMetric.getTimeMetrics().getTimeCoefficient());
-
-			taskMetric.getWorkLogByDay().forEach(dayWorkLog -> {
-
-				System.out.println(dayWorkLog.getWorkDate());
-				dayWorkLog.getPersonWorkLogs().forEach(personWorkLog -> {
-					System.out.println(personWorkLog.getPerson() + " " + convertMinutesToHour(personWorkLog.getMinutesSpent()));
-				});
-
-			});
-
-			task.getSubTasks().forEach(subTask -> {
-
-				TaskMetrics subMaskMetric = taskMetricsByTaskId.get(subTask.getId());
-
-				System.out.println("          " + subTask.getId() + " " + subTask.getName());
-
-				System.out.println("          " +
-						"Estimated " + convertMinutesToHour(subMaskMetric.getTimeMetrics().getOriginalEstimateMinutes()) +
-						" Real " + convertMinutesToHour(subMaskMetric.getTimeMetrics().getTimeSpentMinutes()) +
-						" Remaining " + convertMinutesToHour(subMaskMetric.getTimeMetrics().getRemainingEstimateMinutes()) +
-						"  TC 			==> " + subMaskMetric.getTimeMetrics().getTimeCoefficient());
-
-				subMaskMetric.getWorkLogByDay().forEach(dayWorkLog -> {
-
-					System.out.println("          " + dayWorkLog.getWorkDate());
-					dayWorkLog.getPersonWorkLogs().forEach(personWorkLog -> {
-						System.out
-								.println("          " + personWorkLog.getPerson() + " " + convertMinutesToHour(personWorkLog.getMinutesSpent()));
-					});
-
-				});
-
-				System.out.println("");
-			});
-			System.out.println("");
-
-		});
+		reportGenerator.generateReport(tasksTreeView, peopleView, sprintView);
 	}
 
 	private static <T> T loadJson(String serchFilePath, Class<T> clazz) {

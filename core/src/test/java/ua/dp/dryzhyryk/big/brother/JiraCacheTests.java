@@ -19,8 +19,10 @@ import ua.dp.dryzhyryk.big.brother.core.BigJiraBrother;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.MetricksCalculator;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksTree;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.PeopleViewMetricsCalculator;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.SprintViewMetricsCalculator;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.TasksTreeViewMetricsCalculator;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksTreeView;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 
@@ -37,8 +39,11 @@ class JiraCacheTests {
 	@BeforeEach
 	private void beforeEachTest() {
 		JiraInformationHolder jiraInformationHolder = new JiraInformationHolder(jiraResource, jiraDataStorage);
-		MetricksCalculator metricksCalculator = new MetricksCalculator();
-		bigJiraBrother = new BigJiraBrother(jiraInformationHolder, metricksCalculator);
+		TasksTreeViewMetricsCalculator tasksTreeViewMetricsCalculator = new TasksTreeViewMetricsCalculator();
+		PeopleViewMetricsCalculator peopleViewMetricsCalculator = new PeopleViewMetricsCalculator();
+		SprintViewMetricsCalculator sprintViewMetricsCalculator = new SprintViewMetricsCalculator();
+		bigJiraBrother = new BigJiraBrother(jiraInformationHolder, tasksTreeViewMetricsCalculator, peopleViewMetricsCalculator,
+				sprintViewMetricsCalculator);
 	}
 
 	@Test
@@ -53,11 +58,11 @@ class JiraCacheTests {
 		when(jiraResource.loadProjectSprint(Mockito.any(SprintSearchConditions.class)))
 				.thenReturn(TestDoublesForProjectSprintMega.newProjectSprintMega());
 
-		TasksTree expectedResult = TestDoublesForProjectSprintMega.newTaskViewForProjectSprintMega();
+		TasksTreeView expectedResult = TestDoublesForProjectSprintMega.newTaskViewForProjectSprintMega();
 
 		//when
-		TasksTree actualFirst = bigJiraBrother.prepareTaskView(searchConditionsFirst);
-		TasksTree actualSecond = bigJiraBrother.prepareTaskView(searchConditionsSecond);
+		TasksTreeView actualFirst = bigJiraBrother.prepareTaskView(searchConditionsFirst);
+		TasksTreeView actualSecond = bigJiraBrother.prepareTaskView(searchConditionsSecond);
 
 		//then
 		verify(jiraResource, times(1)).loadProjectSprint(searchConditionsFirst);
@@ -76,11 +81,11 @@ class JiraCacheTests {
 		when(jiraDataStorage.loadProjectSprint(Mockito.any(SprintSearchConditions.class)))
 				.thenReturn(TestDoublesForProjectSprintMega.newProjectSprintMega());
 
-		TasksTree expectedResult = TestDoublesForProjectSprintMega.newTaskViewForProjectSprintMega();
+		TasksTreeView expectedResult = TestDoublesForProjectSprintMega.newTaskViewForProjectSprintMega();
 
 		//when
-		TasksTree actualFirst = bigJiraBrother.prepareTaskView(searchConditionsFirst);
-		TasksTree actualSecond = bigJiraBrother.prepareTaskView(searchConditionsSecond);
+		TasksTreeView actualFirst = bigJiraBrother.prepareTaskView(searchConditionsFirst);
+		TasksTreeView actualSecond = bigJiraBrother.prepareTaskView(searchConditionsSecond);
 
 		//then
 		verify(jiraDataStorage, times(1)).loadProjectSprint(searchConditionsFirst);
@@ -103,10 +108,10 @@ class JiraCacheTests {
 		when(jiraResource.loadProjectSprint(Mockito.any(SprintSearchConditions.class)))
 				.thenReturn(jiraTasks);
 
-		TasksTree expectedResult = TestDoublesForProjectSprintMega.newTaskViewForProjectSprintMega();
+		TasksTreeView expectedResult = TestDoublesForProjectSprintMega.newTaskViewForProjectSprintMega();
 
 		//when
-		TasksTree actualFirst = bigJiraBrother.prepareTaskView(searchConditions);
+		TasksTreeView actualFirst = bigJiraBrother.prepareTaskView(searchConditions);
 
 		//then
 		verify(jiraDataStorage, times(1)).saveProjectSprint(searchConditions, jiraTasks);

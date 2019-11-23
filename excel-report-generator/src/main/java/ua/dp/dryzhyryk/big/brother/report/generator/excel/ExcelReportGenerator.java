@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,10 +21,14 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import lombok.extern.slf4j.Slf4j;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.WorkLogByDay;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.DayWorkLogForPerson;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.SprintView;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskLog;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskMetrics;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskTimeMetrics;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksTree;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksTreeView;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.WorkLogByDay;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.WorkLogByPerson;
 
 @Slf4j
@@ -39,13 +44,19 @@ public class ExcelReportGenerator {
 		}
 	}
 
-	public void generate(TasksTree tasksTree) {
+	public void generateReport(TasksTreeView tasksTreeView, PeopleView peopleView, SprintView sprintView) {
 		XSSFWorkbook workbook = new XSSFWorkbook();
-		XSSFSheet sheet = workbook.createSheet(String.format("%s-%s", tasksTree.getProject(), tasksTree.getSprint()));
 
-		generate(tasksTree, workbook, sheet);
+		XSSFSheet taskTreeSheet = workbook.createSheet(String.format("Task tree view", tasksTreeView.getProject(), tasksTreeView.getSprint()));
+		generateTaskTreeReport(tasksTreeView, workbook, taskTreeSheet);
 
-		File report = new File(reportRoot, String.format("[%s]-[%s].xlsx", tasksTree.getProject(), tasksTree.getSprint()));
+		XSSFSheet peopleSheet = workbook.createSheet(String.format("People view", tasksTreeView.getProject(), tasksTreeView.getSprint()));
+		generatePeopleReport(peopleView, workbook, peopleSheet);
+
+		XSSFSheet sprintSheet = workbook.createSheet(String.format("Sprint view", tasksTreeView.getProject(), tasksTreeView.getSprint()));
+		generateSprintReport(sprintView, workbook, sprintSheet);
+
+		File report = new File(reportRoot, String.format("[%s]-[%s].xlsx", tasksTreeView.getProject(), tasksTreeView.getSprint()));
 
 		try {
 			FileOutputStream outputStream = new FileOutputStream(report);
@@ -60,7 +71,7 @@ public class ExcelReportGenerator {
 		}
 	}
 
-	private void generate(TasksTree tasksTree, XSSFWorkbook workbook, XSSFSheet sheet) {
+	private void generateTaskTreeReport(TasksTreeView tasksTreeView, XSSFWorkbook workbook, XSSFSheet sheet) {
 
 		Map<Styles, CellStyle> styles = createStyles(workbook);
 
@@ -70,17 +81,17 @@ public class ExcelReportGenerator {
 		Cell cell = rowProjectName.createCell(0);
 		cell.setCellStyle(styles.get(Styles.H1));
 		cell.setCellValue("Project: ");
-		rowProjectName.createCell(1).setCellValue(tasksTree.getProject());
+		rowProjectName.createCell(1).setCellValue(tasksTreeView.getProject());
 		rowProjectName.setRowStyle(styles.get(Styles.H1));
 		rowProjectName.setHeightInPoints(25);
 
 		Row rowSprintName = sheet.createRow(rowNum.getAndIncrement());
 		rowSprintName.createCell(0).setCellValue("Sprint:");
-		rowSprintName.createCell(1).setCellValue(tasksTree.getProject());
+		rowSprintName.createCell(1).setCellValue(tasksTreeView.getProject());
 		rowSprintName.setRowStyle(styles.get(Styles.H2));
 		rowSprintName.setHeightInPoints(25);
 
-		tasksTree.getRootTasks()
+		tasksTreeView.getRootTasks()
 				.forEach(rootTask -> {
 					Row rowTaskName = sheet.createRow(rowNum.getAndIncrement());
 					rowTaskName.createCell(0).setCellValue("Task:");
@@ -89,7 +100,7 @@ public class ExcelReportGenerator {
 					rowTaskName.setRowStyle(styles.get(Styles.H3));
 					rowTaskName.setHeightInPoints(25);
 
-					TaskMetrics taskMetrics = tasksTree.getTaskMetricsByTaskId().get(rootTask.getId());
+					TaskMetrics taskMetrics = tasksTreeView.getTaskMetricsByTaskId().get(rootTask.getId());
 
 					TaskTimeMetrics timeMetrics = taskMetrics.getTimeMetrics();
 					Row rowMetricHeader = sheet.createRow(rowNum.getAndIncrement());
@@ -149,7 +160,7 @@ public class ExcelReportGenerator {
 
 								newRowSeparator(sheet, rowNum);
 
-								TaskMetrics subTaskMetrics = tasksTree.getTaskMetricsByTaskId().get(subTask.getId());
+								TaskMetrics subTaskMetrics = tasksTreeView.getTaskMetricsByTaskId().get(subTask.getId());
 
 								TaskTimeMetrics subTimeMetrics = subTaskMetrics.getTimeMetrics();
 								Row rowSubMetricHeader = sheet.createRow(rowNum.getAndIncrement());
@@ -194,7 +205,8 @@ public class ExcelReportGenerator {
 									workSubLogByDayMetrics.forEach(personWorkLog -> {
 										Row rowSubWorkLogByDayMetrics = sheet.createRow(rowNum.getAndIncrement());
 										rowSubWorkLogByDayMetrics.createCell(2).setCellValue(personWorkLog.getPerson());
-										rowSubWorkLogByDayMetrics.createCell(3).setCellValue(convertMinutesToHour(personWorkLog.getMinutesSpent()));
+										rowSubWorkLogByDayMetrics.createCell(3)
+												.setCellValue(convertMinutesToHour(personWorkLog.getMinutesSpent()));
 									});
 								}
 
@@ -203,6 +215,136 @@ public class ExcelReportGenerator {
 					newRowSeparator(sheet, rowNum);
 
 				});
+	}
+
+	private void generatePeopleReport(PeopleView peopleView, XSSFWorkbook workbook, XSSFSheet sheet) {
+		Map<Styles, CellStyle> styles = createStyles(workbook);
+
+		AtomicInteger rowNum = new AtomicInteger(0);
+
+		Row rowProjectName = sheet.createRow(rowNum.getAndIncrement());
+		Cell cell = rowProjectName.createCell(0);
+		cell.setCellStyle(styles.get(Styles.H1));
+		cell.setCellValue("Project: ");
+		rowProjectName.createCell(1).setCellValue(peopleView.getProject());
+		rowProjectName.setRowStyle(styles.get(Styles.H1));
+		rowProjectName.setHeightInPoints(25);
+
+		Row rowSprintName = sheet.createRow(rowNum.getAndIncrement());
+		rowSprintName.createCell(0).setCellValue("Sprint:");
+		rowSprintName.createCell(1).setCellValue(peopleView.getProject());
+		rowSprintName.setRowStyle(styles.get(Styles.H2));
+		rowSprintName.setHeightInPoints(25);
+
+		peopleView.getPersonMetrics()
+				.forEach(personMetric -> {
+					Row rowTaskName = sheet.createRow(rowNum.getAndIncrement());
+					rowTaskName.createCell(0).setCellValue(personMetric.getPerson());
+					rowTaskName.setRowStyle(styles.get(Styles.H3));
+					rowTaskName.setHeightInPoints(25);
+
+					List<DayWorkLogForPerson> dayWorkLogForPeople = personMetric.getDayWorkLogForPeople();
+					if (!dayWorkLogForPeople.isEmpty()) {
+
+						Row rowDailyTaskLogsHeader = sheet.createRow(rowNum.getAndIncrement());
+						rowDailyTaskLogsHeader.createCell(0).setCellValue("Day");
+						rowDailyTaskLogsHeader.createCell(1).setCellValue("Hours");
+						rowDailyTaskLogsHeader.createCell(2).setCellValue("Root task");
+						rowDailyTaskLogsHeader.createCell(3).setCellValue("Task id");
+						rowDailyTaskLogsHeader.createCell(4).setCellValue("Task Name");
+
+						dayWorkLogForPeople
+								.forEach(dayWorkLogForPerson -> {
+
+									LocalDate dayOfWork = dayWorkLogForPerson.getDayOfWork();
+									List<TaskLog> dailyTaskLogs = dayWorkLogForPerson.getDailyTaskLogs();
+
+									dailyTaskLogs.forEach(dailyTaskLog -> {
+										boolean needPrintDay = dailyTaskLogs.get(0).equals(dailyTaskLog);
+
+										Row rowDailyTaskLogMetrics = sheet.createRow(rowNum.getAndIncrement());
+										rowDailyTaskLogMetrics.createCell(0).setCellValue(needPrintDay ? dayOfWork.toString() : "");
+										rowDailyTaskLogMetrics.createCell(1)
+												.setCellValue(convertMinutesToHour(dailyTaskLog.getTimeSpentMinutes()));
+										rowDailyTaskLogMetrics.createCell(2).setCellValue(dailyTaskLog.getParentTaskId());
+										rowDailyTaskLogMetrics.createCell(3).setCellValue(dailyTaskLog.getTaskId());
+										rowDailyTaskLogMetrics.createCell(4).setCellValue(dailyTaskLog.getTaskName());
+									});
+
+								});
+					}
+
+					newRowSeparator(sheet, rowNum);
+
+					List<TaskLog> sprintTaskLogs = personMetric.getSprintTaskLogs();
+					if (!sprintTaskLogs.isEmpty()) {
+
+						Row rowsprintTaskLogsHeader = sheet.createRow(rowNum.getAndIncrement());
+						rowsprintTaskLogsHeader.createCell(0).setCellValue("Spent h");
+						rowsprintTaskLogsHeader.createCell(1).setCellValue("Original h");
+						rowsprintTaskLogsHeader.createCell(2).setCellValue("TC");
+						rowsprintTaskLogsHeader.createCell(3).setCellValue("Root task");
+						rowsprintTaskLogsHeader.createCell(4).setCellValue("Task id");
+						rowsprintTaskLogsHeader.createCell(5).setCellValue("Task Name");
+
+						sprintTaskLogs
+								.forEach(sprintTaskLog -> {
+									Row rowSprintTaskLog = sheet.createRow(rowNum.getAndIncrement());
+									rowSprintTaskLog.createCell(0).setCellValue(convertMinutesToHour(sprintTaskLog.getTimeSpentMinutes()));
+									rowSprintTaskLog.createCell(1).setCellValue(convertMinutesToHour(sprintTaskLog.getOriginalEstimateMinutes()));
+									rowSprintTaskLog.createCell(2).setCellValue(sprintTaskLog.getTimeCoefficient());
+									rowSprintTaskLog.createCell(3).setCellValue(sprintTaskLog.getParentTaskId());
+									rowSprintTaskLog.createCell(4).setCellValue(sprintTaskLog.getTaskId());
+									rowSprintTaskLog.createCell(5).setCellValue(sprintTaskLog.getTaskName());
+								});
+
+						TaskLog totalSprintTaskLog = personMetric.getTotalSprintTaskLog();
+
+						Row rowSprintTaskLogsTotal = sheet.createRow(rowNum.getAndIncrement());
+						rowSprintTaskLogsTotal.createCell(0).setCellValue(convertMinutesToHour(totalSprintTaskLog.getTimeSpentMinutes()));
+						rowSprintTaskLogsTotal.createCell(1).setCellValue(convertMinutesToHour(totalSprintTaskLog.getOriginalEstimateMinutes()));
+						rowSprintTaskLogsTotal.createCell(2).setCellValue(totalSprintTaskLog.getTimeCoefficient());
+						rowSprintTaskLogsTotal.createCell(3).setCellValue(totalSprintTaskLog.getParentTaskId());
+						rowSprintTaskLogsTotal.createCell(4).setCellValue(totalSprintTaskLog.getTaskId());
+						rowSprintTaskLogsTotal.createCell(5).setCellValue(totalSprintTaskLog.getTaskName());
+					}
+
+					newRowSeparator(sheet, rowNum);
+
+				});
+	}
+
+	private void generateSprintReport(SprintView sprintView, XSSFWorkbook workbook, XSSFSheet sheet) {
+		Map<Styles, CellStyle> styles = createStyles(workbook);
+
+		AtomicInteger rowNum = new AtomicInteger(0);
+
+		Row rowProjectName = sheet.createRow(rowNum.getAndIncrement());
+		Cell cell = rowProjectName.createCell(0);
+		cell.setCellStyle(styles.get(Styles.H1));
+		cell.setCellValue("Project: ");
+		rowProjectName.createCell(1).setCellValue(sprintView.getProject());
+		rowProjectName.setRowStyle(styles.get(Styles.H1));
+		rowProjectName.setHeightInPoints(25);
+
+		Row rowSprintName = sheet.createRow(rowNum.getAndIncrement());
+		rowSprintName.createCell(0).setCellValue("Sprint:");
+		rowSprintName.createCell(1).setCellValue(sprintView.getProject());
+		rowSprintName.setRowStyle(styles.get(Styles.H2));
+		rowSprintName.setHeightInPoints(25);
+
+		TaskTimeMetrics totalTasksTimeMetrics = sprintView.getTotalTasksTimeMetrics();
+
+		Row rowTotalTasksTimeMetricsHeader = sheet.createRow(rowNum.getAndIncrement());
+		rowTotalTasksTimeMetricsHeader.createCell(0).setCellValue("Spent h");
+		rowTotalTasksTimeMetricsHeader.createCell(1).setCellValue("Original h");
+		rowTotalTasksTimeMetricsHeader.createCell(2).setCellValue("TC");
+
+
+		Row rowSprintTaskLog = sheet.createRow(rowNum.getAndIncrement());
+		rowSprintTaskLog.createCell(0).setCellValue(convertMinutesToHour(totalTasksTimeMetrics.getTimeSpentMinutes()));
+		rowSprintTaskLog.createCell(1).setCellValue(convertMinutesToHour(totalTasksTimeMetrics.getOriginalEstimateMinutes()));
+		rowSprintTaskLog.createCell(2).setCellValue(totalTasksTimeMetrics.getTimeCoefficient());
 	}
 
 	private void newRowSeparator(XSSFSheet sheet, AtomicInteger rowNum) {
