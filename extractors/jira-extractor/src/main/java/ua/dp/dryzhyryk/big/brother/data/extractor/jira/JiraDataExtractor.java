@@ -86,7 +86,7 @@ public class JiraDataExtractor implements JiraResource {
 
         try {
             //TODO add retry on exception
-            return jiraRestClient.getIssueClient().getIssue(issueKey).get(TIMOUT_IN_SECONDS, TimeUnit.SECONDS);
+            return jiraRestClient.getIssueClient().getIssue(issueKey).get();//.get(TIMOUT_IN_SECONDS, TimeUnit.SECONDS);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

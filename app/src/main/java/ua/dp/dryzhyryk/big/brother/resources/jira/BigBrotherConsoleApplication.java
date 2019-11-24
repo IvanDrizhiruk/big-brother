@@ -36,11 +36,11 @@ public class BigBrotherConsoleApplication {
 
 	public static void main(String[] args) {
 
-		Optional<String> configDir = extract("configDir", args);
+		Optional<String> rootDir = extract("rootDir", args);
 
-		String jiraFilePath = configDir
-				.map(path -> path + "/jira.properties")
-				.orElse("jira.properties");
+		String jiraFilePath = rootDir
+				.map(path -> path + "config/jira.properties")
+				.orElse("config/jira.properties");
 
 		Properties jiraProperties = loadProperties(jiraFilePath);
 
@@ -51,7 +51,7 @@ public class BigBrotherConsoleApplication {
 		AsynchronousJiraRestClientFactory jiraRestClientFactory = new AsynchronousJiraRestClientFactory();
 		JiraRestClient jiraRestClient = jiraRestClientFactory.createWithBasicHttpAuthentication(uri, username, password);
 
-		File storageRoot = new File(configDir.orElse("./"), "../storage");
+		File storageRoot = new File(rootDir.orElse("./"), "storage");
 		storageRoot.mkdirs();
 
 		JiraResource jiraResource = new JiraDataExtractor(jiraRestClient);
@@ -63,7 +63,7 @@ public class BigBrotherConsoleApplication {
 		BigJiraBrother bigJiraBrother = new BigJiraBrother(jiraInformationHolder, tasksTreeViewMetricsCalculator, peopleViewMetricsCalculator,
 				sprintViewMetricsCalculator);
 
-		String serchFilePath = configDir
+		String serchFilePath = rootDir
 				.map(path -> path + "/search.json")
 				.orElse("search.json");
 
@@ -74,7 +74,7 @@ public class BigBrotherConsoleApplication {
 		SprintView sprintView = bigJiraBrother.prepareSprintView(sprintSearchConditions);
 
 
-		File reportRoot = new File(configDir.orElse("./"), "../reports");
+		File reportRoot = new File(rootDir.orElse("./"), "/reports");
 		reportRoot.mkdirs();
 		ExcelReportGenerator reportGenerator = new ExcelReportGenerator(reportRoot.getAbsolutePath());
 		reportGenerator.generateReport(tasksTreeView, peopleView, sprintView);
