@@ -36,7 +36,7 @@ public class JiraDataExtractor implements JiraResource {
     @Override
     public List<Task> loadProjectSprint(SprintSearchConditions sprintSearchConditions) {
 
-        String jql = String.format("project = '%s' AND sprint = '%s' AND type != Sub-task",
+        String jql = String.format("project = '%s' AND sprint = '%s' AND issuetype in standardIssueTypes()",
                 sprintSearchConditions.getProject(),
                 sprintSearchConditions.getSprint());
 
