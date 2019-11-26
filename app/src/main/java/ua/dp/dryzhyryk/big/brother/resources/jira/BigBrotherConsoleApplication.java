@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
@@ -17,7 +18,9 @@ import com.google.gson.GsonBuilder;
 
 import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrother;
+import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleView;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
+import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PersonSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.PeopleViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.SprintViewMetricsCalculator;
@@ -63,21 +66,32 @@ public class BigBrotherConsoleApplication {
 		BigJiraBrother bigJiraBrother = new BigJiraBrother(jiraInformationHolder, tasksTreeViewMetricsCalculator, peopleViewMetricsCalculator,
 				sprintViewMetricsCalculator);
 
+		BigJiraBrotherPeopleView bigJiraBrotherPeopleView = new BigJiraBrotherPeopleView(jiraInformationHolder, tasksTreeViewMetricsCalculator,
+				peopleViewMetricsCalculator, sprintViewMetricsCalculator);
+
 		String serchFilePath = rootDir
 				.map(path -> path + "/search.json")
 				.orElse("search.json");
 
 		SprintSearchConditions sprintSearchConditions = loadJson(serchFilePath, SprintSearchConditions.class);
 
-		TasksTreeView tasksTreeView = bigJiraBrother.prepareTaskView(sprintSearchConditions);
-		PeopleView peopleView = bigJiraBrother.preparePeopleView(sprintSearchConditions);
-		SprintView sprintView = bigJiraBrother.prepareSprintView(sprintSearchConditions);
-
+//		TasksTreeView tasksTreeView = bigJiraBrother.prepareTaskView(sprintSearchConditions);
+//		PeopleView peopleView = bigJiraBrother.preparePeopleView(sprintSearchConditions);
+//		SprintView sprintView = bigJiraBrother.prepareSprintView(sprintSearchConditions);
 
 		File reportRoot = new File(rootDir.orElse("./"), "/reports");
 		reportRoot.mkdirs();
 		ExcelReportGenerator reportGenerator = new ExcelReportGenerator(reportRoot.getAbsolutePath());
-		reportGenerator.generateReport(tasksTreeView, peopleView, sprintView);
+//		reportGenerator.generateReport(tasksTreeView, peopleView, sprintView);
+
+		PersonSearchConditions personSearchConditions = PersonSearchConditions.builder()
+				.personName("o_dkoval")
+				.startPeriod(LocalDate.of(2019, 11, 11))
+				.endPeriod(LocalDate.of(2019, 11, 15))
+				.build();
+
+		PeopleView peopleView2 = bigJiraBrotherPeopleView.preparePeopleView(personSearchConditions);
+		reportGenerator.generateReport(null, peopleView2, null);
 	}
 
 	private static <T> T loadJson(String serchFilePath, Class<T> clazz) {

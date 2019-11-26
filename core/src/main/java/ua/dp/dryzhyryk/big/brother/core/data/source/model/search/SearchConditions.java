@@ -5,8 +5,6 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Value;
 
-@Value
-@Builder
-public class SearchConditions {
-	private final List<SprintSearchConditions> projects;
+public interface SearchConditions {
+	SearchConditionType getSearchConditionType();
 }

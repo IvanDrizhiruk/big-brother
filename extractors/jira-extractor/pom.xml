@@ -26,6 +26,7 @@
             <artifactId>jira-rest-java-client-core</artifactId>
             <version>${jira-rest-java-client-core.version}</version>
         </dependency>
+
         <dependency>
             <groupId>io.atlassian.fugue</groupId>
             <artifactId>fugue</artifactId>

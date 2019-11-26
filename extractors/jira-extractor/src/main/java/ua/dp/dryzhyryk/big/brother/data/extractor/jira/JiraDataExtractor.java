@@ -9,13 +9,15 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.TaskWorkLog;
+import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PersonSearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -26,6 +28,7 @@ public class JiraDataExtractor implements JiraResource {
     private static final int ONE_STEP_SIZE = 5;
     private static final int TIMOUT_IN_SECONDS = 10;
     private static final long REQUEST_RETRIES_NUMBER = 3;
+    private static final DateTimeFormatter DATA_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private final JiraRestClient jiraRestClient;
 
@@ -34,13 +37,24 @@ public class JiraDataExtractor implements JiraResource {
     }
 
     @Override
-    public List<Task> loadProjectSprint(SprintSearchConditions sprintSearchConditions) {
+    public List<Task> loadTasks(SearchConditions searchConditions) {
 
+        switch(searchConditions.getSearchConditionType()) {
+            case SPRINT:
+                return getTasksForSprint((SprintSearchConditions)searchConditions);
+            case PERSON:
+                return getTasksForPerson((PersonSearchConditions)searchConditions);
+        }
+        return getTasksForSprint((SprintSearchConditions) searchConditions);
+    }
+
+
+    private List<Task> getTasksForSprint(SprintSearchConditions searchConditions) {
         String jql = String.format("project = '%s' AND sprint = '%s' AND issuetype in standardIssueTypes()",
-                sprintSearchConditions.getProject(),
-                sprintSearchConditions.getSprint());
+                searchConditions.getProject(),
+                searchConditions.getSprint());
 
-        List<Issue> rootIssues = loadRootIssues(jql);
+        List<Issue> rootIssues = loadIssues(jql);
 
         log.info("Root task has loaded {} ", rootIssues);
 
@@ -60,7 +74,25 @@ public class JiraDataExtractor implements JiraResource {
                 .collect(Collectors.toList());
     }
 
-    private List<Issue> loadRootIssues(String jql) {
+    private List<Task> getTasksForPerson(PersonSearchConditions searchConditions) {
+
+        String jql = String.format("worklogAuthor = %s AND  worklogDate >=  %s AND  worklogDate <= %s",
+                searchConditions.getPersonName(),
+                searchConditions.getStartPeriod().format(DATA_FORMATTER),
+                searchConditions.getEndPeriod().format(DATA_FORMATTER));
+
+        List<Issue>  issues = loadIssues(jql);
+
+        log.info("Root task has loaded {} ",  issues);
+
+        return  issues.stream()
+                .map(issue -> loadIssueFully(issue.getKey()))
+                .map(this::toTask)
+                .collect(Collectors.toList());
+    }
+
+
+    private List<Issue> loadIssues(String jql) {
         return Flux.<List<Issue>, Integer>generate(() -> 0, (index, sink) -> {
             //TODO add retry on exception
             SearchResult result = jiraRestClient.getSearchClient().searchJql(jql, ONE_STEP_SIZE, index, null).claim();
@@ -106,6 +138,7 @@ public class JiraDataExtractor implements JiraResource {
                 .remainingEstimateMinutes(timeTracking.getRemainingEstimateMinutes())
                 .timeSpentMinutes(timeTracking.getTimeSpentMinutes())
                 .workLogs(taskWorkLogs)
+                .subTasks(new ArrayList<>())
                 .build();
     }
 

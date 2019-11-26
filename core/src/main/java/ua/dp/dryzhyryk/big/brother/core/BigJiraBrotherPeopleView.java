@@ -6,6 +6,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
+import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PersonSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.PeopleViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.SprintViewMetricsCalculator;
@@ -18,14 +19,14 @@ import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskTimeMetrics
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksTreeView;
 
 @Slf4j
-public class BigJiraBrother {
+public class BigJiraBrotherPeopleView {
 
 	private final JiraInformationHolder jiraInformationHolder;
 	private final TasksTreeViewMetricsCalculator tasksTreeViewMetricsCalculator;
 	private final PeopleViewMetricsCalculator peopleViewMetricsCalculator;
 	private final SprintViewMetricsCalculator sprintViewMetricsCalculator;
 
-	public BigJiraBrother(
+	public BigJiraBrotherPeopleView(
 			JiraInformationHolder jiraInformationHolder,
 			TasksTreeViewMetricsCalculator tasksTreeViewMetricsCalculator,
 			PeopleViewMetricsCalculator peopleViewMetricsCalculator,
@@ -36,41 +37,19 @@ public class BigJiraBrother {
 		this.sprintViewMetricsCalculator = sprintViewMetricsCalculator;
 	}
 
-	public TasksTreeView prepareTaskView(SprintSearchConditions sprintSearchConditions) {
-		List<Task> rootTasks = jiraInformationHolder.getTasks(sprintSearchConditions);
 
-		Map<String, TaskMetrics> taskMetricsByTaskId = tasksTreeViewMetricsCalculator.calculateFor(rootTasks);
 
-		return TasksTreeView.builder()
-				.project(sprintSearchConditions.getProject())
-				.sprint(sprintSearchConditions.getSprint())
-				.rootTasks(rootTasks)
-				.taskMetricsByTaskId(taskMetricsByTaskId)
-				.build();
-	}
+	public PeopleView preparePeopleView(PersonSearchConditions personSearchConditions) {
+		List<Task> tasks = jiraInformationHolder.getTasks(personSearchConditions);
 
-	public PeopleView preparePeopleView(SprintSearchConditions sprintSearchConditions) {
-		List<Task> rootTasks = jiraInformationHolder.getTasks(sprintSearchConditions);
-
-		List<PersonMetrics> personMetrics = peopleViewMetricsCalculator.calculateFor(rootTasks);
+		List<PersonMetrics> personMetrics = peopleViewMetricsCalculator.calculateFor(tasks);
 
 		return PeopleView.builder()
-				.project(sprintSearchConditions.getProject())
-				.sprint(sprintSearchConditions.getSprint())
+				.project("person")
+				.sprint("person")
 				.personMetrics(personMetrics)
 				.build();
 	}
 
-	public SprintView prepareSprintView(SprintSearchConditions sprintSearchConditions) {
-		List<Task> rootTasks = jiraInformationHolder.getTasks(sprintSearchConditions);
 
-		TaskTimeMetrics totalTasksTimeMetrics = sprintViewMetricsCalculator.calculateFor(rootTasks);
-
-
-		return SprintView.builder()
-				.project(sprintSearchConditions.getProject())
-				.sprint(sprintSearchConditions.getSprint())
-				.totalTasksTimeMetrics(totalTasksTimeMetrics)
-				.build();
-	}
 }

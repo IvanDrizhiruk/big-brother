@@ -69,7 +69,7 @@ class JiraFileDataStorageTest {
 		//when
 		JiraFileDataStorage jiraFileDataStorage = new JiraFileDataStorage(ROOT_TEST_STORAGE_PATH);
 		jiraFileDataStorage.saveProjectSprint(sprintSearchConditions, tasksForSave);
-		List<Task> loadedTasks = jiraFileDataStorage.loadProjectSprint(sprintSearchConditions);
+		List<Task> loadedTasks = jiraFileDataStorage.loadTasks(sprintSearchConditions);
 
 		//than
 		Assertions.assertEquals(tasksForSave, loadedTasks);

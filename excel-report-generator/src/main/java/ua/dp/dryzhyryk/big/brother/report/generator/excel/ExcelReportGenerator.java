@@ -47,16 +47,23 @@ public class ExcelReportGenerator {
 	public void generateReport(TasksTreeView tasksTreeView, PeopleView peopleView, SprintView sprintView) {
 		XSSFWorkbook workbook = new XSSFWorkbook();
 
-		XSSFSheet taskTreeSheet = workbook.createSheet(String.format("Task tree view", tasksTreeView.getProject(), tasksTreeView.getSprint()));
-		generateTaskTreeReport(tasksTreeView, workbook, taskTreeSheet);
+		if (tasksTreeView != null) {
+			XSSFSheet taskTreeSheet =
+					workbook.createSheet(String.format("Task tree view"));
+			generateTaskTreeReport(tasksTreeView, workbook, taskTreeSheet);
+		}
 
-		XSSFSheet peopleSheet = workbook.createSheet(String.format("People view", tasksTreeView.getProject(), tasksTreeView.getSprint()));
-		generatePeopleReport(peopleView, workbook, peopleSheet);
+		if (peopleView != null) {
+			XSSFSheet peopleSheet = workbook.createSheet(String.format("People view"));
+			generatePeopleReport(peopleView, workbook, peopleSheet);
+		}
 
-		XSSFSheet sprintSheet = workbook.createSheet(String.format("Sprint view", tasksTreeView.getProject(), tasksTreeView.getSprint()));
-		generateSprintReport(sprintView, workbook, sprintSheet);
+		if (sprintView != null) {
+			XSSFSheet sprintSheet = workbook.createSheet(String.format("Sprint view"));
+			generateSprintReport(sprintView, workbook, sprintSheet);
+		}
 
-		File report = new File(reportRoot, String.format("[%s]-[%s].xlsx", tasksTreeView.getProject(), tasksTreeView.getSprint()));
+		File report = new File(reportRoot, String.format("[%s]-[%s].xlsx", peopleView.getProject(), peopleView.getSprint()));
 
 		try {
 			FileOutputStream outputStream = new FileOutputStream(report);
@@ -291,7 +298,8 @@ public class ExcelReportGenerator {
 								.forEach(sprintTaskLog -> {
 									Row rowSprintTaskLog = sheet.createRow(rowNum.getAndIncrement());
 									rowSprintTaskLog.createCell(0).setCellValue(convertMinutesToHour(sprintTaskLog.getTimeSpentMinutes()));
-									rowSprintTaskLog.createCell(1).setCellValue(convertMinutesToHour(sprintTaskLog.getOriginalEstimateMinutes()));
+									rowSprintTaskLog.createCell(1)
+											.setCellValue(convertMinutesToHour(sprintTaskLog.getOriginalEstimateMinutes()));
 									rowSprintTaskLog.createCell(2).setCellValue(sprintTaskLog.getTimeCoefficient());
 									rowSprintTaskLog.createCell(3).setCellValue(sprintTaskLog.getParentTaskId());
 									rowSprintTaskLog.createCell(4).setCellValue(sprintTaskLog.getTaskId());
@@ -339,7 +347,6 @@ public class ExcelReportGenerator {
 		rowTotalTasksTimeMetricsHeader.createCell(0).setCellValue("Spent h");
 		rowTotalTasksTimeMetricsHeader.createCell(1).setCellValue("Original h");
 		rowTotalTasksTimeMetricsHeader.createCell(2).setCellValue("TC");
-
 
 		Row rowSprintTaskLog = sheet.createRow(rowNum.getAndIncrement());
 		rowSprintTaskLog.createCell(0).setCellValue(convertMinutesToHour(totalTasksTimeMetrics.getTimeSpentMinutes()));

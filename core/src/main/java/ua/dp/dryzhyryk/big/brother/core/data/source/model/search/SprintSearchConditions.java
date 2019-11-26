@@ -6,9 +6,15 @@ import lombok.Value;
 
 @Value
 @Builder(toBuilder = true)
-public class SprintSearchConditions {
-    @NonNull
-    private final String project;
-    @NonNull
-    private final String sprint;
+public class SprintSearchConditions implements SearchConditions {
+
+	@NonNull
+	private final String project;
+	@NonNull
+	private final String sprint;
+
+	@Override
+	public SearchConditionType getSearchConditionType() {
+		return SearchConditionType.SPRINT;
+	}
 }
