@@ -45,7 +45,9 @@ public class JiraDataExtractor implements JiraResource {
             case PERSON:
                 return getTasksForPerson((PersonSearchConditions)searchConditions);
         }
-        return getTasksForSprint((SprintSearchConditions) searchConditions);
+
+        throw new IllegalArgumentException(
+                "Unable to load tasks. Unsupported search type " + searchConditions.getSearchConditionType());
     }
 
 

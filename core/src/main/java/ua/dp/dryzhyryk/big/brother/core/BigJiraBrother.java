@@ -1,8 +1,5 @@
 package ua.dp.dryzhyryk.big.brother.core;
 
-import java.util.List;
-import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
@@ -10,12 +7,13 @@ import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchCon
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.PeopleViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.SprintViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.TasksTreeViewMetricsCalculator;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PersonMetrics;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.SprintView;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskMetrics;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskTimeMetrics;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksTreeView;
+
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class BigJiraBrother {
@@ -46,18 +44,6 @@ public class BigJiraBrother {
 				.sprint(sprintSearchConditions.getSprint())
 				.rootTasks(rootTasks)
 				.taskMetricsByTaskId(taskMetricsByTaskId)
-				.build();
-	}
-
-	public PeopleView preparePeopleView(SprintSearchConditions sprintSearchConditions) {
-		List<Task> rootTasks = jiraInformationHolder.getTasks(sprintSearchConditions);
-
-		List<PersonMetrics> personMetrics = peopleViewMetricsCalculator.calculateFor(rootTasks);
-
-		return PeopleView.builder()
-				.project(sprintSearchConditions.getProject())
-				.sprint(sprintSearchConditions.getSprint())
-				.personMetrics(personMetrics)
 				.build();
 	}
 

@@ -12,5 +12,5 @@ public class DayWorkLogForPerson {
 
 	private final LocalDate dayOfWork;
 
-	private final List<TaskLog> dailyTaskLogs;
+	private final List<TaskWorkingLogMetrics> dailyTaskLogs;
 }

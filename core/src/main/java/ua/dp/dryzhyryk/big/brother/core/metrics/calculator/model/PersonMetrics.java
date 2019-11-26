@@ -11,8 +11,6 @@ public class PersonMetrics {
 
 	private final String person;
 
-	List<DayWorkLogForPerson> dayWorkLogForPeople;
-
-	private final List<TaskLog> sprintTaskLogs;
-	private final TaskLog totalSprintTaskLog;
+	private final List<TaskWorkingLogMetrics> dailyTaskLogs;
+	private final List<TimeSpentByDay> totalTimeSpentByDay;
 }

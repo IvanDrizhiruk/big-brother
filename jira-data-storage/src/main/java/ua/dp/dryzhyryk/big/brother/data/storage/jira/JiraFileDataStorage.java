@@ -80,7 +80,8 @@ public class JiraFileDataStorage implements JiraDataStorage {
 				return toFileName((PersonSearchConditions) searchConditions);
 		}
 
-		throw new IllegalArgumentException("Unsupported search type " + searchConditions.getSearchConditionType());
+		throw new IllegalArgumentException(
+				"Unable to prepare filename. Unsupported search type " + searchConditions.getSearchConditionType());
 	}
 
 	private String toFileName(SprintSearchConditions searchConditions) {

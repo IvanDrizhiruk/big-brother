@@ -5,13 +5,16 @@ import lombok.NonNull;
 import lombok.Value;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Value
 @Builder(toBuilder = true)
-public class PersonSearchConditions implements SearchConditions {
+public class PeopleSearchConditions implements SearchConditions {
 
     @NonNull
-    private final String personName;
+    private final String teamName;
+    @NonNull
+    private final List<String> peopleNames;
     @NonNull
     private final LocalDate startPeriod;
     @NonNull
@@ -19,6 +22,6 @@ public class PersonSearchConditions implements SearchConditions {
 
     @Override
     public SearchConditionType getSearchConditionType() {
-        return SearchConditionType.PERSON;
+        return SearchConditionType.PEOPLE;
     }
 }
