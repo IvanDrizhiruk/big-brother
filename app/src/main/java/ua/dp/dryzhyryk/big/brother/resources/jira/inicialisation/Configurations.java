@@ -1,4 +1,4 @@
-package ua.dp.dryzhyryk.big.brother.resources.jira;
+package ua.dp.dryzhyryk.big.brother.resources.jira.inicialisation;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -63,11 +63,6 @@ public class Configurations {
 	private static Properties loadProperties(String fileName) {
 		try (InputStream input = new FileInputStream(fileName)) {
 
-			if (input == null) {
-				log.error("Sorry, unable to find {}", fileName);
-				throw new IllegalArgumentException("Sorry, unable to find " + fileName);
-			}
-
 			Properties prop = new Properties();
 			prop.load(input);
 
@@ -75,7 +70,7 @@ public class Configurations {
 
 		}
 		catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new IllegalArgumentException("Sorry, unable to find " + fileName, e);
 		}
 	}
 }

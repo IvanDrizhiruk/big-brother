@@ -65,10 +65,7 @@ public class JiraFileDataStorage implements JiraDataStorage {
 			return gson.fromJson(reader, type);
 		}
 		catch (IOException e) {
-			String errorMessage = "Unable to load data for " + searchConditions.toString();
-			log.error(errorMessage, e);
-
-			throw new IllegalArgumentException(errorMessage, e);
+			throw new IllegalArgumentException("Unable to load data for " + searchConditions.toString(), e);
 		}
 	}
 

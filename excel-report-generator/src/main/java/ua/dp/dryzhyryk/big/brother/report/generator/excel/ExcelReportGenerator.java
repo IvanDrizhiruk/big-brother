@@ -64,12 +64,12 @@ public class ExcelReportGenerator {
 		File reportFile = new File(reportRoot, reportFileName);
 
 		try (FileOutputStream outputStream = new FileOutputStream(reportFile)) {
-			;
+
 			workbook.write(outputStream);
 			workbook.close();
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			throw new IllegalArgumentException("Unable to generate report", e);
 		}
 	}
 
@@ -88,7 +88,7 @@ public class ExcelReportGenerator {
 			workbook.close();
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			throw new IllegalArgumentException("Unable to generate report", e);
 		}
 	}
 

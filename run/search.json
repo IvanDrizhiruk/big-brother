@@ -1,0 +1,22 @@
+{
+  "_peopleSearchConditions": [
+    {
+      "teamName": "Ducks",
+      "peopleNames": [
+        "o_dkoval",
+        "o_ssolov",
+        "o_okolom",
+        "o_ystepa",
+        "o_izhytn"
+      ],
+      "beginOfTheTime": "2019-11-11",
+      "periodDurationInDays": 7
+    }
+  ],
+  "sprintSearchConditions": [
+    {
+      "project": "Mega-project",
+      "sprint": "Mega-sprint"
+    }
+  ]
+}
