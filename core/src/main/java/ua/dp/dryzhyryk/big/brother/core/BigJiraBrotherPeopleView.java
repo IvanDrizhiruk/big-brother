@@ -37,7 +37,7 @@ public class BigJiraBrotherPeopleView {
                 .map(jiraInformationHolder::getTasks)
                 .flatMap(List::stream)
                 .distinct()
-                .collect(Collectors.toList())
+                .collect(Collectors.toList());
 
         List<PersonMetrics> personMetrics = peopleViewMetricsCalculator.calculateFor(tasks);
 

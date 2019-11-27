@@ -61,8 +61,7 @@ public class BigBrotherConsoleApplication {
         BigJiraBrother bigJiraBrother = new BigJiraBrother(jiraInformationHolder, tasksTreeViewMetricsCalculator, peopleViewMetricsCalculator,
                 sprintViewMetricsCalculator);
 
-        BigJiraBrotherPeopleView bigJiraBrotherPeopleView = new BigJiraBrotherPeopleView(jiraInformationHolder, tasksTreeViewMetricsCalculator,
-                peopleViewMetricsCalculator, sprintViewMetricsCalculator);
+        BigJiraBrotherPeopleView bigJiraBrotherPeopleView = new BigJiraBrotherPeopleView(jiraInformationHolder, peopleViewMetricsCalculator);
 
         String serchFilePath = rootDir
                 .map(path -> path + "/search.json")
@@ -80,7 +79,7 @@ public class BigBrotherConsoleApplication {
 
         PeopleSearchConditions peopleSearchConditions = PeopleSearchConditions.builder()
                 .teamName("Ducks")
-                .peopleNames(Arrays.asList("o_dkoval","o_ssolov", "o_okolom"))
+                .peopleNames(Arrays.asList("o_dkoval","o_ssolov", "o_okolom", "o_ystepa", "o_izhytn"))
                 .startPeriod(LocalDate.of(2019, 11, 11))
                 .endPeriod(LocalDate.of(2019, 11, 15))
                 .build();

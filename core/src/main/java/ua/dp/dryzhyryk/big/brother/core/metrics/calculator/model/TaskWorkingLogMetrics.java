@@ -14,6 +14,9 @@ public class TaskWorkingLogMetrics {
 
 	private final List<TimeSpentByDay> timeSpentByDays;
 
+	//TODO
+	private final int timeSpentInCurrentPeriodInMinutes;
+
 	private final int timeSpentMinutes;
 	private final int originalEstimateMinutes;
 
