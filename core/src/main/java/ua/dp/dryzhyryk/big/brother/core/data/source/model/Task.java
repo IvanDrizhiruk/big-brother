@@ -11,6 +11,9 @@ public class Task {
 
     private final String id;
     private final String name;
+    private final String status;
+    private final String type;
+    private final boolean isSubTask;
 
     private final Integer originalEstimateMinutes;
     private final Integer remainingEstimateMinutes;

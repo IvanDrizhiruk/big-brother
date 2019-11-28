@@ -112,6 +112,7 @@ public class PeopleViewMetricsCalculator {
 		return TaskWorkingLogMetrics.builder()
 				.taskId(task.getId())
 				.taskName(task.getName())
+				.taskExternalStatus(task.getStatus())
 				.timeSpentByDays(timeSpentByDays)
 				.totalTimeSpentByDaysInMinutes(totalTimeSpentByDaysInMinutes)
 				.timeSpentMinutes(minutesSpent)

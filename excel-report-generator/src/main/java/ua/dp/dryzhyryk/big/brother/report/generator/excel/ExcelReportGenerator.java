@@ -323,8 +323,9 @@ public class ExcelReportGenerator {
 						rowTaskLogsHeader.createCell(1).setCellValue("Estimated");
 						rowTaskLogsHeader.createCell(2).setCellValue("TC");
 						rowTaskLogsHeader.createCell(3).setCellValue("-");
-						rowTaskLogsHeader.createCell(4).setCellValue("Task id");
-						rowTaskLogsHeader.createCell(5).setCellValue("Task name");
+						rowTaskLogsHeader.createCell(4).setCellValue("Status");
+						rowTaskLogsHeader.createCell(5).setCellValue("Task id");
+						rowTaskLogsHeader.createCell(6).setCellValue("Task name");
 						dailyTaskLogs
 								.forEach(dailyTaskLog -> {
 
@@ -334,8 +335,9 @@ public class ExcelReportGenerator {
 											.setCellValue(convertMinutesToHour(dailyTaskLog.getOriginalEstimateMinutes()));
 									rowDailyTaskLogMetrics.createCell(2).setCellValue(dailyTaskLog.getTimeCoefficient());
 									rowDailyTaskLogMetrics.createCell(3).setCellValue("-");
-									rowDailyTaskLogMetrics.createCell(4).setCellValue(dailyTaskLog.getTaskId());
-									rowDailyTaskLogMetrics.createCell(5).setCellValue(dailyTaskLog.getTaskName());
+									rowDailyTaskLogMetrics.createCell(4).setCellValue(dailyTaskLog.getTaskExternalStatus());
+									rowDailyTaskLogMetrics.createCell(5).setCellValue(dailyTaskLog.getTaskId());
+									rowDailyTaskLogMetrics.createCell(6).setCellValue(dailyTaskLog.getTaskName());
 								});
 					}
 
