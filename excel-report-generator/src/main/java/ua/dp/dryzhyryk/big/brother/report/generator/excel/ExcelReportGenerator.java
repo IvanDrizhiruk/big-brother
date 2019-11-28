@@ -268,53 +268,75 @@ public class ExcelReportGenerator {
 
 					List<TaskWorkingLogMetrics> dailyTaskLogs = personMetric.getDailyTaskLogs();
 					if (!dailyTaskLogs.isEmpty()) {
-
 						AtomicInteger cellHeaderCount = new AtomicInteger();
 						Row rowDailyTaskLogsHeader = sheet.createRow(rowNum.getAndIncrement());
 						days.forEach(day -> {
 							rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue(day.toString());
 
 						});
-
-						rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue("Real");
-						rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue("Estimated");
-						rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue("TC");
+						rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue("Total");
+						rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue("-");
 						rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue("Task id");
 						rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue("Task name");
 
 						dailyTaskLogs
 								.forEach(dailyTaskLog -> {
 
-                                    Row rowDailyTaskLogMetrics = sheet.createRow(rowNum.getAndIncrement());
+									Row rowDailyTaskLogMetrics = sheet.createRow(rowNum.getAndIncrement());
 
 									Map<LocalDate, Integer> timeSpentByDays = dailyTaskLog.getTimeSpentByDays().stream()
 											.collect(Collectors.toMap(TimeSpentByDay::getDay, TimeSpentByDay::getTimeSpentMinutes));
 
-                                    AtomicInteger cellCount = new AtomicInteger();
+									AtomicInteger cellCount = new AtomicInteger();
 									days.forEach(day -> {
 										rowDailyTaskLogMetrics.createCell(cellCount.getAndIncrement())
 												.setCellValue(safeGetIntAsString(timeSpentByDays, day));
 
 									});
 
-                                    rowDailyTaskLogMetrics.createCell(cellCount.getAndIncrement()).setCellValue(convertMinutesToHour(dailyTaskLog.getTimeSpentMinutes()));
-                                    rowDailyTaskLogMetrics.createCell(cellCount.getAndIncrement()).setCellValue(convertMinutesToHour(dailyTaskLog.getOriginalEstimateMinutes()));
-                                    rowDailyTaskLogMetrics.createCell(cellCount.getAndIncrement()).setCellValue(dailyTaskLog.getTimeCoefficient());
+									rowDailyTaskLogMetrics.createCell(cellCount.getAndIncrement()).setCellValue(
+											convertMinutesToHour(dailyTaskLog.getTotalTimeSpentByDaysInMinutes()));
+									rowDailyTaskLogMetrics.createCell(cellCount.getAndIncrement()).setCellValue("-");
 
-                                    rowDailyTaskLogMetrics.createCell(cellCount.getAndIncrement()).setCellValue(dailyTaskLog.getTaskId());
-                                    rowDailyTaskLogMetrics.createCell(cellCount.getAndIncrement()).setCellValue(dailyTaskLog.getTaskName());
+									rowDailyTaskLogMetrics.createCell(cellCount.getAndIncrement()).setCellValue(dailyTaskLog.getTaskId());
+									rowDailyTaskLogMetrics.createCell(cellCount.getAndIncrement()).setCellValue(dailyTaskLog.getTaskName());
 								});
 
-                        AtomicInteger cellTotalCount = new AtomicInteger();
-                        Row rowTotalDailyTaskLogs = sheet.createRow(rowNum.getAndIncrement());
+						AtomicInteger cellTotalCount = new AtomicInteger();
+						Row rowTotalDailyTaskLogs = sheet.createRow(rowNum.getAndIncrement());
 
-                        Map<LocalDate, Integer> totalTimeSpentByDay = personMetric.getTotalTimeSpentByDay().stream()
-                                .collect(Collectors.toMap(TimeSpentByDay::getDay, TimeSpentByDay::getTimeSpentMinutes));
+						Map<LocalDate, Integer> totalTimeSpentByDay = personMetric.getTotalTimeSpentByDay().stream()
+								.collect(Collectors.toMap(TimeSpentByDay::getDay, TimeSpentByDay::getTimeSpentMinutes));
 
-                        days.forEach(day -> {
-                            rowTotalDailyTaskLogs.createCell(cellTotalCount.getAndIncrement()).setCellValue(
-									safeGetIntAsString(totalTimeSpentByDay,day));
-                        });
+						days.forEach(day -> {
+							rowTotalDailyTaskLogs.createCell(cellTotalCount.getAndIncrement()).setCellValue(
+									safeGetIntAsString(totalTimeSpentByDay, day));
+						});
+						rowTotalDailyTaskLogs.createCell(cellTotalCount.getAndIncrement()).setCellValue(
+								convertMinutesToHour(personMetric.getTotalTimeSpentInCurrentPeriodInMinutes()));
+
+
+						newRowSeparator(sheet, rowNum);
+
+						Row rowTaskLogsHeader = sheet.createRow(rowNum.getAndIncrement());
+						rowTaskLogsHeader.createCell(0).setCellValue("Real");
+						rowTaskLogsHeader.createCell(1).setCellValue("Estimated");
+						rowTaskLogsHeader.createCell(2).setCellValue("TC");
+						rowTaskLogsHeader.createCell(3).setCellValue("-");
+						rowTaskLogsHeader.createCell(4).setCellValue("Task id");
+						rowTaskLogsHeader.createCell(5).setCellValue("Task name");
+						dailyTaskLogs
+								.forEach(dailyTaskLog -> {
+
+									Row rowDailyTaskLogMetrics = sheet.createRow(rowNum.getAndIncrement());
+									rowDailyTaskLogMetrics.createCell(0).setCellValue(convertMinutesToHour(dailyTaskLog.getTimeSpentMinutes()));
+									rowDailyTaskLogMetrics.createCell(1)
+											.setCellValue(convertMinutesToHour(dailyTaskLog.getOriginalEstimateMinutes()));
+									rowDailyTaskLogMetrics.createCell(2).setCellValue(dailyTaskLog.getTimeCoefficient());
+									rowDailyTaskLogMetrics.createCell(3).setCellValue("-");
+									rowDailyTaskLogMetrics.createCell(4).setCellValue(dailyTaskLog.getTaskId());
+									rowDailyTaskLogMetrics.createCell(5).setCellValue(dailyTaskLog.getTaskName());
+								});
 					}
 
 					newRowSeparator(sheet, rowNum);
@@ -332,7 +354,7 @@ public class ExcelReportGenerator {
 
 	public static List<LocalDate> getDatesBetween(LocalDate startDate, LocalDate endDate) {
 
-		long numOfDaysBetween = ChronoUnit.DAYS.between(startDate, endDate) + 1;
+		long numOfDaysBetween = ChronoUnit.DAYS.between(startDate, endDate);
 		return IntStream.iterate(0, i -> i + 1)
 				.limit(numOfDaysBetween)
 				.mapToObj(i -> startDate.plusDays(i))

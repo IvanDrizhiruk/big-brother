@@ -52,7 +52,7 @@ public class ReportByPersonProcessor {
 
     private static List<LocalDate> getDatesToNow(LocalDate beginOfTheTime, int periodDurationInDays) {
 
-        long numOfDaysBetween = ChronoUnit.DAYS.between(beginOfTheTime, LocalDate.now());
+        long numOfDaysBetween = ChronoUnit.DAYS.between(beginOfTheTime, LocalDate.now()) / periodDurationInDays;
         return IntStream.iterate(0, i -> i + periodDurationInDays)
                 .limit(numOfDaysBetween)
                 .mapToObj(beginOfTheTime::plusDays)

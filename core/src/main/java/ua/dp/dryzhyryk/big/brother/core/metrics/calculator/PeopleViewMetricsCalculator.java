@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.TaskWorkLog;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.DayWorkLogForPerson;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PersonMetrics;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskWorkingLogMetrics;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TimeSpentByDay;
@@ -21,7 +20,6 @@ import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TimeSpentByDay;
 public class PeopleViewMetricsCalculator {
 
 	public List<PersonMetrics> calculateFor(List<Task> tasks) {
-
 
 		Map<String, PersonMetrics> personMetricsByUser = tasks.stream()
 				.flatMap(this::toPersonMetrics)
@@ -49,35 +47,18 @@ public class PeopleViewMetricsCalculator {
 				.map(entry -> {
 					TaskWorkingLogMetrics dailyTaskLogs = toTaskWorkingLogMetrics(entry.getValue(), task);
 					List<TimeSpentByDay> totalTimeSpentByDay = dailyTaskLogs.getTimeSpentByDays();
+					int totalTimeSpentInCurrentPeriodInMinutes = totalTimeSpentByDay
+							.stream()
+							.mapToInt(TimeSpentByDay::getTimeSpentMinutes)
+							.sum();
 
 					return PersonMetrics.builder()
 							.person(entry.getKey())
 							.dailyTaskLogs(Collections.singletonList(dailyTaskLogs))
 							.totalTimeSpentByDay(totalTimeSpentByDay)
+							.totalTimeSpentInCurrentPeriodInMinutes(totalTimeSpentInCurrentPeriodInMinutes)
 							.build();
 				});
-	}
-
-	private List<DayWorkLogForPerson> toDayWorkLogForPeople(Map<LocalDate, Integer> spentMinutesForDay, Task rootTask, Task task) {
-		String parentTaskId = Optional.ofNullable(rootTask)
-				.map(Task::getId)
-				.orElse(task.getId());
-
-		return spentMinutesForDay.entrySet().stream()
-				.map(entry -> {
-					List<TaskWorkingLogMetrics> dailyTaskLogs = new ArrayList<>();
-					dailyTaskLogs.add(TaskWorkingLogMetrics.builder()
-							.timeSpentMinutes(entry.getValue())
-							.taskId(task.getId())
-							.taskName(task.getName())
-							.build());
-
-					return DayWorkLogForPerson.builder()
-							.dayOfWork(entry.getKey())
-							.dailyTaskLogs(dailyTaskLogs)
-							.build();
-				})
-				.collect(Collectors.toList());
 	}
 
 	private PersonMetrics mergePersonMetricsForOnePerson(PersonMetrics x, PersonMetrics y) {
@@ -94,9 +75,13 @@ public class PeopleViewMetricsCalculator {
 								.timeSpentMinutes(a.getTimeSpentMinutes() + b.getTimeSpentMinutes())
 								.build())).values();
 
+		int totalTimeSpentInCurrentPeriodInMinutes =
+				x.getTotalTimeSpentInCurrentPeriodInMinutes() + y.getTotalTimeSpentInCurrentPeriodInMinutes();
+
 		return x.toBuilder()
 				.dailyTaskLogs(dailyTaskLogs)
 				.totalTimeSpentByDay(new ArrayList<>(totalTimeSpentByDay))
+				.totalTimeSpentInCurrentPeriodInMinutes(totalTimeSpentInCurrentPeriodInMinutes)
 				.build();
 	}
 
@@ -119,10 +104,16 @@ public class PeopleViewMetricsCalculator {
 						.build())
 				.collect(Collectors.toList());
 
+		int totalTimeSpentByDaysInMinutes = timeSpentByDays
+				.stream()
+				.mapToInt(TimeSpentByDay::getTimeSpentMinutes)
+				.sum();
+
 		return TaskWorkingLogMetrics.builder()
 				.taskId(task.getId())
 				.taskName(task.getName())
 				.timeSpentByDays(timeSpentByDays)
+				.totalTimeSpentByDaysInMinutes(totalTimeSpentByDaysInMinutes)
 				.timeSpentMinutes(minutesSpent)
 				.originalEstimateMinutes(originalEstimateMinutes)
 				.timeCoefficient(timeCoefficient)
