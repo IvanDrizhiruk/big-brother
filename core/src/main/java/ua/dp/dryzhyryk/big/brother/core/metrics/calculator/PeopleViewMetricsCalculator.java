@@ -57,7 +57,7 @@ public class PeopleViewMetricsCalculator {
 							.dailyTaskLogs(Collections.singletonList(dailyTaskLogs))
 							.totalTimeSpentByDay(totalTimeSpentByDay)
 							//TODO
-//							.totalTimeSpentInCurrentPeriodInMinutes()
+							//.totalTimeSpentInCurrentPeriodInMinutes()
 							.totalTimeSpentOnTaskInMinutes(totalTimeSpentInCurrentPeriodInMinutes)
 							.build();
 				});
