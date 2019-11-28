@@ -14,10 +14,15 @@ import java.util.stream.IntStream;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.ClientAnchor;
+import org.apache.poi.ss.usermodel.Comment;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Drawing;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -337,13 +342,34 @@ public class ExcelReportGenerator {
 									rowDailyTaskLogMetrics.createCell(3).setCellValue("-");
 									rowDailyTaskLogMetrics.createCell(4).setCellValue(dailyTaskLog.getTaskExternalStatus());
 									rowDailyTaskLogMetrics.createCell(5).setCellValue(dailyTaskLog.getTaskId());
-									rowDailyTaskLogMetrics.createCell(6).setCellValue(dailyTaskLog.getTaskName());
+									Cell cell1 = rowDailyTaskLogMetrics.createCell(6);
+									cell1.setCellValue(dailyTaskLog.getTaskName());
+									addComment(workbook, sheet, cell1, "the author", "content of comment");
 								});
 					}
 
 					newRowSeparator(sheet, rowNum);
 
 				});
+	}
+
+	public void addComment(Workbook workbook, Sheet sheet, Cell cell, String author, String commentText) {
+		CreationHelper factory = workbook.getCreationHelper();
+		//get an existing cell or create it otherwise:
+		ClientAnchor anchor = factory.createClientAnchor();
+		//i found it useful to show the comment box at the bottom right corner
+		anchor.setCol1(cell.getColumnIndex() + 1); //the box of the comment starts at this given column...
+		anchor.setCol2(cell.getColumnIndex() + 3); //...and ends at that given column
+		anchor.setRow1(cell.getRowIndex() + 1); //one row below the cell...
+		anchor.setRow2(cell.getRowIndex() + 5); //...and 4 rows high
+
+		Drawing drawing = sheet.createDrawingPatriarch();
+		Comment comment = drawing.createCellComment(anchor);
+		//set the comment text and author
+		comment.setString(factory.createRichTextString(commentText));
+		comment.setAuthor(author);
+
+		cell.setCellComment(comment);
 	}
 
 	private String safeGetIntAsString(Map<LocalDate, Integer> timeSpentByDays, LocalDate day) {
