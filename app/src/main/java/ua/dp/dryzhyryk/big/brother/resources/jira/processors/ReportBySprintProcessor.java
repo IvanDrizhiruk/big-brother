@@ -3,6 +3,7 @@ package ua.dp.dryzhyryk.big.brother.resources.jira.processors;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrother;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.SprintView;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksRootView;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksTreeView;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
 import ua.dp.dryzhyryk.big.brother.resources.jira.search.SprintSearchRequest;
@@ -26,9 +27,10 @@ public class ReportBySprintProcessor {
         sprintSearchRequest.stream()
                 .map(this::toSprintSearchConditions)
                 .forEach(condition -> {
-                    TasksTreeView tasksTreeView = bigJiraBrother.prepareTaskView(condition);
+                    TasksTreeView tasksTreeView = bigJiraBrother.prepareTasksTreeView(condition);
                     SprintView sprintView = bigJiraBrother.prepareSprintView(condition);
-                    reportGenerator.generateReport(tasksTreeView, sprintView);
+                    TasksRootView tasksRootView = bigJiraBrother.prepareTasksRootView(condition);
+                    reportGenerator.generateReport(tasksTreeView, sprintView, tasksRootView);
                 });
     }
 

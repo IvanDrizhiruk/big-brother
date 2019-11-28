@@ -56,7 +56,9 @@ public class PeopleViewMetricsCalculator {
 							.person(entry.getKey())
 							.dailyTaskLogs(Collections.singletonList(dailyTaskLogs))
 							.totalTimeSpentByDay(totalTimeSpentByDay)
-							.totalTimeSpentInCurrentPeriodInMinutes(totalTimeSpentInCurrentPeriodInMinutes)
+							//TODO
+//							.totalTimeSpentInCurrentPeriodInMinutes()
+							.totalTimeSpentOnTaskInMinutes(totalTimeSpentInCurrentPeriodInMinutes)
 							.build();
 				});
 	}
@@ -76,12 +78,12 @@ public class PeopleViewMetricsCalculator {
 								.build())).values();
 
 		int totalTimeSpentInCurrentPeriodInMinutes =
-				x.getTotalTimeSpentInCurrentPeriodInMinutes() + y.getTotalTimeSpentInCurrentPeriodInMinutes();
+				x.getTotalTimeSpentOnTaskInMinutes() + y.getTotalTimeSpentOnTaskInMinutes();
 
 		return x.toBuilder()
 				.dailyTaskLogs(dailyTaskLogs)
 				.totalTimeSpentByDay(new ArrayList<>(totalTimeSpentByDay))
-				.totalTimeSpentInCurrentPeriodInMinutes(totalTimeSpentInCurrentPeriodInMinutes)
+				.totalTimeSpentOnTaskInMinutes(totalTimeSpentInCurrentPeriodInMinutes)
 				.build();
 	}
 
@@ -104,7 +106,7 @@ public class PeopleViewMetricsCalculator {
 						.build())
 				.collect(Collectors.toList());
 
-		int totalTimeSpentByDaysInMinutes = timeSpentByDays
+		int totalTimeSpentOnTaskInMinutes = timeSpentByDays
 				.stream()
 				.mapToInt(TimeSpentByDay::getTimeSpentMinutes)
 				.sum();
@@ -114,7 +116,9 @@ public class PeopleViewMetricsCalculator {
 				.taskName(task.getName())
 				.taskExternalStatus(task.getStatus())
 				.timeSpentByDays(timeSpentByDays)
-				.totalTimeSpentByDaysInMinutes(totalTimeSpentByDaysInMinutes)
+				//TODO
+				//.totalTimeSpentByPeriodInMinutes()
+				.totalTimeSpentOnTaskInMinutes(totalTimeSpentOnTaskInMinutes)
 				.timeSpentMinutes(minutesSpent)
 				.originalEstimateMinutes(originalEstimateMinutes)
 				.timeCoefficient(timeCoefficient)
