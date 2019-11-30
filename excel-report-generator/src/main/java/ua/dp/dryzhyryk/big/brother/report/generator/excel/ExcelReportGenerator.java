@@ -5,10 +5,14 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.*;
+import ua.dp.dryzhyryk.big.brother.core.utils.TimeUtils;
+import ua.dp.dryzhyryk.big.brother.core.validator.ReportByPersonValidator;
+import ua.dp.dryzhyryk.big.brother.core.validator.model.ValidationInformation;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -22,9 +26,11 @@ import java.util.stream.IntStream;
 public class ExcelReportGenerator {
 
     private final File reportRoot;
+    private ReportByPersonValidator reportValidator;
 
-    public ExcelReportGenerator(String reportRoot) {
+    public ExcelReportGenerator(String reportRoot, ReportByPersonValidator reportByPersonValidator) {
         this.reportRoot = new File(reportRoot);
+        this.reportValidator = reportByPersonValidator;
 
         if (!this.reportRoot.isDirectory()) {
             throw new IllegalArgumentException("Report root directory does not exist. Path: " + reportRoot);
@@ -62,7 +68,7 @@ public class ExcelReportGenerator {
         }
     }
 
-    public void generateReport(PeopleView peopleView) {
+    public void generatePeopleReport(PeopleView peopleView) {
         XSSFWorkbook workbook = new XSSFWorkbook();
 
         XSSFSheet peopleSheet = workbook.createSheet(String.format("People view"));
@@ -304,11 +310,22 @@ public class ExcelReportGenerator {
 
                     List<TaskWorkingLogMetrics> dailyTaskLogs = personMetric.getDailyTaskLogs();
                     if (!dailyTaskLogs.isEmpty()) {
+
+                        Map<LocalDate, Integer> totalTimeSpentByDay = personMetric.getTotalTimeSpentByDay().stream()
+                                .collect(Collectors.toMap(TimeSpentByDay::getDay, TimeSpentByDay::getTimeSpentMinutes));
+
+                        List<LocalDate> daysWithoutFreeWeekends = days.stream()
+                                .filter(day -> (day.getDayOfWeek() != DayOfWeek.SATURDAY
+                                        && day.getDayOfWeek() != DayOfWeek.SUNDAY)
+                                        || (null != totalTimeSpentByDay.get(day)
+                                        && !totalTimeSpentByDay.get(day).equals(0)))
+                                .collect(Collectors.toList());
+
                         AtomicInteger cellHeaderCount = new AtomicInteger();
                         Row rowDailyTaskLogsHeader = sheet.createRow(rowNum.getAndIncrement());
-                        days.forEach(day -> {
+                        daysWithoutFreeWeekends.forEach(day -> {
+                            //TODO valisate weekends
                             rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue(day.toString());
-
                         });
                         rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue("Total");
                         rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue("Total");
@@ -329,7 +346,7 @@ public class ExcelReportGenerator {
                                             .collect(Collectors.toMap(TimeSpentByDay::getDay, TimeSpentByDay::getTimeSpentMinutes));
 
                                     AtomicInteger cellCount = new AtomicInteger();
-                                    days.forEach(day -> {
+                                    daysWithoutFreeWeekends.forEach(day -> {
                                         rowDailyTaskLogMetrics.createCell(cellCount.getAndIncrement())
                                                 .setCellValue(safeGetIntAsString(timeSpentByDays, day));
                                     });
@@ -347,15 +364,30 @@ public class ExcelReportGenerator {
                         AtomicInteger cellTotalCount = new AtomicInteger();
                         Row rowTotalDailyTaskLogs = sheet.createRow(rowNum.getAndIncrement());
 
-                        Map<LocalDate, Integer> totalTimeSpentByDay = personMetric.getTotalTimeSpentByDay().stream()
-                                .collect(Collectors.toMap(TimeSpentByDay::getDay, TimeSpentByDay::getTimeSpentMinutes));
+                        daysWithoutFreeWeekends.forEach(day -> {
+                            Cell cellTotalForDay = rowTotalDailyTaskLogs.createCell(cellTotalCount.getAndIncrement());
 
-                        days.forEach(day -> {
-                            rowTotalDailyTaskLogs.createCell(cellTotalCount.getAndIncrement()).setCellValue(
-                                    safeGetIntAsString(totalTimeSpentByDay, day));
+                            processValidationInfo(
+                                    workbook,
+                                    sheet,
+                                    cellTotalForDay,
+                                    reportValidator.validateTotalTimeSpentByDay(totalTimeSpentByDay.get(day)),
+                                    styles);
+
+                            cellTotalForDay.setCellValue(safeGetIntAsString(totalTimeSpentByDay, day));
                         });
-                        rowTotalDailyTaskLogs.createCell(cellTotalCount.getAndIncrement()).setCellValue(
-                                convertMinutesToHour(personMetric.getTotalTimeSpentInCurrentPeriodInMinutes()));
+                        Cell cellTotalTimeSpentInDay = rowTotalDailyTaskLogs.createCell(cellTotalCount.getAndIncrement());
+                        cellTotalTimeSpentInDay.setCellValue(convertMinutesToHour(personMetric.getTotalTimeSpentInCurrentPeriodInMinutes()));
+
+                        processValidationInfo(
+                                workbook,
+                                sheet,
+                                cellTotalTimeSpentInDay,
+                                reportValidator.validateTotalTimeSpentByPeriod(
+                                        personMetric.getTotalTimeSpentInCurrentPeriodInMinutes(),
+                                        daysWithoutFreeWeekends.size()),
+                                styles);
+
                         rowTotalDailyTaskLogs.createCell(cellTotalCount.getAndIncrement()).setCellValue(
                                 convertMinutesToHour(personMetric.getTotalTimeSpentOnTaskInMinutes()));
 
@@ -381,15 +413,34 @@ public class ExcelReportGenerator {
                                     rowDailyTaskLogMetrics.createCell(3).setCellValue("-");
                                     rowDailyTaskLogMetrics.createCell(4).setCellValue(dailyTaskLog.getTaskExternalStatus());
                                     rowDailyTaskLogMetrics.createCell(5).setCellValue(dailyTaskLog.getTaskId());
-                                    Cell cell1 = rowDailyTaskLogMetrics.createCell(6);
-                                    cell1.setCellValue(dailyTaskLog.getTaskName());
-                                    addComment(workbook, sheet, cell1, "the author", "content of comment");
+                                    rowDailyTaskLogMetrics.createCell(6).setCellValue(dailyTaskLog.getTaskName());
                                 });
                     }
 
                     newRowSeparator(sheet, rowNum);
 
                 });
+    }
+
+    private void processValidationInfo(XSSFWorkbook workbook, XSSFSheet sheet, Cell cell, ValidationInformation validationInformation, Map<Styles, CellStyle> styles) {
+        switch (validationInformation.getValidationStatus()) {
+            case OK:
+                cell.setCellStyle(styles.get(Styles.OK));
+                break;
+            case WARNING:
+                cell.setCellStyle(styles.get(Styles.WARNING));
+                break;
+            case ERROR_NOT_ENOUGH:
+                cell.setCellStyle(styles.get(Styles.ERROR_NOT_ENOUGH));
+                break;
+            case ERROR_TOO_MUCH:
+                cell.setCellStyle(styles.get(Styles.ERROR_TOO_MUCH));
+                break;
+        }
+
+        if (null != validationInformation.getMessage()) {
+            addComment(workbook, sheet, cell, "Big Brother", validationInformation.getMessage());
+        }
     }
 
     public void addComment(Workbook workbook, Sheet sheet, Cell cell, String author, String commentText) {
@@ -424,7 +475,7 @@ public class ExcelReportGenerator {
         long numOfDaysBetween = ChronoUnit.DAYS.between(startDate, endDate);
         return IntStream.iterate(0, i -> i + 1)
                 .limit(numOfDaysBetween)
-                .mapToObj(i -> startDate.plusDays(i))
+                .mapToObj(startDate::plusDays)
                 .collect(Collectors.toList());
     }
 
@@ -464,17 +515,18 @@ public class ExcelReportGenerator {
         sheet.createRow(rowNum.getAndIncrement());
     }
 
-    private static Integer convertMinutesToHour(Integer minutes) {
-        if (null == minutes || minutes.equals(0)) {
-            return 0;
-        }
-        return minutes / 60;
+    private static Float convertMinutesToHour(Integer minutes) {
+        return TimeUtils.convertMinutesToHour(minutes);
     }
 
     enum Styles {
         H1,
         H2,
-        H3
+        H3,
+        ERROR_NOT_ENOUGH,
+        ERROR_TOO_MUCH,
+        WARNING,
+        OK
     }
 
     private static Map<Styles, CellStyle> createStyles(Workbook wb) {
@@ -508,13 +560,26 @@ public class ExcelReportGenerator {
         styleH3.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         styles.put(Styles.H3, styleH3);
 
-        //		Font itemFont = wb.createFont();
-        //		itemFont.setFontHeightInPoints((short) 9);
-        //		itemFont.setFontName("Trebuchet MS");
-        //		style = wb.createCellStyle();
-        //		style.setAlignment(HorizontalAlignment.LEFT);
-        //		style.setFont(itemFont);
-        //		styles.put("item_left", style);
+        CellStyle styleError = wb.createCellStyle();
+        styleError.setFillForegroundColor(IndexedColors.ROSE.getIndex());
+        styleError.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        styles.put(Styles.ERROR_NOT_ENOUGH, styleError);
+
+        CellStyle styleErrorNotEnough = wb.createCellStyle();
+        styleErrorNotEnough.setFillForegroundColor(IndexedColors.RED1.getIndex());
+        styleErrorNotEnough.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        styles.put(Styles.ERROR_TOO_MUCH, styleErrorNotEnough);
+
+        CellStyle styleWarning = wb.createCellStyle();
+        styleWarning.setFillForegroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
+        styleWarning.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        styles.put(Styles.WARNING, styleWarning);
+
+        CellStyle styleOk = wb.createCellStyle();
+        styleOk.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
+        styleOk.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        styles.put(Styles.OK, styleOk);
+
         //
         //		style = wb.createCellStyle();
         //		style.setAlignment(HorizontalAlignment.RIGHT);

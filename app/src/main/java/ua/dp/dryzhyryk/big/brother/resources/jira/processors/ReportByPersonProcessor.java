@@ -32,7 +32,7 @@ public class ReportByPersonProcessor {
                 .flatMap(this::toPeopleSearchConditions)
                 .forEach(condition -> {
                     PeopleView peopleView = bigJiraBrotherPeopleView.preparePeopleView(condition);
-                    reportGenerator.generateReport(peopleView);
+                    reportGenerator.generatePeopleReport(peopleView);
                 });
     }
 

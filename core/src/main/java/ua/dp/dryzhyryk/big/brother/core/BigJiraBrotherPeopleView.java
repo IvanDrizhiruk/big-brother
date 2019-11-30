@@ -48,6 +48,4 @@ public class BigJiraBrotherPeopleView {
                 .personMetrics(personMetrics)
                 .build();
     }
-
-
 }

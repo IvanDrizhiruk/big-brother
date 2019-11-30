@@ -12,6 +12,7 @@ import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.TasksRootViewMetricsC
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.TasksTreeViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
+import ua.dp.dryzhyryk.big.brother.core.validator.ReportByPersonValidator;
 import ua.dp.dryzhyryk.big.brother.data.extractor.jira.JiraDataExtractor;
 import ua.dp.dryzhyryk.big.brother.data.storage.jira.JiraFileDataStorage;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
@@ -56,7 +57,10 @@ public class BigBrotherConsoleApplication {
 
         BigJiraBrotherPeopleView bigJiraBrotherPeopleView = new BigJiraBrotherPeopleView(jiraInformationHolder, peopleViewMetricsCalculator);
 
-        ExcelReportGenerator reportGenerator = new ExcelReportGenerator(reportRoot.getAbsolutePath());
+        ReportByPersonValidator reportByPersonValidator = new ReportByPersonValidator();
+
+        ExcelReportGenerator reportGenerator = new ExcelReportGenerator(reportRoot.getAbsolutePath(), reportByPersonValidator);
+
 
         reportBySprintProcessor = new ReportBySprintProcessor(bigJiraBrother, reportGenerator);
         reportByPersonProcessor = new ReportByPersonProcessor(bigJiraBrotherPeopleView, reportGenerator);

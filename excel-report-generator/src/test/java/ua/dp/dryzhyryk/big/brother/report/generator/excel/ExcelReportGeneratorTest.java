@@ -11,7 +11,7 @@ class ExcelReportGeneratorTest {
 
 		TasksTreeView tasksTreeView = null;
 
-		ExcelReportGenerator reportGenerator = new ExcelReportGenerator("");
+		ExcelReportGenerator reportGenerator = new ExcelReportGenerator("", null);
 		//reportGenerator.generate(tasksTree);
 	}
 }
