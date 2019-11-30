@@ -1,127 +1,131 @@
 package ua.dp.dryzhyryk.big.brother.core.metrics.calculator;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.TaskWorkLog;
+import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PersonMetrics;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskWorkingLogMetrics;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TimeSpentByDay;
 
+import java.time.LocalDate;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public class PeopleViewMetricsCalculator {
 
-	public List<PersonMetrics> calculateFor(List<Task> tasks) {
+    public List<PersonMetrics> calculateFor(List<Task> tasks, PeopleSearchConditions peopleSearchConditions) {
 
-		Map<String, PersonMetrics> personMetricsByUser = tasks.stream()
-				.flatMap(this::toPersonMetrics)
-				.collect(
-						Collectors.toMap(
-								PersonMetrics::getPerson,
-								Function.identity(),
-								this::mergePersonMetricsForOnePerson)
-				);
+        Map<String, PersonMetrics> personMetricsByUser = tasks.stream()
+                .flatMap(task -> toPersonMetrics(task, peopleSearchConditions))
+                .filter(personMetrics -> peopleSearchConditions.getPeopleNames().contains(personMetrics.getPerson()))
+                .collect(
+                        Collectors.toMap(
+                                PersonMetrics::getPerson,
+                                Function.identity(),
+                                this::mergePersonMetricsForOnePerson)
+                );
 
-		return new ArrayList<>(personMetricsByUser.values());
-	}
+        return new ArrayList<>(personMetricsByUser.values());
+    }
 
-	private Stream<PersonMetrics> toPersonMetrics(Task task) {
+    private Stream<PersonMetrics> toPersonMetrics(Task task, PeopleSearchConditions peopleSearchConditions) {
 
-		Map<String, Map<LocalDate, Integer>> spendTimeByDayForPerson = task.getWorkLogs().stream()
-				.collect(
-						Collectors.groupingBy(
-								TaskWorkLog::getPerson,
-								Collectors.groupingBy(
-										taskWorkLog -> taskWorkLog.getStartDateTime().toLocalDate(),
-										Collectors.summingInt(TaskWorkLog::getMinutesSpent))));
+        Map<String, Map<LocalDate, Integer>> spendTimeByDayForPerson = task.getWorkLogs().stream()
+                .collect(
+                        Collectors.groupingBy(
+                                TaskWorkLog::getPerson,
+                                Collectors.groupingBy(
+                                        taskWorkLog -> taskWorkLog.getStartDateTime().toLocalDate(),
+                                        Collectors.summingInt(TaskWorkLog::getMinutesSpent))));
 
-		return spendTimeByDayForPerson.entrySet().stream()
-				.map(entry -> {
-					TaskWorkingLogMetrics dailyTaskLogs = toTaskWorkingLogMetrics(entry.getValue(), task);
-					List<TimeSpentByDay> totalTimeSpentByDay = dailyTaskLogs.getTimeSpentByDays();
-					int totalTimeSpentInCurrentPeriodInMinutes = totalTimeSpentByDay
-							.stream()
-							.mapToInt(TimeSpentByDay::getTimeSpentMinutes)
-							.sum();
+        return spendTimeByDayForPerson.entrySet().stream()
+                .map(entry -> {
+                    TaskWorkingLogMetrics dailyTaskLogs = toTaskWorkingLogMetrics(entry.getValue(), task, peopleSearchConditions);
+                    List<TimeSpentByDay> totalTimeSpentByDay = dailyTaskLogs.getTimeSpentByDays();
 
-					return PersonMetrics.builder()
-							.person(entry.getKey())
-							.dailyTaskLogs(Collections.singletonList(dailyTaskLogs))
-							.totalTimeSpentByDay(totalTimeSpentByDay)
-							//TODO
-							//.totalTimeSpentInCurrentPeriodInMinutes()
-							.totalTimeSpentOnTaskInMinutes(totalTimeSpentInCurrentPeriodInMinutes)
-							.build();
-				});
-	}
+                    int totalTimeSpentOnTaskInMinutes = dailyTaskLogs.getTotalTimeSpentOnTaskInMinutes();
+                    int totalTimeSpentInCurrentPeriodInMinutes = dailyTaskLogs.getTotalTimeSpentByPeriodInMinutes();
 
-	private PersonMetrics mergePersonMetricsForOnePerson(PersonMetrics x, PersonMetrics y) {
-		List<TaskWorkingLogMetrics> dailyTaskLogs = Stream.of(x.getDailyTaskLogs(), y.getDailyTaskLogs())
-				.flatMap(List::stream)
-				.collect(Collectors.toList());
+                    return PersonMetrics.builder()
+                            .person(entry.getKey())
+                            .dailyTaskLogs(Collections.singletonList(dailyTaskLogs))
+                            .totalTimeSpentByDay(totalTimeSpentByDay)
+                            .totalTimeSpentInCurrentPeriodInMinutes(totalTimeSpentInCurrentPeriodInMinutes)
+                            .totalTimeSpentOnTaskInMinutes(totalTimeSpentOnTaskInMinutes)
+                            .build();
+                });
+    }
 
-		Collection<TimeSpentByDay> totalTimeSpentByDay = Stream.of(x.getTotalTimeSpentByDay(), y.getTotalTimeSpentByDay())
-				.flatMap(Collection::stream)
-				.collect(Collectors.toMap(
-						TimeSpentByDay::getDay,
-						Function.identity(),
-						(a, b) -> a.toBuilder()
-								.timeSpentMinutes(a.getTimeSpentMinutes() + b.getTimeSpentMinutes())
-								.build())).values();
+    private PersonMetrics mergePersonMetricsForOnePerson(PersonMetrics x, PersonMetrics y) {
+        List<TaskWorkingLogMetrics> dailyTaskLogs = Stream.of(x.getDailyTaskLogs(), y.getDailyTaskLogs())
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
 
-		int totalTimeSpentInCurrentPeriodInMinutes =
-				x.getTotalTimeSpentOnTaskInMinutes() + y.getTotalTimeSpentOnTaskInMinutes();
+        Collection<TimeSpentByDay> totalTimeSpentByDay = Stream.of(x.getTotalTimeSpentByDay(), y.getTotalTimeSpentByDay())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toMap(
+                        TimeSpentByDay::getDay,
+                        Function.identity(),
+                        (a, b) -> a.toBuilder()
+                                .timeSpentMinutes(a.getTimeSpentMinutes() + b.getTimeSpentMinutes())
+                                .build())).values();
 
-		return x.toBuilder()
-				.dailyTaskLogs(dailyTaskLogs)
-				.totalTimeSpentByDay(new ArrayList<>(totalTimeSpentByDay))
-				.totalTimeSpentOnTaskInMinutes(totalTimeSpentInCurrentPeriodInMinutes)
-				.build();
-	}
+        int totalTimeSpentOnTaskInMinutes =
+                x.getTotalTimeSpentOnTaskInMinutes() + y.getTotalTimeSpentOnTaskInMinutes();
+        int totalTimeSpentInCurrentPeriodInMinutes =
+                x.getTotalTimeSpentInCurrentPeriodInMinutes() + y.getTotalTimeSpentInCurrentPeriodInMinutes();
 
-	private TaskWorkingLogMetrics toTaskWorkingLogMetrics(Map<LocalDate, Integer> spentMinutesForDay, Task task) {
+        return x.toBuilder()
+                .dailyTaskLogs(dailyTaskLogs)
+                .totalTimeSpentByDay(new ArrayList<>(totalTimeSpentByDay))
+                .totalTimeSpentInCurrentPeriodInMinutes(totalTimeSpentInCurrentPeriodInMinutes)
+                .totalTimeSpentOnTaskInMinutes(totalTimeSpentOnTaskInMinutes)
+                .build();
+    }
 
-		int minutesSpent = spentMinutesForDay.values().stream().mapToInt(i -> i).sum();
+    private TaskWorkingLogMetrics toTaskWorkingLogMetrics(Map<LocalDate, Integer> spentMinutesForDay, Task task, PeopleSearchConditions peopleSearchConditions) {
 
-		int originalEstimateMinutes = Optional.ofNullable(task.getOriginalEstimateMinutes()).orElse(0);
-		int timeSpentMinutes = Optional.ofNullable(task.getTimeSpentMinutes()).orElse(0);
+        int minutesSpent = spentMinutesForDay.values().stream().mapToInt(i -> i).sum();
 
-		float timeCoefficient =
-				0 == timeSpentMinutes
-						? 0
-						: ((float) originalEstimateMinutes) / timeSpentMinutes;
+        int originalEstimateMinutes = Optional.ofNullable(task.getOriginalEstimateMinutes()).orElse(0);
+        int timeSpentMinutes = Optional.ofNullable(task.getTimeSpentMinutes()).orElse(0);
 
-		List<TimeSpentByDay> timeSpentByDays = spentMinutesForDay.entrySet().stream()
-				.map(entry -> TimeSpentByDay.builder()
-						.day(entry.getKey())
-						.timeSpentMinutes(entry.getValue())
-						.build())
-				.collect(Collectors.toList());
+        float timeCoefficient =
+                0 == timeSpentMinutes
+                        ? 0
+                        : ((float) originalEstimateMinutes) / timeSpentMinutes;
 
-		int totalTimeSpentOnTaskInMinutes = timeSpentByDays
-				.stream()
-				.mapToInt(TimeSpentByDay::getTimeSpentMinutes)
-				.sum();
+        List<TimeSpentByDay> timeSpentByDays = spentMinutesForDay.entrySet().stream()
+                .map(entry -> TimeSpentByDay.builder()
+                        .day(entry.getKey())
+                        .timeSpentMinutes(entry.getValue())
+                        .build())
+                .collect(Collectors.toList());
 
-		return TaskWorkingLogMetrics.builder()
-				.taskId(task.getId())
-				.taskName(task.getName())
-				.taskExternalStatus(task.getStatus())
-				.timeSpentByDays(timeSpentByDays)
-				//TODO
-				//.totalTimeSpentByPeriodInMinutes()
-				.totalTimeSpentOnTaskInMinutes(totalTimeSpentOnTaskInMinutes)
-				.timeSpentMinutes(minutesSpent)
-				.originalEstimateMinutes(originalEstimateMinutes)
-				.timeCoefficient(timeCoefficient)
-				.build();
-	}
+        int totalTimeSpentOnTaskInMinutes = timeSpentByDays
+                .stream()
+                .mapToInt(TimeSpentByDay::getTimeSpentMinutes)
+                .sum();
+
+        int totalTimeSpentByPeriodInMinutes = timeSpentByDays
+                .stream()
+                .filter(timeSpentByDay -> (!timeSpentByDay.getDay().isBefore(peopleSearchConditions.getStartPeriod()))
+                        && timeSpentByDay.getDay().isBefore(peopleSearchConditions.getEndPeriod()))
+                .mapToInt(TimeSpentByDay::getTimeSpentMinutes)
+                .sum();
+
+        return TaskWorkingLogMetrics.builder()
+                .taskId(task.getId())
+                .taskName(task.getName())
+                .taskExternalStatus(task.getStatus())
+                .timeSpentByDays(timeSpentByDays)
+                .totalTimeSpentByPeriodInMinutes(totalTimeSpentByPeriodInMinutes)
+                .totalTimeSpentOnTaskInMinutes(totalTimeSpentOnTaskInMinutes)
+                .timeSpentMinutes(minutesSpent)
+                .originalEstimateMinutes(originalEstimateMinutes)
+                .timeCoefficient(timeCoefficient)
+                .build();
+    }
 }

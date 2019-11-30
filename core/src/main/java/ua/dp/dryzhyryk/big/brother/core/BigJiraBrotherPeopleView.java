@@ -39,7 +39,7 @@ public class BigJiraBrotherPeopleView {
                 .distinct()
                 .collect(Collectors.toList());
 
-        List<PersonMetrics> personMetrics = peopleViewMetricsCalculator.calculateFor(tasks);
+        List<PersonMetrics> personMetrics = peopleViewMetricsCalculator.calculateFor(tasks, peopleSearchConditions);
 
         return PeopleView.builder()
                 .teamName(peopleSearchConditions.getTeamName())

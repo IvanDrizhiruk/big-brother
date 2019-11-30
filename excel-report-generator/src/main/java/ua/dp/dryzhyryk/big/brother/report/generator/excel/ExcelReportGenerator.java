@@ -311,12 +311,17 @@ public class ExcelReportGenerator {
 
                         });
                         rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue("Total");
+                        rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue("Total");
                         rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue("-");
                         rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue("Task id");
                         rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue("Task name");
 
                         dailyTaskLogs
                                 .forEach(dailyTaskLog -> {
+
+                                    if (dailyTaskLog.getTotalTimeSpentByPeriodInMinutes() == 0) {
+                                        return;
+                                    }
 
                                     Row rowDailyTaskLogMetrics = sheet.createRow(rowNum.getAndIncrement());
 
@@ -327,9 +332,10 @@ public class ExcelReportGenerator {
                                     days.forEach(day -> {
                                         rowDailyTaskLogMetrics.createCell(cellCount.getAndIncrement())
                                                 .setCellValue(safeGetIntAsString(timeSpentByDays, day));
-
                                     });
 
+                                    rowDailyTaskLogMetrics.createCell(cellCount.getAndIncrement()).setCellValue(
+                                            convertMinutesToHour(dailyTaskLog.getTotalTimeSpentByPeriodInMinutes()));
                                     rowDailyTaskLogMetrics.createCell(cellCount.getAndIncrement()).setCellValue(
                                             convertMinutesToHour(dailyTaskLog.getTotalTimeSpentOnTaskInMinutes()));
                                     rowDailyTaskLogMetrics.createCell(cellCount.getAndIncrement()).setCellValue("-");
@@ -348,6 +354,8 @@ public class ExcelReportGenerator {
                             rowTotalDailyTaskLogs.createCell(cellTotalCount.getAndIncrement()).setCellValue(
                                     safeGetIntAsString(totalTimeSpentByDay, day));
                         });
+                        rowTotalDailyTaskLogs.createCell(cellTotalCount.getAndIncrement()).setCellValue(
+                                convertMinutesToHour(personMetric.getTotalTimeSpentInCurrentPeriodInMinutes()));
                         rowTotalDailyTaskLogs.createCell(cellTotalCount.getAndIncrement()).setCellValue(
                                 convertMinutesToHour(personMetric.getTotalTimeSpentOnTaskInMinutes()));
 
