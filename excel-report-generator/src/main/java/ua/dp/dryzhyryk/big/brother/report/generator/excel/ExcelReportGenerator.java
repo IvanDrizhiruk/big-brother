@@ -324,8 +324,15 @@ public class ExcelReportGenerator {
                         AtomicInteger cellHeaderCount = new AtomicInteger();
                         Row rowDailyTaskLogsHeader = sheet.createRow(rowNum.getAndIncrement());
                         daysWithoutFreeWeekends.forEach(day -> {
-                            //TODO valisate weekends
-                            rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue(day.toString());
+                            Cell cellDay = rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement());
+                            cellDay.setCellValue(day.toString());
+
+                            processValidationInfo(
+                                    workbook,
+                                    sheet,
+                                    cellDay,
+                                    reportValidator.validateDay(day),
+                                    styles);
                         });
                         rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue("Total");
                         rowDailyTaskLogsHeader.createCell(cellHeaderCount.getAndIncrement()).setCellValue("Total");
@@ -409,7 +416,20 @@ public class ExcelReportGenerator {
                                     rowDailyTaskLogMetrics.createCell(0).setCellValue(convertMinutesToHour(dailyTaskLog.getTimeSpentMinutes()));
                                     rowDailyTaskLogMetrics.createCell(1)
                                             .setCellValue(convertMinutesToHour(dailyTaskLog.getOriginalEstimateMinutes()));
-                                    rowDailyTaskLogMetrics.createCell(2).setCellValue(dailyTaskLog.getTimeCoefficient());
+
+                                    Cell cellTC = rowDailyTaskLogMetrics.createCell(2);
+
+                                    processValidationInfo(
+                                            workbook,
+                                            sheet,
+                                            cellTC,
+                                            reportValidator.validateTC(
+                                                    dailyTaskLog.getTimeCoefficient(),
+                                                    personMetric.getPerson()),
+                                            styles);
+
+                                    cellTC.setCellValue(dailyTaskLog.getTimeCoefficient());
+
                                     rowDailyTaskLogMetrics.createCell(3).setCellValue("-");
                                     rowDailyTaskLogMetrics.createCell(4).setCellValue(dailyTaskLog.getTaskExternalStatus());
                                     rowDailyTaskLogMetrics.createCell(5).setCellValue(dailyTaskLog.getTaskId());

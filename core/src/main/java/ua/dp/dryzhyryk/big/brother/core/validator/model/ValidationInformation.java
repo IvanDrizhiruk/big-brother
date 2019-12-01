@@ -11,6 +11,10 @@ public class ValidationInformation {
             .validationStatus(ValidationStatus.OK)
             .build();
 
+    public final static ValidationInformation NONE = ValidationInformation.builder()
+            .validationStatus(ValidationStatus.NONE)
+            .build();
+
     private final String message;
     private final ValidationStatus validationStatus;
 }
