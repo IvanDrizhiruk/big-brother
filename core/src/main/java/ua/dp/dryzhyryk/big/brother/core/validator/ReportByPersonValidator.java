@@ -92,29 +92,29 @@ public class ReportByPersonValidator {
         PearsonCoefficientThresholds thresholds = DEFAULT_PEARSON_COEFFICIENT_THRESHOLDS;
          if (timeCoefficient < thresholds.getErrorLessCoefficientThreshold()) {
              return ValidationInformation.builder()
-                     .message("Task made extremely fast")
+                     .message("Task made extremely slow")
                      .validationStatus(ValidationStatus.ERROR_NOT_ENOUGH)
                      .build();
          }
 
         if (timeCoefficient < thresholds.getWarningLessCoefficientThreshold()) {
             return ValidationInformation.builder()
+                    .message("Task made to slow")
+                    .validationStatus(ValidationStatus.WARNING)
+                    .build();
+        }
+
+        if (timeCoefficient > thresholds.getErrorMoreCoefficientThreshold()) {
+            return ValidationInformation.builder()
+                    .message("Task made extremely fast")
+                    .validationStatus(ValidationStatus.ERROR_TOO_MUCH)
+                    .build();
+        }
+
+        if (timeCoefficient > thresholds.getWarningMoreCoefficientThreshold()) {
+            return ValidationInformation.builder()
                     .message("Task made to fast")
                     .validationStatus(ValidationStatus.WARNING)
-                    .build();
-        }
-
-        if (timeCoefficient < thresholds.getWarningMoreCoefficientThreshold()) {
-            return ValidationInformation.builder()
-                    .message("Task made to long")
-                    .validationStatus(ValidationStatus.WARNING)
-                    .build();
-        }
-
-        if (timeCoefficient < thresholds.getErrorMoreCoefficientThreshold()) {
-            return ValidationInformation.builder()
-                    .message("Task made extremely long")
-                    .validationStatus(ValidationStatus.ERROR_TOO_MUCH)
                     .build();
         }
 

@@ -88,6 +88,6 @@ public class JiraFileDataStorage implements JiraDataStorage {
 	private String toFileName(PersonSearchConditions searchConditions) {
 		return String.format("[%s] %s-%s.json", searchConditions.getPersonName(),
 				searchConditions.getStartPeriod().format(DateTimeFormatter.ISO_LOCAL_DATE),
-				searchConditions.getStartPeriod().format(DateTimeFormatter.ISO_LOCAL_DATE));
+				searchConditions.getEndPeriod().format(DateTimeFormatter.ISO_LOCAL_DATE));
 	}
 }
