@@ -2,6 +2,7 @@ package ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model;
 
 import lombok.Builder;
 import lombok.Value;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.PersonMetrics;
 
 import java.time.LocalDate;
 import java.util.List;

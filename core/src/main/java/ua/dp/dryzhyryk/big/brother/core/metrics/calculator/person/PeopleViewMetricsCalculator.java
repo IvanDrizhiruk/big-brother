@@ -1,11 +1,11 @@
-package ua.dp.dryzhyryk.big.brother.core.metrics.calculator;
+package ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person;
 
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.TaskWorkLog;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PersonMetrics;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskWorkingLogMetrics;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TimeSpentByDay;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.PersonMetrics;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.TaskWorkingLogMetrics;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.TimeSpentByDay;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -19,7 +19,7 @@ public class PeopleViewMetricsCalculator {
 
         Map<String, PersonMetrics> personMetricsByUser = tasks.stream()
                 .flatMap(task -> toPersonMetrics(task, peopleSearchConditions))
-                .filter(personMetrics -> peopleSearchConditions.getPeopleNames().contains(personMetrics.getPerson()))
+                .filter(personMetrics -> isExcludePersonFromPersonMetrics(personMetrics, peopleSearchConditions.getPeopleNames()))
                 .collect(
                         Collectors.toMap(
                                 PersonMetrics::getPerson,
@@ -28,6 +28,10 @@ public class PeopleViewMetricsCalculator {
                 );
 
         return new ArrayList<>(personMetricsByUser.values());
+    }
+
+    private boolean isExcludePersonFromPersonMetrics(PersonMetrics personMetrics, List<String> availablePersons) {
+        return availablePersons.contains(personMetrics.getPerson());
     }
 
     private Stream<PersonMetrics> toPersonMetrics(Task task, PeopleSearchConditions peopleSearchConditions) {
@@ -42,7 +46,8 @@ public class PeopleViewMetricsCalculator {
 
         return spendTimeByDayForPerson.entrySet().stream()
                 .map(entry -> {
-                    TaskWorkingLogMetrics dailyTaskLogs = toTaskWorkingLogMetrics(entry.getValue(), task, peopleSearchConditions);
+                    TaskWorkingLogMetrics dailyTaskLogs = toTaskWorkingLogMetrics(
+                            entry.getValue(), task, peopleSearchConditions);
                     List<TimeSpentByDay> totalTimeSpentByDay = dailyTaskLogs.getTimeSpentByDays();
 
                     int totalTimeSpentOnTaskInMinutes = dailyTaskLogs.getTotalTimeSpentOnTaskInMinutes();
@@ -85,7 +90,8 @@ public class PeopleViewMetricsCalculator {
                 .build();
     }
 
-    private TaskWorkingLogMetrics toTaskWorkingLogMetrics(Map<LocalDate, Integer> spentMinutesForDay, Task task, PeopleSearchConditions peopleSearchConditions) {
+    private TaskWorkingLogMetrics toTaskWorkingLogMetrics(
+            Map<LocalDate, Integer> spentMinutesForDay, Task task, PeopleSearchConditions peopleSearchConditions) {
 
         int minutesSpent = spentMinutesForDay.values().stream().mapToInt(i -> i).sum();
 

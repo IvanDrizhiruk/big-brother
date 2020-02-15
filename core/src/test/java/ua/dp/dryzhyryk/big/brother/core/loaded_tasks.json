@@ -1,0 +1,415 @@
+[
+  {
+    "id": "FXBEV-96",
+    "name": "ORC: Update tests according to refactor the Client Extraction",
+    "status": "Review by DUCKS",
+    "type": "Sub-task",
+    "isSubTask": true,
+    "originalEstimateMinutes": 480,
+    "remainingEstimateMinutes": 0,
+    "timeSpentMinutes": 900,
+    "workLogs": [
+      {
+        "person": "o_ssolov",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 13
+          },
+          "time": {
+            "hour": 17,
+            "minute": 14,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 120
+      },
+      {
+        "person": "o_ssolov",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 14
+          },
+          "time": {
+            "hour": 19,
+            "minute": 3,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 360
+      },
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 14
+          },
+          "time": {
+            "hour": 10,
+            "minute": 27,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 120
+      },
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 15
+          },
+          "time": {
+            "hour": 10,
+            "minute": 27,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 60
+      },
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 16
+          },
+          "time": {
+            "hour": 10,
+            "minute": 27,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 60
+      },
+      {
+        "person": "o_ssolov",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 15
+          },
+          "time": {
+            "hour": 12,
+            "minute": 12,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 120
+      },
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 15
+          },
+          "time": {
+            "hour": 14,
+            "minute": 9,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 120
+      }
+    ],
+    "subTasks": []
+  },
+  {
+    "id": "FXBEV-95",
+    "name": "ORC: Refactor completely the Client Extraction",
+    "status": "Review by DUCKS",
+    "type": "Sub-task",
+    "isSubTask": true,
+    "originalEstimateMinutes": 1200,
+    "remainingEstimateMinutes": 0,
+    "timeSpentMinutes": 1980,
+    "workLogs": [
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 7
+          },
+          "time": {
+            "hour": 14,
+            "minute": 12,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 240
+      },
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 8
+          },
+          "time": {
+            "hour": 14,
+            "minute": 12,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 240
+      },
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 11
+          },
+          "time": {
+            "hour": 7,
+            "minute": 49,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 300
+      },
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 12
+          },
+          "time": {
+            "hour": 9,
+            "minute": 2,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 120
+      },
+      {
+        "person": "o_ssolov",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 12
+          },
+          "time": {
+            "hour": 12,
+            "minute": 17,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 120
+      },
+      {
+        "person": "o_ssolov",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 13
+          },
+          "time": {
+            "hour": 12,
+            "minute": 17,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 300
+      },
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 13
+          },
+          "time": {
+            "hour": 8,
+            "minute": 26,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 180
+      },
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 14
+          },
+          "time": {
+            "hour": 7,
+            "minute": 26,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 240
+      },
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 15
+          },
+          "time": {
+            "hour": 12,
+            "minute": 9,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 240
+      }
+    ],
+    "subTasks": []
+  },
+  {
+    "id": "FXBEV-92",
+    "name": "ORC: Replace using of the Client Information SOA with  Swap rate SOA",
+    "status": "To test on Pre",
+    "type": "Sub-task",
+    "isSubTask": true,
+    "originalEstimateMinutes": 780,
+    "remainingEstimateMinutes": 120,
+    "timeSpentMinutes": 660,
+    "workLogs": [
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 10,
+            "day": 24
+          },
+          "time": {
+            "hour": 15,
+            "minute": 37,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 180
+      },
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 10,
+            "day": 24
+          },
+          "time": {
+            "hour": 18,
+            "minute": 11,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 60
+      },
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 10,
+            "day": 25
+          },
+          "time": {
+            "hour": 12,
+            "minute": 12,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 60
+      },
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 10,
+            "day": 28
+          },
+          "time": {
+            "hour": 13,
+            "minute": 29,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 120
+      },
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 12
+          },
+          "time": {
+            "hour": 11,
+            "minute": 50,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 120
+      },
+      {
+        "person": "o_dkoval",
+        "startDateTime": {
+          "date": {
+            "year": 2019,
+            "month": 11,
+            "day": 12
+          },
+          "time": {
+            "hour": 9,
+            "minute": 2,
+            "second": 0,
+            "nano": 0
+          }
+        },
+        "minutesSpent": 120
+      }
+    ],
+    "subTasks": []
+  }
+]

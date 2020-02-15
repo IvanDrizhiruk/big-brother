@@ -5,6 +5,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.*;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.TaskWorkingLogMetrics;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.TimeSpentByDay;
 import ua.dp.dryzhyryk.big.brother.core.utils.TimeUtils;
 import ua.dp.dryzhyryk.big.brother.core.validator.ReportByPersonValidator;
 import ua.dp.dryzhyryk.big.brother.core.validator.model.ValidationInformation;

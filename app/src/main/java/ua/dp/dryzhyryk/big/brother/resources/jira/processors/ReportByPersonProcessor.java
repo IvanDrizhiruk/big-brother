@@ -1,6 +1,6 @@
 package ua.dp.dryzhyryk.big.brother.resources.jira.processors;
 
-import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleView;
+import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
@@ -15,11 +15,11 @@ import java.util.stream.Stream;
 
 public class ReportByPersonProcessor {
 
-    private final BigJiraBrotherPeopleView bigJiraBrotherPeopleView;
+    private final BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider;
     private final ExcelReportGenerator reportGenerator;
 
-    public ReportByPersonProcessor(BigJiraBrotherPeopleView bigJiraBrotherPeopleView, ExcelReportGenerator reportGenerator) {
-        this.bigJiraBrotherPeopleView = bigJiraBrotherPeopleView;
+    public ReportByPersonProcessor(BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider, ExcelReportGenerator reportGenerator) {
+        this.bigJiraBrotherPeopleViewProvider = bigJiraBrotherPeopleViewProvider;
         this.reportGenerator = reportGenerator;
     }
 
@@ -30,8 +30,9 @@ public class ReportByPersonProcessor {
 
         peopleSearchRequest.stream()
                 .flatMap(this::toPeopleSearchConditions)
+                .limit(1)
                 .forEach(condition -> {
-                    PeopleView peopleView = bigJiraBrotherPeopleView.preparePeopleView(condition);
+                    PeopleView peopleView = bigJiraBrotherPeopleViewProvider.preparePeopleView(condition);
                     reportGenerator.generatePeopleReport(peopleView);
                 });
     }

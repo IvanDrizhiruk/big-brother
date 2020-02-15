@@ -4,9 +4,9 @@ import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrother;
-import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleView;
+import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.PeopleViewMetricsCalculator;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.PeopleViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.SprintViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.TasksRootViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.TasksTreeViewMetricsCalculator;
@@ -55,7 +55,7 @@ public class BigBrotherConsoleApplication {
         BigJiraBrother bigJiraBrother = new BigJiraBrother(jiraInformationHolder, tasksTreeViewMetricsCalculator, tasksRootViewMetricsCalculator,
                 sprintViewMetricsCalculator);
 
-        BigJiraBrotherPeopleView bigJiraBrotherPeopleView = new BigJiraBrotherPeopleView(jiraInformationHolder, peopleViewMetricsCalculator);
+        BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProvider(jiraInformationHolder, peopleViewMetricsCalculator);
 
         ReportByPersonValidator reportByPersonValidator = new ReportByPersonValidator();
 
@@ -63,7 +63,7 @@ public class BigBrotherConsoleApplication {
 
 
         reportBySprintProcessor = new ReportBySprintProcessor(bigJiraBrother, reportGenerator);
-        reportByPersonProcessor = new ReportByPersonProcessor(bigJiraBrotherPeopleView, reportGenerator);
+        reportByPersonProcessor = new ReportByPersonProcessor(bigJiraBrotherPeopleViewProvider, reportGenerator);
     }
 
     public static void main(String[] args) {

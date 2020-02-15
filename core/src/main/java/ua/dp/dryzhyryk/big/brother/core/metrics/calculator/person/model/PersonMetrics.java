@@ -1,4 +1,4 @@
-package ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model;
+package ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model;
 
 import java.util.List;
 

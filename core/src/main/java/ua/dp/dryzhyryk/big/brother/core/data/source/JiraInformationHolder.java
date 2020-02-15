@@ -12,6 +12,7 @@ import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchCon
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 
+//TODO rework with interface and file cash implementation
 public class JiraInformationHolder {
 
 	private final JiraResource jiraResource;

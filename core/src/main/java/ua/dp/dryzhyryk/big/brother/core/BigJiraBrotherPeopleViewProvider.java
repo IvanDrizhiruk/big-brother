@@ -5,20 +5,20 @@ import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PersonSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.PeopleViewMetricsCalculator;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.PeopleViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PersonMetrics;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.PersonMetrics;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class BigJiraBrotherPeopleView {
+public class BigJiraBrotherPeopleViewProvider {
 
     private final JiraInformationHolder jiraInformationHolder;
     private final PeopleViewMetricsCalculator peopleViewMetricsCalculator;
 
-    public BigJiraBrotherPeopleView(
+    public BigJiraBrotherPeopleViewProvider(
             JiraInformationHolder jiraInformationHolder,
             PeopleViewMetricsCalculator peopleViewMetricsCalculator) {
         this.jiraInformationHolder = jiraInformationHolder;
