@@ -3,9 +3,11 @@ package ua.dp.dryzhyryk.big.brother.resources.jira.processors;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
+import ua.dp.dryzhyryk.big.brother.core.utils.DateTomeProvider;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
 import ua.dp.dryzhyryk.big.brother.resources.jira.search.PeopleSearchRequest;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -17,10 +19,39 @@ public class ReportByPersonProcessor {
 
     private final BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider;
     private final ExcelReportGenerator reportGenerator;
+    private final DateTomeProvider dateTomeProvider;
 
-    public ReportByPersonProcessor(BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider, ExcelReportGenerator reportGenerator) {
+    public ReportByPersonProcessor(BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider, ExcelReportGenerator reportGenerator, DateTomeProvider dateTomeProvider) {
         this.bigJiraBrotherPeopleViewProvider = bigJiraBrotherPeopleViewProvider;
         this.reportGenerator = reportGenerator;
+        this.dateTomeProvider = dateTomeProvider;
+    }
+
+    public void prepareReportByPersonForLastFinishedWeek(List<PeopleSearchRequest> peopleSearchRequest) {
+        if (null == peopleSearchRequest) {
+            return;
+        }
+
+        peopleSearchRequest.stream()
+                .map(this::toPeopleSearchConditionsForLastFinishedWeek)
+                .map(bigJiraBrotherPeopleViewProvider::preparePeopleView)
+                .forEach(reportGenerator::generatePeopleReport);
+    }
+
+    private PeopleSearchConditions toPeopleSearchConditionsForLastFinishedWeek(PeopleSearchRequest peopleSearchRequest) {
+
+        LocalDate mondayOfLastFinishedWeek = dateTomeProvider.nowLocalDate()
+                .with(DayOfWeek.MONDAY)
+                .minusWeeks(1);
+
+        LocalDate sundayOfLastFinishedWeek = mondayOfLastFinishedWeek.plusWeeks(1);
+
+        return PeopleSearchConditions.builder()
+                .teamName(peopleSearchRequest.getTeamName())
+                .peopleNames(peopleSearchRequest.getPeopleNames())
+                .startPeriod(mondayOfLastFinishedWeek)
+                .endPeriod(sundayOfLastFinishedWeek)
+                .build();
     }
 
     public void prepareReportByPerson(List<PeopleSearchRequest> peopleSearchRequest) {
@@ -30,7 +61,6 @@ public class ReportByPersonProcessor {
 
         peopleSearchRequest.stream()
                 .flatMap(this::toPeopleSearchConditions)
-                .limit(1)
                 .forEach(condition -> {
                     PeopleView peopleView = bigJiraBrotherPeopleViewProvider.preparePeopleView(condition);
                     reportGenerator.generatePeopleReport(peopleView);

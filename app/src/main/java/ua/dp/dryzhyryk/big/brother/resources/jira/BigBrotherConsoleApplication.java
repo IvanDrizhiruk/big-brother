@@ -12,6 +12,7 @@ import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.TasksRootViewMetricsC
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.TasksTreeViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
+import ua.dp.dryzhyryk.big.brother.core.utils.DateTomeProvider;
 import ua.dp.dryzhyryk.big.brother.core.validator.ReportByPersonValidator;
 import ua.dp.dryzhyryk.big.brother.data.extractor.jira.JiraDataExtractor;
 import ua.dp.dryzhyryk.big.brother.data.storage.jira.JiraFileDataStorage;
@@ -55,6 +56,8 @@ public class BigBrotherConsoleApplication {
         BigJiraBrother bigJiraBrother = new BigJiraBrother(jiraInformationHolder, tasksTreeViewMetricsCalculator, tasksRootViewMetricsCalculator,
                 sprintViewMetricsCalculator);
 
+        DateTomeProvider dateTomeProvider = new DateTomeProvider();
+
         BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProvider(jiraInformationHolder, peopleViewMetricsCalculator);
 
         ReportByPersonValidator reportByPersonValidator = new ReportByPersonValidator();
@@ -63,7 +66,7 @@ public class BigBrotherConsoleApplication {
 
 
         reportBySprintProcessor = new ReportBySprintProcessor(bigJiraBrother, reportGenerator);
-        reportByPersonProcessor = new ReportByPersonProcessor(bigJiraBrotherPeopleViewProvider, reportGenerator);
+        reportByPersonProcessor = new ReportByPersonProcessor(bigJiraBrotherPeopleViewProvider, reportGenerator, dateTomeProvider);
     }
 
     public static void main(String[] args) {
@@ -72,8 +75,10 @@ public class BigBrotherConsoleApplication {
 
 		SearchRequests searchRequests = loadSearchRequests();
 
-		reportBySprintProcessor.prepareReportBySprint(searchRequests.getSprintSearchConditions());
-        reportByPersonProcessor.prepareReportByPerson(searchRequests.getPeopleSearchConditions());
+//		reportBySprintProcessor.prepareReportBySprint(searchRequests.getSprintSearchConditions());
+//      reportByPersonProcessor.prepareReportByPerson(searchRequests.getPeopleSearchConditions());
+
+        reportByPersonProcessor.prepareReportByPersonForLastFinishedWeek(searchRequests.getPeopleSearchConditions());
     }
 
 	private static SearchRequests loadSearchRequests() {
