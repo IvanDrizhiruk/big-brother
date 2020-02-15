@@ -77,7 +77,7 @@ public class ExcelReportGenerator {
         generatePeopleReport(peopleView, workbook, peopleSheet);
 
         String reportFileName =
-                String.format("[%s]: %s-%s.xlsx", peopleView.getTeamName(), peopleView.getStartPeriod(), peopleView.getEndPeriod());
+                String.format("%s:%s-%s.xlsx", peopleView.getTeamName(), peopleView.getStartPeriod(), peopleView.getEndPeriod());
         File reportFile = new File(reportRoot, reportFileName);
 
         try (FileOutputStream outputStream = new FileOutputStream(reportFile)) {
