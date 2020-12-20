@@ -21,6 +21,7 @@ import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
+import static ua.dp.dryzhyryk.big.brother.TestDoublesForProjectSprintMega.*;
 
 @ExtendWith(MockitoExtension.class)
 class JiraCacheTests {
@@ -45,16 +46,16 @@ class JiraCacheTests {
     @Test
     public void dataShouldBeReceivedFromJiraResourceAndCashed() {
         //given
-        SprintSearchConditions searchConditionsFirst = TestDoublesForProjectSprintMega.newSearchConditionsMega();
-        SprintSearchConditions searchConditionsSecond = TestDoublesForProjectSprintMega.newSearchConditionsMega();
+        SprintSearchConditions searchConditionsFirst = newSearchConditionsMega();
+        SprintSearchConditions searchConditionsSecond = newSearchConditionsMega();
 
         when(jiraDataStorage.loadTasks(Mockito.any(SprintSearchConditions.class)))
                 .thenReturn(null);
 
         when(jiraResource.loadTasks(Mockito.any(SprintSearchConditions.class)))
-                .thenReturn(TestDoublesForProjectSprintMega.newProjectSprintMega());
+                .thenReturn(newProjectSprintMega());
 
-        TasksTreeView expectedResult = TestDoublesForProjectSprintMega.newTaskViewForProjectSprintMega();
+        TasksTreeView expectedResult = newTaskViewForProjectSprintMega();
 
         //when
         TasksTreeView actualFirst = bigJiraBrother.prepareTasksTreeView(searchConditionsFirst);
@@ -71,13 +72,13 @@ class JiraCacheTests {
     @Test
     public void dataShouldBeReceivedFromJiraStorageAndCashed() {
         //given
-        SprintSearchConditions searchConditionsFirst = TestDoublesForProjectSprintMega.newSearchConditionsMega();
-        SprintSearchConditions searchConditionsSecond = TestDoublesForProjectSprintMega.newSearchConditionsMega();
+        SprintSearchConditions searchConditionsFirst = newSearchConditionsMega();
+        SprintSearchConditions searchConditionsSecond = newSearchConditionsMega();
 
         when(jiraDataStorage.loadTasks(Mockito.any(SprintSearchConditions.class)))
-                .thenReturn(TestDoublesForProjectSprintMega.newProjectSprintMega());
+                .thenReturn(newProjectSprintMega());
 
-        TasksTreeView expectedResult = TestDoublesForProjectSprintMega.newTaskViewForProjectSprintMega();
+        TasksTreeView expectedResult = newTaskViewForProjectSprintMega();
 
         //when
         TasksTreeView actualFirst = bigJiraBrother.prepareTasksTreeView(searchConditionsFirst);
@@ -94,25 +95,23 @@ class JiraCacheTests {
     @Test
     public void dataReceivedFromJiraResourceShouldBeStoredToJiraStorage() {
         //given
-        SprintSearchConditions searchConditions = TestDoublesForProjectSprintMega.newSearchConditionsMega();
-
-        List<Task> jiraTasks = TestDoublesForProjectSprintMega.newProjectSprintMega();
-
+        SprintSearchConditions searchConditions = newSearchConditionsMega();
+        List<Task> jiraTasks = newProjectSprintMega();
         when(jiraDataStorage.loadTasks(Mockito.any(SprintSearchConditions.class)))
                 .thenReturn(null);
-
         when(jiraResource.loadTasks(Mockito.any(SprintSearchConditions.class)))
                 .thenReturn(jiraTasks);
 
-        TasksTreeView expectedResult = TestDoublesForProjectSprintMega.newTaskViewForProjectSprintMega();
+        TasksTreeView expectedResult = newTaskViewForProjectSprintMega();
 
         //when
         TasksTreeView actualFirst = bigJiraBrother.prepareTasksTreeView(searchConditions);
 
         //then
-        verify(jiraDataStorage, times(1)).saveProjectSprint(searchConditions, jiraTasks);
-        verify(jiraResource, times(1)).loadTasks(searchConditions);
-
+        verify(jiraDataStorage, times(1))
+                .saveProjectSprint(searchConditions, jiraTasks);
+        verify(jiraResource, times(1))
+                .loadTasks(searchConditions);
         Assertions.assertEquals(expectedResult, actualFirst);
     }
 }
