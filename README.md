@@ -20,3 +20,7 @@ worklogAuthor = o_dkoval
 assignee = o_dkoval 
 
 worklogAuthor = o_dkoval AND  worklogDate >=  2019-11-11 AND  worklogDate <= 2019-11-15
+
+
+Sonar
+mvn clean verify -Dsonar.host.url=https://sonarcloud.io org.sonarsource.scanner.maven:sonar-maven-plugin:3.7.0.1746:sonar -Dsonar.organization=ivandrizhiruk -Dsonar.projectKey=IvanDrizhiruk_big-brother
