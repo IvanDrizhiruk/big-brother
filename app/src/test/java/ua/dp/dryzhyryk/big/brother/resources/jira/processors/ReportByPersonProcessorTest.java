@@ -1,6 +1,5 @@
 package ua.dp.dryzhyryk.big.brother.resources.jira.processors;
 
-import lombok.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,7 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.utils.DateTomeProvider;
+import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
 import ua.dp.dryzhyryk.big.brother.resources.jira.search.PeopleSearchRequest;
 
@@ -30,7 +29,7 @@ class ReportByPersonProcessorTest {
     private ExcelReportGenerator reportGenerator;
 
     @Mock
-    private DateTomeProvider dateTomeProvider;
+    private DateTimeProvider dateTimeProvider;
 
     @InjectMocks
     private ReportByPersonProcessor processor;
@@ -49,7 +48,7 @@ class ReportByPersonProcessorTest {
         );
 
         LocalDate nowMonday = LocalDate.of(2020, 1, 6);
-        when(dateTomeProvider.nowLocalDate()).thenReturn(nowMonday);
+        when(dateTimeProvider.nowLocalDate()).thenReturn(nowMonday);
 
         LocalDate startPeriod = LocalDate.of(2019,12, 30);
         LocalDate endPeriod = LocalDate.of(2020,1, 6);
@@ -85,7 +84,7 @@ class ReportByPersonProcessorTest {
         );
 
         LocalDate nowMonday = LocalDate.of(2020, 1, 5);
-        when(dateTomeProvider.nowLocalDate()).thenReturn(nowMonday);
+        when(dateTimeProvider.nowLocalDate()).thenReturn(nowMonday);
 
         LocalDate startPeriod = LocalDate.of(2019,12, 23);
         LocalDate endPeriod = LocalDate.of(2019,12, 30);

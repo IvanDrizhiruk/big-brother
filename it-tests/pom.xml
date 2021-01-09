@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ua.dp.dryzhyryk</groupId>
+        <artifactId>big-brother</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>it-tests</artifactId>
+
+    <properties>
+        <jbehave-maven-plugin.version>4.0.2</jbehave-maven-plugin.version>
+
+        <junit4.version>4.12</junit4.version>
+        <jbehave-core.version>4.0.2</jbehave-core.version>
+        <logback.version>1.0.1</logback.version>
+        <commons-lang3.version>3.4</commons-lang3.version>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${failsafe.and.surefire.version}</version>
+                    <executions>
+                        <execution>
+                            <id>integration-test</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <includes>
+                            <include>**/*Test.java</include>
+                        </includes>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.jbehave</groupId>
+                    <artifactId>jbehave-maven-plugin</artifactId>
+                    <version>${jbehave-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>run-stories-as-embeddables</id>
+                            <phase>integration-test</phase>
+                            <configuration>
+
+                                <includes>
+                                    <include>**/*Test.java</include>
+                                </includes>
+                                <ignoreFailureInStories>false</ignoreFailureInStories>
+                                <ignoreFailureInView>false</ignoreFailureInView>
+
+                                <systemProperties>
+                                    <property>
+                                        <name>java.awt.headless</name>
+                                        <value>true</value>
+                                    </property>
+                                </systemProperties>
+
+
+                            </configuration>
+                            <goals>
+                                <goal>run-stories-as-embeddables</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+    </build>
+
+
+    <dependencies>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit4.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jbehave</groupId>
+            <artifactId>jbehave-core</artifactId>
+            <version>${jbehave-core.version}</version>
+        </dependency>
+
+    </dependencies>
+</project>

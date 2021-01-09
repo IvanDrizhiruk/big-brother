@@ -3,7 +3,7 @@ package ua.dp.dryzhyryk.big.brother.resources.jira.processors;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
-import ua.dp.dryzhyryk.big.brother.core.utils.DateTomeProvider;
+import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
 import ua.dp.dryzhyryk.big.brother.resources.jira.search.PeopleSearchRequest;
 
@@ -19,12 +19,12 @@ public class ReportByPersonProcessor {
 
     private final BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider;
     private final ExcelReportGenerator reportGenerator;
-    private final DateTomeProvider dateTomeProvider;
+    private final DateTimeProvider dateTimeProvider;
 
-    public ReportByPersonProcessor(BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider, ExcelReportGenerator reportGenerator, DateTomeProvider dateTomeProvider) {
+    public ReportByPersonProcessor(BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider, ExcelReportGenerator reportGenerator, DateTimeProvider dateTimeProvider) {
         this.bigJiraBrotherPeopleViewProvider = bigJiraBrotherPeopleViewProvider;
         this.reportGenerator = reportGenerator;
-        this.dateTomeProvider = dateTomeProvider;
+        this.dateTimeProvider = dateTimeProvider;
     }
 
     public void prepareReportByPersonForLastFinishedWeek(List<PeopleSearchRequest> peopleSearchRequest) {
@@ -40,7 +40,7 @@ public class ReportByPersonProcessor {
 
     private PeopleSearchConditions toPeopleSearchConditionsForLastFinishedWeek(PeopleSearchRequest peopleSearchRequest) {
 
-        LocalDate mondayOfLastFinishedWeek = dateTomeProvider.nowLocalDate()
+        LocalDate mondayOfLastFinishedWeek = dateTimeProvider.nowLocalDate()
                 .with(DayOfWeek.MONDAY)
                 .minusWeeks(1);
 
