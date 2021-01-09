@@ -6,10 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrother;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.PeopleViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.SprintViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.TasksRootViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.TasksTreeViewMetricsCalculator;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.PeopleViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
@@ -20,28 +20,29 @@ import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
 import ua.dp.dryzhyryk.big.brother.resources.jira.inicialisation.Configurations;
 import ua.dp.dryzhyryk.big.brother.resources.jira.processors.ReportByPersonProcessor;
 import ua.dp.dryzhyryk.big.brother.resources.jira.processors.ReportBySprintProcessor;
+import ua.dp.dryzhyryk.big.brother.resources.jira.search.PeopleSearchRequest;
 import ua.dp.dryzhyryk.big.brother.resources.jira.search.SearchRequests;
 import ua.dp.dryzhyryk.big.brother.resources.jira.utils.JsonUtils;
 
 import java.io.File;
+import java.util.List;
 
 @Slf4j
 public class BigBrotherConsoleApplication {
 
+    private Configurations config;
+    private ReportBySprintProcessor reportBySprintProcessor;
+    private ReportByPersonProcessor reportByPersonProcessor;
 
-	private static Configurations config;
-	private static ReportBySprintProcessor reportBySprintProcessor;
-	private static ReportByPersonProcessor reportByPersonProcessor;
+    public BigBrotherConsoleApplication(Configurations config) {
 
-	private static void initBeans(String[] args) {
+        this.config = config;
 
-		config = Configurations.loadFromAppArguments(args);
+        File storageRoot = new File(config.getRootDir(), "storage");
+        storageRoot.mkdirs();
 
-		File storageRoot = new File(config.getRootDir(), "storage");
-		storageRoot.mkdirs();
-
-		File reportRoot = new File(config.getRootDir(), "/reports");
-		reportRoot.mkdirs();
+        File reportRoot = new File(config.getRootDir(), "/reports");
+        reportRoot.mkdirs();
 
         AsynchronousJiraRestClientFactory jiraRestClientFactory = new AsynchronousJiraRestClientFactory();
         JiraRestClient jiraRestClient = jiraRestClientFactory
@@ -74,19 +75,25 @@ public class BigBrotherConsoleApplication {
 
     public static void main(String[] args) {
 
-        initBeans(args);
+        Configurations config = Configurations.loadFromAppArguments(args);
 
-		SearchRequests searchRequests = loadSearchRequests();
+        BigBrotherConsoleApplication app = new BigBrotherConsoleApplication(config);
+
+        SearchRequests searchRequests = app.loadSearchRequests();
 
 //		reportBySprintProcessor.prepareReportBySprint(searchRequests.getSprintSearchConditions());
 //      reportByPersonProcessor.prepareReportByPerson(searchRequests.getPeopleSearchConditions());
 
-        reportByPersonProcessor.prepareReportByPersonForLastFinishedWeek(searchRequests.getPeopleSearchConditions());
+        app.prepareReportByPersonForLastFinishedWeek(searchRequests);
     }
 
-	private static SearchRequests loadSearchRequests() {
-		String searchFilePath = config.getRootDir() + "/search.json";
-		return JsonUtils.loadJson(searchFilePath, SearchRequests.class);
-	}
+    private SearchRequests loadSearchRequests() {
+        String searchFilePath = config.getRootDir() + "/search.json";
+        return JsonUtils.loadJson(searchFilePath, SearchRequests.class);
+    }
 
+    private void prepareReportByPersonForLastFinishedWeek(SearchRequests searchRequests) {
+        List<PeopleSearchRequest> peopleSearchConditions = searchRequests.getPeopleSearchConditions();
+        reportByPersonProcessor.prepareReportByPersonForLastFinishedWeek(peopleSearchConditions);
+    }
 }

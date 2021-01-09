@@ -1,4 +1,4 @@
-package com.projectvalis.compUtils.tests.example;
+package ua.dp.dryzhyryk.big.brother.tests;
 
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Named;
@@ -6,13 +6,7 @@ import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
 import org.jbehave.core.steps.Steps;
 
-
-/**
- * BDD tests for the ingest class
- *
- * @author funktapuss
- */
-public class ExampleSteps extends Steps {
+public class ReportByPersonForLastFinishedWeekSteps extends Steps {
 
     @Given("a file, $filename")
     public void setFileName(@Named("filename") String filename) {

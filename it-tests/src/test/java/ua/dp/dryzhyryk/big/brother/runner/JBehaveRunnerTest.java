@@ -1,7 +1,6 @@
-package com.projectvalis.compUtils.tests.runner;
+package ua.dp.dryzhyryk.big.brother.runner;
 
 
-import com.projectvalis.compUtils.tests.example.ExampleSteps;
 import org.jbehave.core.configuration.Configuration;
 import org.jbehave.core.configuration.MostUsefulConfiguration;
 import org.jbehave.core.io.CodeLocations;
@@ -13,16 +12,20 @@ import org.jbehave.core.reporters.StoryReporterBuilder;
 import org.jbehave.core.steps.InjectableStepsFactory;
 import org.jbehave.core.steps.InstanceStepsFactory;
 import org.jbehave.core.steps.Steps;
+import ua.dp.dryzhyryk.big.brother.resources.jira.BigBrotherConsoleApplication;
+import ua.dp.dryzhyryk.big.brother.resources.jira.inicialisation.Configurations;
+import ua.dp.dryzhyryk.big.brother.tests.JiraDataSteps;
+import ua.dp.dryzhyryk.big.brother.tests.ReportByPersonForLastFinishedWeekSteps;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class JBehaveRunner_Test extends JUnitStories {
-	
-    @Override 
-    public Configuration configuration() { 
-    	return new MostUsefulConfiguration()            
+public class JBehaveRunnerTest extends JUnitStories {
+
+    @Override
+    public Configuration configuration() {
+    	return new MostUsefulConfiguration()
     			.useStoryLoader(
     					new LoadFromClasspath(this.getClass().getClassLoader()))
                 .useStoryReporterBuilder(
@@ -35,12 +38,21 @@ public class JBehaveRunner_Test extends JUnitStories {
 
     @Override
     public InjectableStepsFactory stepsFactory() {
+
+        String[] args = {};
+        Configurations config = Configurations.loadFromAppArguments(args);
+
+        BigBrotherConsoleApplication app = new BigBrotherConsoleApplication(config);
+
+
         List<Steps> stepFileList = Arrays.asList(
-                new ExampleSteps());
-    	
-        return new InstanceStepsFactory(configuration(), stepFileList);       
+                new JiraDataSteps(),
+                new ReportByPersonForLastFinishedWeekSteps()
+        );
+
+        return new InstanceStepsFactory(configuration(), stepFileList);
     }
-    
+
     @Override
     protected List<String> storyPaths() {
        return new StoryFinder().
@@ -48,7 +60,6 @@ public class JBehaveRunner_Test extends JUnitStories {
     				   this.getClass()),
                        Collections.singletonList("**/*.story"),
                        Collections.singletonList(""));
-       
+
     }
-   
 }
