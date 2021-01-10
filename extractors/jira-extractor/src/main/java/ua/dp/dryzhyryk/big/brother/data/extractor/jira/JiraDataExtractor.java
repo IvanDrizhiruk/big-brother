@@ -88,6 +88,7 @@ public class JiraDataExtractor implements JiraResource {
         log.info("Root task has loaded {} ",  issues);
 
         return  issues.stream()
+                //TODO load work log fully
                 .map(issue -> loadIssueFully(issue.getKey()))
                 .map(this::toTask)
                 .collect(Collectors.toList());
