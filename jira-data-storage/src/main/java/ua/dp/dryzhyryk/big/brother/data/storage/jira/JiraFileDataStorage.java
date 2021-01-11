@@ -55,6 +55,8 @@ public class JiraFileDataStorage implements JiraDataStorage {
 		File fileForStoring = new File(rootStorageDirectory, filename);
 
 		if (!fileForStoring.isFile() || !fileForStoring.exists()) {
+			log.info("Unable find cashed data in file: {}", fileForStoring.getAbsolutePath());
+
 			return null;
 		}
 
