@@ -5,16 +5,17 @@ import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchCon
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.SprintView;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksRootView;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksTreeView;
-import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
+import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
 import ua.dp.dryzhyryk.big.brother.resources.jira.search.SprintSearchRequest;
 
 import java.util.List;
 
+//FIXME move to core
 public class ReportBySprintProcessor {
     private final BigJiraBrother bigJiraBrother;
-    private final ExcelReportGenerator reportGenerator;
+    private final ReportGenerator reportGenerator;
 
-    public ReportBySprintProcessor(BigJiraBrother bigJiraBrother, ExcelReportGenerator reportGenerator) {
+    public ReportBySprintProcessor(BigJiraBrother bigJiraBrother, ReportGenerator reportGenerator) {
         this.bigJiraBrother = bigJiraBrother;
         this.reportGenerator = reportGenerator;
     }

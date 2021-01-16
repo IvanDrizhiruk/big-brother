@@ -7,6 +7,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.*;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.TaskWorkingLogMetrics;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.TimeSpentByDay;
+import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
 import ua.dp.dryzhyryk.big.brother.core.utils.TimeUtils;
 import ua.dp.dryzhyryk.big.brother.core.validator.ReportByPersonValidator;
 import ua.dp.dryzhyryk.big.brother.core.validator.model.ValidationInformation;
@@ -25,10 +26,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Slf4j
-public class ExcelReportGenerator {
+public class ExcelReportGenerator implements ReportGenerator {
 
     private final File reportRoot;
-    private ReportByPersonValidator reportValidator;
+    private final ReportByPersonValidator reportValidator;
 
     public ExcelReportGenerator(String reportRoot, ReportByPersonValidator reportByPersonValidator) {
         this.reportRoot = new File(reportRoot);
@@ -465,7 +466,7 @@ public class ExcelReportGenerator {
         }
     }
 
-    public void addComment(Workbook workbook, Sheet sheet, Cell cell, String author, String commentText) {
+    private void addComment(Workbook workbook, Sheet sheet, Cell cell, String author, String commentText) {
         CreationHelper factory = workbook.getCreationHelper();
         //get an existing cell or create it otherwise:
         ClientAnchor anchor = factory.createClientAnchor();
@@ -492,7 +493,7 @@ public class ExcelReportGenerator {
                 : convertMinutesToHour(res).toString();
     }
 
-    public static List<LocalDate> getDatesBetween(LocalDate startDate, LocalDate endDate) {
+    private static List<LocalDate> getDatesBetween(LocalDate startDate, LocalDate endDate) {
 
         long numOfDaysBetween = ChronoUnit.DAYS.between(startDate, endDate);
         return IntStream.iterate(0, i -> i + 1)

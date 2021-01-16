@@ -119,6 +119,8 @@ public class JiraDataExtractor implements JiraResource {
 
         log.info("Load issue fully {} ", issueKey);
 
+        //TODO add cache for full loaded task
+
         try {
             //TODO add retry on exception
             return jiraRestClient.getIssueClient().getIssue(issueKey).get();//.get(TIMOUT_IN_SECONDS, TimeUnit.SECONDS);

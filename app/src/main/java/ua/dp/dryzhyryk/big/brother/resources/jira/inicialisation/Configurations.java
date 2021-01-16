@@ -8,9 +8,14 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Value
+@Builder
 public class Configurations {
 
 	private final String rootDir;
@@ -23,22 +28,6 @@ public class Configurations {
 		this.jiraUri = jiraUri;
 		this.jiraUsername = jiraUsername;
 		this.jiraPassword = jiraPassword;
-	}
-
-	public String getRootDir() {
-		return rootDir;
-	}
-
-	public URI getJiraUri() {
-		return jiraUri;
-	}
-
-	public String getJiraUsername() {
-		return jiraUsername;
-	}
-
-	public String getJiraPassword() {
-		return jiraPassword;
 	}
 
 	public static Configurations loadFromAppArguments(String[] args) {

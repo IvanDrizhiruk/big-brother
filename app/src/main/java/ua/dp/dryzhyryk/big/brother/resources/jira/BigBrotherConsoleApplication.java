@@ -12,6 +12,7 @@ import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.TasksTreeViewMetricsC
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.PeopleViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
+import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
 import ua.dp.dryzhyryk.big.brother.core.validator.ReportByPersonValidator;
 import ua.dp.dryzhyryk.big.brother.data.extractor.jira.JiraDataExtractor;
@@ -30,9 +31,9 @@ import java.util.List;
 @Slf4j
 public class BigBrotherConsoleApplication {
 
-    private Configurations config;
-    private ReportBySprintProcessor reportBySprintProcessor;
-    private ReportByPersonProcessor reportByPersonProcessor;
+    private final Configurations config;
+    private final ReportBySprintProcessor reportBySprintProcessor;
+    private final ReportByPersonProcessor reportByPersonProcessor;
 
     public BigBrotherConsoleApplication(Configurations config) {
 
@@ -49,7 +50,7 @@ public class BigBrotherConsoleApplication {
                 .createWithBasicHttpAuthentication(config.getJiraUri(), config.getJiraUsername(), config.getJiraPassword());
         JiraResource jiraResource = new JiraDataExtractor(jiraRestClient);
         JiraDataStorage jiraDataStorage = new JiraFileDataStorage(storageRoot.getAbsolutePath());
-        JiraInformationHolder jiraInformationHolder = new JiraInformationHolder(jiraResource, jiraDataStorage);
+        JiraInformationHolder jiraInformationHolder = newJiraInformationHolder(jiraResource, jiraDataStorage);
         TasksTreeViewMetricsCalculator tasksTreeViewMetricsCalculator = new TasksTreeViewMetricsCalculator();
         TasksRootViewMetricsCalculator tasksRootViewMetricsCalculator = new TasksRootViewMetricsCalculator();
         PeopleViewMetricsCalculator peopleViewMetricsCalculator = new PeopleViewMetricsCalculator();
@@ -57,13 +58,13 @@ public class BigBrotherConsoleApplication {
         BigJiraBrother bigJiraBrother = new BigJiraBrother(jiraInformationHolder, tasksTreeViewMetricsCalculator, tasksRootViewMetricsCalculator,
                 sprintViewMetricsCalculator);
 
-        DateTimeProvider dateTimeProvider = new DateTimeProvider();
+        DateTimeProvider dateTimeProvider = newDateTimeProvider();
 
         BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProvider(jiraInformationHolder, peopleViewMetricsCalculator);
 
         ReportByPersonValidator reportByPersonValidator = new ReportByPersonValidator();
 
-        ExcelReportGenerator reportGenerator = new ExcelReportGenerator(reportRoot.getAbsolutePath(), reportByPersonValidator);
+        ReportGenerator reportGenerator = newExcelReportGenerator(reportRoot.getAbsolutePath(), reportByPersonValidator);
 
 
         reportBySprintProcessor = new ReportBySprintProcessor(bigJiraBrother, reportGenerator);
@@ -71,6 +72,18 @@ public class BigBrotherConsoleApplication {
                 bigJiraBrotherPeopleViewProvider,
                 reportGenerator,
                 dateTimeProvider);
+    }
+
+    protected DateTimeProvider newDateTimeProvider() {
+        return new DateTimeProvider();
+    }
+
+    protected JiraInformationHolder newJiraInformationHolder(JiraResource jiraResource, JiraDataStorage jiraDataStorage) {
+        return new JiraInformationHolder(jiraResource, jiraDataStorage);
+    }
+
+    protected ReportGenerator newExcelReportGenerator(String absolutePath, ReportByPersonValidator reportByPersonValidator) {
+        return new ExcelReportGenerator(absolutePath, reportByPersonValidator);
     }
 
     public static void main(String[] args) {
@@ -92,7 +105,7 @@ public class BigBrotherConsoleApplication {
         return JsonUtils.loadJson(searchFilePath, SearchRequests.class);
     }
 
-    private void prepareReportByPersonForLastFinishedWeek(SearchRequests searchRequests) {
+    public void prepareReportByPersonForLastFinishedWeek(SearchRequests searchRequests) {
         List<PeopleSearchRequest> peopleSearchConditions = searchRequests.getPeopleSearchConditions();
         reportByPersonProcessor.prepareReportByPersonForLastFinishedWeek(peopleSearchConditions);
     }

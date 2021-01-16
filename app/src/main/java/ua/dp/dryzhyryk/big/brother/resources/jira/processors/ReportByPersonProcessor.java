@@ -1,11 +1,13 @@
 package ua.dp.dryzhyryk.big.brother.resources.jira.processors;
 
+import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
+import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
-import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
 import ua.dp.dryzhyryk.big.brother.resources.jira.search.PeopleSearchRequest;
+import ua.dp.dryzhyryk.big.brother.utils.PrintUtils;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -15,13 +17,15 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+//FIXME move to core
+@Slf4j
 public class ReportByPersonProcessor {
 
     private final BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider;
-    private final ExcelReportGenerator reportGenerator;
+    private final ReportGenerator reportGenerator;
     private final DateTimeProvider dateTimeProvider;
 
-    public ReportByPersonProcessor(BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider, ExcelReportGenerator reportGenerator, DateTimeProvider dateTimeProvider) {
+    public ReportByPersonProcessor(BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider, ReportGenerator reportGenerator, DateTimeProvider dateTimeProvider) {
         this.bigJiraBrotherPeopleViewProvider = bigJiraBrotherPeopleViewProvider;
         this.reportGenerator = reportGenerator;
         this.dateTimeProvider = dateTimeProvider;
@@ -35,6 +39,7 @@ public class ReportByPersonProcessor {
         peopleSearchRequest.stream()
                 .map(this::toPeopleSearchConditionsForLastFinishedWeek)
                 .map(bigJiraBrotherPeopleViewProvider::preparePeopleView)
+                .peek(peopleView -> PrintUtils.printPeopleView(peopleView, log))
                 .forEach(reportGenerator::generatePeopleReport);
     }
 

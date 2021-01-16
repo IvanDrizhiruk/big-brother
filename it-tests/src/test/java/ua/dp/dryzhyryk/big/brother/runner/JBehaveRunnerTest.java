@@ -1,6 +1,7 @@
 package ua.dp.dryzhyryk.big.brother.runner;
 
 
+import lombok.SneakyThrows;
 import org.jbehave.core.configuration.Configuration;
 import org.jbehave.core.configuration.MostUsefulConfiguration;
 import org.jbehave.core.io.CodeLocations;
@@ -12,11 +13,20 @@ import org.jbehave.core.reporters.StoryReporterBuilder;
 import org.jbehave.core.steps.InjectableStepsFactory;
 import org.jbehave.core.steps.InstanceStepsFactory;
 import org.jbehave.core.steps.Steps;
+import org.mockito.Mockito;
+import ua.dp.dryzhyryk.big.brother.app.ReportGeneratorMock;
+import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
+import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
+import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
+import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
+import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
+import ua.dp.dryzhyryk.big.brother.core.validator.ReportByPersonValidator;
 import ua.dp.dryzhyryk.big.brother.resources.jira.BigBrotherConsoleApplication;
 import ua.dp.dryzhyryk.big.brother.resources.jira.inicialisation.Configurations;
-import ua.dp.dryzhyryk.big.brother.tests.JiraDataSteps;
+import ua.dp.dryzhyryk.big.brother.tests.JiraInformationHolderMockingSteps;
 import ua.dp.dryzhyryk.big.brother.tests.ReportByPersonForLastFinishedWeekSteps;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -25,29 +35,52 @@ public class JBehaveRunnerTest extends JUnitStories {
 
     @Override
     public Configuration configuration() {
-    	return new MostUsefulConfiguration()
-    			.useStoryLoader(
-    					new LoadFromClasspath(this.getClass().getClassLoader()))
+        return new MostUsefulConfiguration()
+                .useStoryLoader(
+                        new LoadFromClasspath(this.getClass().getClassLoader()))
                 .useStoryReporterBuilder(
                         new StoryReporterBuilder()
-                            .withDefaultFormats()
-                            .withFormats(Format.HTML, Format.CONSOLE)
-                            .withRelativeDirectory("jbehave-report")
+                                .withDefaultFormats()
+                                .withFormats(Format.HTML, Format.CONSOLE)
+                                .withRelativeDirectory("jbehave-report")
                 );
     }
 
+    @SneakyThrows
     @Override
     public InjectableStepsFactory stepsFactory() {
+        Configurations config = Configurations.builder()
+                .rootDir("target/")
+                .jiraUri(new URI("mega_url"))
+                .jiraUsername("mega_user")
+                .jiraPassword("mega_password")
+                .build();
 
-        String[] args = {};
-        Configurations config = Configurations.loadFromAppArguments(args);
+        DateTimeProvider dateTimeProviderMock = Mockito.mock(DateTimeProvider.class);
+        JiraInformationHolder jiraInformationHolderMock = Mockito.mock(JiraInformationHolder.class);
+        ReportGeneratorMock reportGeneratorMock = new ReportGeneratorMock();
 
-        BigBrotherConsoleApplication app = new BigBrotherConsoleApplication(config);
+        BigBrotherConsoleApplication app = new BigBrotherConsoleApplication(config) {
 
+            @Override
+            protected DateTimeProvider newDateTimeProvider() {
+                return dateTimeProviderMock;
+            }
+
+            @Override
+            protected JiraInformationHolder newJiraInformationHolder(JiraResource jiraResource, JiraDataStorage jiraDataStorage) {
+                return jiraInformationHolderMock;
+            }
+
+            @Override
+            protected ReportGenerator newExcelReportGenerator(String absolutePath, ReportByPersonValidator reportByPersonValidator) {
+                return reportGeneratorMock;
+            }
+        };
 
         List<Steps> stepFileList = Arrays.asList(
-                new JiraDataSteps(),
-                new ReportByPersonForLastFinishedWeekSteps()
+                new JiraInformationHolderMockingSteps(jiraInformationHolderMock),
+                new ReportByPersonForLastFinishedWeekSteps(app, dateTimeProviderMock, reportGeneratorMock)
         );
 
         return new InstanceStepsFactory(configuration(), stepFileList);
@@ -55,11 +88,10 @@ public class JBehaveRunnerTest extends JUnitStories {
 
     @Override
     protected List<String> storyPaths() {
-       return new StoryFinder().
-    		   findPaths(CodeLocations.codeLocationFromClass(
-    				   this.getClass()),
-                       Collections.singletonList("**/*.story"),
-                       Collections.singletonList(""));
-
+        return new StoryFinder().
+                findPaths(CodeLocations.codeLocationFromClass(
+                        this.getClass()),
+                        Collections.singletonList("**/*.story"),
+                        Collections.singletonList(""));
     }
 }
