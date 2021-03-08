@@ -2,6 +2,7 @@ package ua.dp.dryzhyryk.big.brother;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -43,6 +44,7 @@ class JiraCacheTests {
                 tasksRootViewMetricsCalculator, sprintViewMetricsCalculator);
     }
 
+    @Disabled
     @Test
     public void dataShouldBeReceivedFromJiraResourceAndCashed() {
         //given
@@ -69,6 +71,7 @@ class JiraCacheTests {
         Assertions.assertEquals(actualFirst, actualSecond);
     }
 
+    @Disabled
     @Test
     public void dataShouldBeReceivedFromJiraStorageAndCashed() {
         //given
@@ -92,6 +95,7 @@ class JiraCacheTests {
         Assertions.assertEquals(actualFirst, actualSecond);
     }
 
+    @Disabled
     @Test
     public void dataReceivedFromJiraResourceShouldBeStoredToJiraStorage() {
         //given

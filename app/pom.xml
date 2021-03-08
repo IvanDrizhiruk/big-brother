@@ -35,14 +35,6 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
@@ -55,9 +47,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
-                            <mainClass>
-                                ua.dp.dryzhyryk.big.brother.resources.jira.BigBrotherConsoleApplication
-                            </mainClass>
+                            <mainClass>ua.dp.dryzhyryk.big.brother.resources.jira.BigBrotherConsoleApplication</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -74,9 +64,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>
-                                        ua.dp.dryzhyryk.big.brother.resources.jira.BigBrotherConsoleApplication
-                                    </mainClass>
+                                    <mainClass>ua.dp.dryzhyryk.big.brother.resources.jira.BigBrotherConsoleApplication</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
