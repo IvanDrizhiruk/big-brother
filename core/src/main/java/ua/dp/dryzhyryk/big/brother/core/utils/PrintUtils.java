@@ -1,4 +1,4 @@
-package ua.dp.dryzhyryk.big.brother.utils;
+package ua.dp.dryzhyryk.big.brother.core.utils;
 
 import org.slf4j.Logger;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;

@@ -5,7 +5,7 @@ import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
-import ua.dp.dryzhyryk.big.brother.utils.PrintUtils;
+import ua.dp.dryzhyryk.big.brother.core.utils.PrintUtils;
 
 import java.util.*;
 

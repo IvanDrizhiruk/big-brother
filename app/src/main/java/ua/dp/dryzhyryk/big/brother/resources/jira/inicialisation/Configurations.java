@@ -1,5 +1,9 @@
 package ua.dp.dryzhyryk.big.brother.resources.jira.inicialisation;
 
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,11 +11,6 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
-
-import lombok.Builder;
-import lombok.Data;
-import lombok.Value;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Value

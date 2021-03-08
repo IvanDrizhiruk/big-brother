@@ -7,7 +7,7 @@ import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
 import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
 import ua.dp.dryzhyryk.big.brother.resources.jira.search.PeopleSearchRequest;
-import ua.dp.dryzhyryk.big.brother.utils.PrintUtils;
+import ua.dp.dryzhyryk.big.brother.core.utils.PrintUtils;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
