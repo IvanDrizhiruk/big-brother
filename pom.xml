@@ -17,10 +17,10 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <jacoco.version>0.8.6</jacoco.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-failsafe-plugin.version>3.0.0-M5</maven-failsafe-plugin.version>
-        <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+        <jacoco.version>0.8.6</jacoco.version>
+        <sonar-maven-plugin.version>3.7.0.1746</sonar-maven-plugin.version>
 
         <atlassian.product.version>8.4.2</atlassian.product.version>
         <jira-rest-java-client-core.version>5.1.6</jira-rest-java-client-core.version>
@@ -33,9 +33,7 @@
 
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-<!--        <sonar.coverage.jacoco.xmlReportPaths>/home/idryzhyruk/workspace/big-brother/jacoco-report/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>-->
         <sonar.language>java</sonar.language>
-
     </properties>
 
     <repositories>
@@ -127,40 +125,18 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>${maven-failsafe-plugin.version}</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven-surefire-plugin.version}</version>
-            </plugin>
+
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
                 <executions>
-                    <!--                    <execution>-->
-                    <!--                        <id>default-prepare-agent</id>-->
-                    <!--                        <goals>-->
-                    <!--                            <goal>prepare-agent</goal>-->
-                    <!--                        </goals>-->
-                    <!--                        <configuration>-->
-                    <!--                            <destFile>${project.basedir}/target/jacoco.exec</destFile>-->
-                    <!--                        </configuration>-->
-                    <!--                    </execution>-->
-
                     <execution>
                         <id>jacoco-initialize</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
                         <phase>test-compile</phase>
-                        <!--                        <configuration>-->
-                        <!--                            <destFile>${project.basedir}/target/site/jacoco/jacoco.xml</destFile>-->
-                        <!--                        </configuration>-->
                     </execution>
                     <execution>
                         <id>jacoco-site</id>
@@ -169,48 +145,39 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
-                    <!--                    <execution>-->
-                    <!--                        <id>report</id>-->
-                    <!--                        <goals>-->
-                    <!--                            <goal>report-aggregate</goal>-->
-                    <!--                        </goals>-->
-                    <!--                        <phase>verify</phase>-->
-                    <!--                    </execution>-->
                 </executions>
             </plugin>
-
-
-<!--            <plugin>-->
-<!--                <groupId>org.codehaus.mojo</groupId>-->
-<!--                <artifactId>properties-maven-plugin</artifactId>-->
-<!--                <version>1.0.0</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>initialize</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>read-project-properties</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <files>-->
-<!--                                <file>/home/idryzhyruk/workspace/big-brother/sonar-project.properties</file>-->
-<!--                            </files>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
-<!--            <plugin>-->
-<!--                <groupId>org.sonarsource.scanner.maven</groupId>-->
-<!--                <artifactId>sonar-maven-plugin</artifactId>-->
-<!--                <version>3.7.0.1746</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>compile</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>sonar<``/goal>-->
-<!--                        </goals>-->
-<!--                  `  </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>sonar</id>
+
+            <properties>
+                <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+                <sonar.organization>ivandrizhiruk</sonar.organization>
+                <sonar.projectKey>IvanDrizhiruk_big-brother</sonar.projectKey>
+                <sonar.token>big-brother-token</sonar.token>
+            </properties>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonarsource.scanner.maven</groupId>
+                        <artifactId>sonar-maven-plugin</artifactId>
+                        <version>${sonar-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>sonar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
