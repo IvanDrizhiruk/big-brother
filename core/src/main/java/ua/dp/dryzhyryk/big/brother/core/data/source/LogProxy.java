@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SearchConditions;
-import ua.dp.dryzhyryk.big.brother.utils.PrintUtils;
+import ua.dp.dryzhyryk.big.brother.core.utils.PrintUtils;
 
 @Slf4j
 public class LogProxy implements IJiraInformationHolder {
