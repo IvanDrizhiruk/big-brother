@@ -21,12 +21,14 @@ public class Configurations {
 	private final URI jiraUri;
 	private final String jiraUsername;
 	private final String jiraPassword;
+	private final boolean isDebugEnabled;
 
-	public Configurations(String rootDir, URI jiraUri, String jiraUsername, String jiraPassword) {
+	public Configurations(String rootDir, URI jiraUri, String jiraUsername, String jiraPassword, boolean isDebugEnabled) {
 		this.rootDir = rootDir;
 		this.jiraUri = jiraUri;
 		this.jiraUsername = jiraUsername;
 		this.jiraPassword = jiraPassword;
+		this.isDebugEnabled = isDebugEnabled;
 	}
 
 	public static Configurations loadFromAppArguments(String[] args) {
@@ -38,7 +40,10 @@ public class Configurations {
 		String jiraUsername = jiraProperties.getProperty("jira.user");
 		String jiraPassword = jiraProperties.getProperty("jira.password");
 
-		return new Configurations(rootDir, jiraUri, jiraUsername, jiraPassword);
+		Properties configProperties = loadProperties(rootDir + "config/config.properties");
+		boolean isDebugEnabled = Boolean.parseBoolean(configProperties.getProperty("isDebugEnabled", "true"));
+
+		return new Configurations(rootDir, jiraUri, jiraUsername, jiraPassword, isDebugEnabled);
 	}
 
 	private static Optional<String> extract(String parameterName, String[] args) {

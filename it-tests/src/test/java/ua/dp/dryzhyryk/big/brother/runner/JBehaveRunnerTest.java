@@ -68,7 +68,8 @@ public class JBehaveRunnerTest extends JUnitStories {
             }
 
             @Override
-            protected JiraInformationHolder newJiraInformationHolder(JiraResource jiraResource, JiraDataStorage jiraDataStorage) {
+            protected JiraInformationHolder newJiraInformationHolder(JiraResource jiraResource, JiraDataStorage jiraDataStorage,
+					Configurations config) {
                 return jiraInformationHolderMock;
             }
 

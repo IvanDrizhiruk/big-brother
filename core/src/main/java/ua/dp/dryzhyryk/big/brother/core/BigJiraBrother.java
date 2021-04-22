@@ -1,6 +1,7 @@
 package ua.dp.dryzhyryk.big.brother.core;
 
 import lombok.extern.slf4j.Slf4j;
+import ua.dp.dryzhyryk.big.brother.core.data.source.IJiraInformationHolder;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchConditions;
@@ -15,13 +16,13 @@ import java.util.Map;
 @Slf4j
 public class BigJiraBrother {
 
-    private final JiraInformationHolder jiraInformationHolder;
+    private final IJiraInformationHolder jiraInformationHolder;
     private final TasksTreeViewMetricsCalculator tasksTreeViewMetricsCalculator;
     private final TasksRootViewMetricsCalculator tasksRootViewMetricsCalculator;
     private final SprintViewMetricsCalculator sprintViewMetricsCalculator;
 
     public BigJiraBrother(
-            JiraInformationHolder jiraInformationHolder,
+            IJiraInformationHolder jiraInformationHolder,
             TasksTreeViewMetricsCalculator tasksTreeViewMetricsCalculator,
             TasksRootViewMetricsCalculator tasksRootViewMetricsCalculator,
             SprintViewMetricsCalculator sprintViewMetricsCalculator) {

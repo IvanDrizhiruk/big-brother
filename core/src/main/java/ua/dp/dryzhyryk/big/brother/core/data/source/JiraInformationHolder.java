@@ -11,7 +11,7 @@ import java.util.*;
 
 @Slf4j
 //TODO rework with interface and file cash implementation
-public class JiraInformationHolder {
+public class JiraInformationHolder implements IJiraInformationHolder {
 
     private final JiraResource jiraResource;
     private final JiraDataStorage jiraDataStorage;
@@ -23,6 +23,7 @@ public class JiraInformationHolder {
         this.jiraDataStorage = jiraDataStorage;
     }
 
+    @Override
     public List<Task> getTasks(SearchConditions searchConditions) {
         return tasksBySearchConditions.computeIfAbsent(searchConditions, this::loadTask);
     }
@@ -30,8 +31,6 @@ public class JiraInformationHolder {
     private List<Task> loadTask(SearchConditions searchConditions) {
         List<Task> tasksFromStorage = jiraDataStorage.loadTasks(searchConditions);
         if (null != tasksFromStorage) {
-            PrintUtils.printTasks(tasksFromStorage, log);
-
             return tasksFromStorage;
         }
 
@@ -39,8 +38,6 @@ public class JiraInformationHolder {
         List<Task> tasksFromResource = Optional.ofNullable(loadedTaskFromResources).orElse(Collections.emptyList());
 
         jiraDataStorage.saveProjectSprint(searchConditions, tasksFromResource);
-
-        PrintUtils.printTasks(tasksFromResource, log);
 
         return tasksFromResource;
     }

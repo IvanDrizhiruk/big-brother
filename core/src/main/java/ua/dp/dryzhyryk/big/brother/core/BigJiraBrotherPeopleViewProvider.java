@@ -1,6 +1,7 @@
 package ua.dp.dryzhyryk.big.brother.core;
 
 import lombok.extern.slf4j.Slf4j;
+import ua.dp.dryzhyryk.big.brother.core.data.source.IJiraInformationHolder;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchConditions;
@@ -15,11 +16,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BigJiraBrotherPeopleViewProvider {
 
-    private final JiraInformationHolder jiraInformationHolder;
+    private final IJiraInformationHolder jiraInformationHolder;
     private final PeopleViewMetricsCalculator peopleViewMetricsCalculator;
 
     public BigJiraBrotherPeopleViewProvider(
-            JiraInformationHolder jiraInformationHolder,
+            IJiraInformationHolder jiraInformationHolder,
             PeopleViewMetricsCalculator peopleViewMetricsCalculator) {
         this.jiraInformationHolder = jiraInformationHolder;
         this.peopleViewMetricsCalculator = peopleViewMetricsCalculator;
