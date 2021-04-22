@@ -9,7 +9,7 @@
         "o_ystepa",
         "o_izhytn"
       ],
-      "beginOfTheTime": "2019-11-11",
+      "beginOfTheTime": {"year":2019,"month":11,"day":11},
       "periodDurationInDays": 7
     }
   ],
