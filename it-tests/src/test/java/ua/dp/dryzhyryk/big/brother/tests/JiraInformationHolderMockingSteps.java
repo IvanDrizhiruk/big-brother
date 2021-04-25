@@ -1,5 +1,6 @@
 package ua.dp.dryzhyryk.big.brother.tests;
 
+import org.jbehave.core.annotations.BeforeScenario;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Named;
 import org.jbehave.core.model.ExamplesTable;
@@ -22,10 +23,22 @@ import static ua.dp.dryzhyryk.big.brother.Utilities.valueAs;
 public class JiraInformationHolderMockingSteps extends BaseSteps {
 
     private final JiraInformationHolder jiraInformationHolderMock;
-    private final Map<String, Task> tasks = new HashMap<>();
+    private Map<String, Task> tasks = new HashMap<>();
 
     public JiraInformationHolderMockingSteps(JiraInformationHolder jiraInformationHolderMock) {
         this.jiraInformationHolderMock = jiraInformationHolderMock;
+    }
+
+    @BeforeScenario
+    public void beforeScenarioCleanup() {
+        tasks = new HashMap<>();
+        Mockito.clearInvocations(jiraInformationHolderMock);
+    }
+
+    @Given("cleanup jira response")
+    public void cleanupJiraResponse() {
+        tasks = new HashMap<>();
+        Mockito.clearInvocations(jiraInformationHolderMock);
     }
 
     @Given("task: $task with work log: $workLog")
