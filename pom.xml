@@ -16,7 +16,7 @@
     <description>Project for extraction data about employees</description>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
 
         <atlassian.product.version>8.4.2</atlassian.product.version>
         <jira-rest-java-client-core.version>5.1.6</jira-rest-java-client-core.version>

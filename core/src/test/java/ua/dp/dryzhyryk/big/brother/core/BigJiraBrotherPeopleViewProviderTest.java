@@ -9,7 +9,7 @@ import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchCon
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PersonSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.PeopleViewMetricsCalculator;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.PeopleViewMetricsCalculatorOld;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ class BigJiraBrotherPeopleViewProviderTest {
 
         //when
         BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProvider(
-                jiraInformationHolder, new PeopleViewMetricsCalculator());
+                jiraInformationHolder, new PeopleViewMetricsCalculatorOld());
 
         bigJiraBrotherPeopleViewProvider.preparePeopleView(peopleSearchConditions);
 
@@ -92,7 +92,7 @@ class BigJiraBrotherPeopleViewProviderTest {
 
         //when
         BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProvider(
-                jiraInformationHolder, new PeopleViewMetricsCalculator());
+                jiraInformationHolder, new PeopleViewMetricsCalculatorOld());
 
         PeopleView actual = bigJiraBrotherPeopleViewProvider.preparePeopleView(peopleSearchConditions);
         //then

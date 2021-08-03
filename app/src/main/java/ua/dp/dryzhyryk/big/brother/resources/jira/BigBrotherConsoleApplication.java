@@ -11,7 +11,7 @@ import ua.dp.dryzhyryk.big.brother.core.data.source.LogProxy;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.SprintViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.TasksRootViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.TasksTreeViewMetricsCalculator;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.PeopleViewMetricsCalculator;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.PeopleViewMetricsCalculatorOld;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
@@ -55,7 +55,7 @@ public class BigBrotherConsoleApplication {
         IJiraInformationHolder jiraInformationHolder = newJiraInformationHolder(jiraResource, jiraDataStorage, config);
         TasksTreeViewMetricsCalculator tasksTreeViewMetricsCalculator = new TasksTreeViewMetricsCalculator();
         TasksRootViewMetricsCalculator tasksRootViewMetricsCalculator = new TasksRootViewMetricsCalculator();
-        PeopleViewMetricsCalculator peopleViewMetricsCalculator = new PeopleViewMetricsCalculator();
+        PeopleViewMetricsCalculatorOld peopleViewMetricsCalculator = new PeopleViewMetricsCalculatorOld();
         SprintViewMetricsCalculator sprintViewMetricsCalculator = new SprintViewMetricsCalculator();
         BigJiraBrother bigJiraBrother = new BigJiraBrother(jiraInformationHolder, tasksTreeViewMetricsCalculator, tasksRootViewMetricsCalculator,
                 sprintViewMetricsCalculator);
