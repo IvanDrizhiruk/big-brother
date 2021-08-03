@@ -3,13 +3,13 @@ package ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.TaskWorkLog;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.person.PersonMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TaskWorkingLogMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TimeSpentByDay;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValueWithValidation;
@@ -53,21 +53,14 @@ class TaskMetricsForPeopleCalculatorTest {
 				.timeSpentOnTaskInMinutesByPeriod(ValueWithValidation.valueWithNotEvaluatedValidationStatus(150))
 				.build();
 
-		PersonMetrics personMetrics1 = PersonMetrics.builder()
-				.person("person#1")
-				.dailyTaskWorkingLogMetrics(
-						List.of(taskWorkingLogMetrics1))
-				.build();
-
-		List<PersonMetrics> expected = List.of(personMetrics1);
+		Map<String, TaskWorkingLogMetrics> expected = Map.of("person#1", taskWorkingLogMetrics1);
 
 		//when
 		TaskMetricsForPeopleCalculator calculator = new TaskMetricsForPeopleCalculator();
-		List<PersonMetrics> actual = calculator.toPersonsMetricsForTask(task, startPeriod, endPeriod);
+		Map<String, TaskWorkingLogMetrics> actual = calculator.calculatePersonsMetricsForPeopleFromTask(task, startPeriod, endPeriod);
 
 		//then
-		Assertions.assertThat(actual)
-				.containsExactlyInAnyOrderElementsOf(expected);
+		Assertions.assertThat(actual).isEqualTo(expected);
 	}
 
 	@Test
@@ -105,12 +98,6 @@ class TaskMetricsForPeopleCalculatorTest {
 				.timeSpentOnTaskInMinutesByPeriod(ValueWithValidation.valueWithNotEvaluatedValidationStatus(100))
 				.build();
 
-		PersonMetrics personMetrics1 = PersonMetrics.builder()
-				.person("person#1")
-				.dailyTaskWorkingLogMetrics(
-						List.of(taskWorkingLogMetrics1))
-				.build();
-
 		TaskWorkingLogMetrics taskWorkingLogMetrics2 = TaskWorkingLogMetrics.builder()
 				.taskId("#1")
 				.taskName("Task name")
@@ -121,21 +108,16 @@ class TaskMetricsForPeopleCalculatorTest {
 				.timeSpentOnTaskInMinutesByPeriod(ValueWithValidation.valueWithNotEvaluatedValidationStatus(100))
 				.build();
 
-		PersonMetrics personMetrics2 = PersonMetrics.builder()
-				.person("person#2")
-				.dailyTaskWorkingLogMetrics(
-						List.of(taskWorkingLogMetrics2))
-				.build();
-
-		List<PersonMetrics> expected = List.of(personMetrics1, personMetrics2);
+		Map<String, TaskWorkingLogMetrics> expected = Map.of(
+				"person#1", taskWorkingLogMetrics1,
+				"person#2", taskWorkingLogMetrics2);
 
 		//when
 		TaskMetricsForPeopleCalculator calculator = new TaskMetricsForPeopleCalculator();
-		List<PersonMetrics> actual = calculator.toPersonsMetricsForTask(task, startPeriod, endPeriod);
+		Map<String, TaskWorkingLogMetrics> actual = calculator.calculatePersonsMetricsForPeopleFromTask(task, startPeriod, endPeriod);
 
 		//then
-		Assertions.assertThat(actual)
-				.containsExactlyInAnyOrderElementsOf(expected);
+		Assertions.assertThat(actual).isEqualTo(expected);
 	}
 
 	private TimeSpentByDay newTimeSpentByDay(LocalDate day, int timeSpentMinutes) {

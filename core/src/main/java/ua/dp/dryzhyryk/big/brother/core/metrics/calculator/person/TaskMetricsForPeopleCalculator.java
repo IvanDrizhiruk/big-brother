@@ -8,30 +8,21 @@ import java.util.stream.Collectors;
 
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.TaskWorkLog;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.person.PersonMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TaskWorkingLogMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TimeSpentByDay;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValueWithValidation;
 
 public class TaskMetricsForPeopleCalculator {
 
-	public List<PersonMetrics> toPersonsMetricsForTask(Task task, LocalDate startPeriod, LocalDate endPeriod) {
+	public Map<String, TaskWorkingLogMetrics> calculatePersonsMetricsForPeopleFromTask(Task task, LocalDate startPeriod, LocalDate endPeriod) {
 
 		Map<String, Map<LocalDate, Integer>> spendTimeByDayForPerson = groupSpendTimeByDayForPerson(task);
 
 		return spendTimeByDayForPerson.entrySet().stream()
-				.map(entry -> {
-					String person = entry.getKey();
-					Map<LocalDate, Integer> spentMinutesForDay = entry.getValue();
-
-					TaskWorkingLogMetrics dailyTaskLogs = toTaskWorkingLogMetrics(task, spentMinutesForDay, startPeriod, endPeriod);
-
-					return PersonMetrics.builder()
-							.person(person)
-							.dailyTaskWorkingLogMetrics(List.of(dailyTaskLogs))
-							.build();
-				})
-				.collect(Collectors.toList());
+				.collect(
+						Collectors.toMap(
+								Map.Entry::getKey,
+								entry -> toTaskWorkingLogMetrics(task, entry.getValue(), startPeriod, endPeriod)));
 	}
 
 	private Map<String, Map<LocalDate, Integer>> groupSpendTimeByDayForPerson(Task task) {

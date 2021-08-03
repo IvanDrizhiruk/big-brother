@@ -3,6 +3,7 @@ package ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,36 +22,30 @@ public class PeopleViewMetricsCalculator {
 		this.taskMetricsForPeopleCalculator = taskMetricsForPeopleCalculator;
 	}
 
-	public List<PersonMetrics> calculateFor(List<Task> tasks, PeopleSearchConditions peopleSearchConditions) {
-		Map<String, PersonMetrics> personMetricsByUser = tasks.stream()
+	public List<PersonMetrics> calculatePersonsMetrics(List<Task> tasks, PeopleSearchConditions peopleSearchConditions) {
+		Map<String, List<TaskWorkingLogMetrics>> personMetricsByUser = tasks.stream()
 				.flatMap(task ->
-						taskMetricsForPeopleCalculator.toPersonsMetricsForTask(
+						taskMetricsForPeopleCalculator.calculatePersonsMetricsForPeopleFromTask(
 										task,
 										peopleSearchConditions.getStartPeriod(),
 										peopleSearchConditions.getEndPeriod())
-								.stream()
+								.entrySet().stream()
 				)
-				.filter(personMetrics -> isExcludePersonFromPersonMetrics(personMetrics, peopleSearchConditions.getPeopleNames()))
-				.collect(
-						Collectors.toMap(
-								PersonMetrics::getPerson,
-								Function.identity(),
-								this::mergePersonMetricsForOnePerson));
+				.filter(taskWorkingLogMetricsForUser -> isExcludePersonFromPersonMetrics(taskWorkingLogMetricsForUser.getKey(),
+						peopleSearchConditions.getPeopleNames()))
+				.collect(Collectors.groupingBy(
+						Entry::getKey,
+						Collectors.mapping(Entry::getValue, Collectors.toList())));
 
-		return new ArrayList<>(personMetricsByUser.values());
-	}
-
-	private boolean isExcludePersonFromPersonMetrics(PersonMetrics personMetrics, List<String> availablePersons) {
-		return availablePersons.contains(personMetrics.getPerson());
-	}
-
-	private PersonMetrics mergePersonMetricsForOnePerson(PersonMetrics first, PersonMetrics second) {
-		List<TaskWorkingLogMetrics> dailyTaskLogs = Stream.of(first.getDailyTaskWorkingLogMetrics(), second.getDailyTaskWorkingLogMetrics())
-				.flatMap(List::stream)
+		return personMetricsByUser.entrySet().stream()
+				.map(entry -> PersonMetrics.builder()
+						.person(entry.getKey())
+						.dailyTaskWorkingLogMetrics(entry.getValue())
+						.build())
 				.collect(Collectors.toList());
+	}
 
-		return first.toBuilder()
-				.dailyTaskWorkingLogMetrics(dailyTaskLogs)
-				.build();
+	private boolean isExcludePersonFromPersonMetrics(String person, List<String> availablePersons) {
+		return availablePersons.contains(person);
 	}
 }

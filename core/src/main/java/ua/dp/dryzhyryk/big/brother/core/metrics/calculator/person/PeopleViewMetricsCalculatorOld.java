@@ -18,6 +18,7 @@ import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.PersonMe
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.TaskWorkingLogMetrics;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.TimeSpentByDay;
 
+//TODO delete me
 public class PeopleViewMetricsCalculatorOld {
 
 	public List<PersonMetrics> calculateFor(List<Task> tasks, PeopleSearchConditions peopleSearchConditions) {
