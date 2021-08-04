@@ -1,7 +1,7 @@
 package ua.dp.dryzhyryk.big.brother.app;
 
 import lombok.Getter;
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.SprintView;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksRootView;

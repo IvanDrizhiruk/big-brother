@@ -11,7 +11,7 @@
     <artifactId>big-brother-excel-report-generator</artifactId>
 
     <properties>
-        <apache.poi.version>4.1.1</apache.poi.version>
+        <apache.poi.version>5.0.0</apache.poi.version>
     </properties>
 
     <dependencies>

@@ -1,5 +1,6 @@
 package ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,11 +23,15 @@ public class PeopleViewMetricsCalculator {
 	public List<PersonMetrics> calculatePersonsMetrics(List<Task> tasks, PeopleSearchConditions peopleSearchConditions) {
 		Map<String, List<TaskWorkingLogMetrics>> personMetricsByUser = tasks.stream()
 				.flatMap(task ->
-						taskMetricsForPeopleCalculator.calculatePersonsMetricsForPeopleFromTask(
-										task,
-										peopleSearchConditions.getStartPeriod(),
-										peopleSearchConditions.getEndPeriod())
-								.entrySet().stream()
+						{
+							Map<String, TaskWorkingLogMetrics> stringTaskWorkingLogMetricsMap = taskMetricsForPeopleCalculator.calculatePersonsMetricsForPeopleFromTask(
+									task,
+									peopleSearchConditions.getStartPeriod(),
+									peopleSearchConditions.getEndPeriod());
+
+							return stringTaskWorkingLogMetricsMap
+									.entrySet().stream();
+						}
 				)
 				.filter(taskWorkingLogMetricsForUser -> isExcludePersonFromPersonMetrics(taskWorkingLogMetricsForUser.getKey(),
 						peopleSearchConditions.getPeopleNames()))
@@ -37,8 +42,11 @@ public class PeopleViewMetricsCalculator {
 		return personMetricsByUser.entrySet().stream()
 				.map(entry -> PersonMetrics.builder()
 						.person(entry.getKey())
-						.dailyTaskWorkingLogMetrics(entry.getValue())
+						.dailyTaskWorkingLogMetrics(entry.getValue().stream()
+								.sorted(Comparator.comparing(TaskWorkingLogMetrics::getTaskId))
+								.collect(Collectors.toList()))
 						.build())
+				.sorted(Comparator.comparing(PersonMetrics::getPerson))
 				.collect(Collectors.toList());
 	}
 
