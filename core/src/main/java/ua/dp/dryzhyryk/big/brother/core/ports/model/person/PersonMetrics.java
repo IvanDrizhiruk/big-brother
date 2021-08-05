@@ -12,4 +12,6 @@ public class PersonMetrics {
 	private final String person;
 
 	private final List<TaskWorkingLogMetrics> dailyTaskWorkingLogMetrics;
+
+	//TODO total
 }

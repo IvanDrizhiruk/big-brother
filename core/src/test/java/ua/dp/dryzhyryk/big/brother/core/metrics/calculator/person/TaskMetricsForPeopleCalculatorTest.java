@@ -12,7 +12,6 @@ import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.TaskWorkLog;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TaskWorkingLogMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TimeSpentByDay;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValueWithValidation;
 
 class TaskMetricsForPeopleCalculatorTest {
 
@@ -49,8 +48,8 @@ class TaskMetricsForPeopleCalculatorTest {
 						newTimeSpentByDay(day3, 50),
 						newTimeSpentByDay(day4, 50),
 						newTimeSpentByDay(day5, 50)))
-				.timeSpentOnTaskInMinutes(ValueWithValidation.valueWithNotEvaluatedValidationStatus(250))
-				.timeSpentOnTaskInMinutesByPeriod(ValueWithValidation.valueWithNotEvaluatedValidationStatus(150))
+				.timeSpentOnTaskInMinutes(250)
+				.timeSpentOnTaskInMinutesByPeriod(150)
 				.build();
 
 		Map<String, TaskWorkingLogMetrics> expected = Map.of("person#1", taskWorkingLogMetrics1);
@@ -94,8 +93,8 @@ class TaskMetricsForPeopleCalculatorTest {
 				.timeSpentByDays(List.of(
 						newTimeSpentByDay(day3, 50),
 						newTimeSpentByDay(day5, 50)))
-				.timeSpentOnTaskInMinutes(ValueWithValidation.valueWithNotEvaluatedValidationStatus(100))
-				.timeSpentOnTaskInMinutesByPeriod(ValueWithValidation.valueWithNotEvaluatedValidationStatus(100))
+				.timeSpentOnTaskInMinutes(100)
+				.timeSpentOnTaskInMinutesByPeriod(100)
 				.build();
 
 		TaskWorkingLogMetrics taskWorkingLogMetrics2 = TaskWorkingLogMetrics.builder()
@@ -104,8 +103,8 @@ class TaskMetricsForPeopleCalculatorTest {
 				.timeSpentByDays(List.of(
 						newTimeSpentByDay(day3, 50),
 						newTimeSpentByDay(day4, 50)))
-				.timeSpentOnTaskInMinutes(ValueWithValidation.valueWithNotEvaluatedValidationStatus(100))
-				.timeSpentOnTaskInMinutesByPeriod(ValueWithValidation.valueWithNotEvaluatedValidationStatus(100))
+				.timeSpentOnTaskInMinutes(100)
+				.timeSpentOnTaskInMinutesByPeriod(100)
 				.build();
 
 		Map<String, TaskWorkingLogMetrics> expected = Map.of(

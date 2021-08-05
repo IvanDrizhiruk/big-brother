@@ -17,8 +17,6 @@ import static org.mockito.ArgumentMatchers.eq;
 
 class PeopleViewMetricsCalculatorTest {
 
-    // ignore users absent in filter
-
     @Test
     public void taskWorkingLogMetricsShouldBeAggregatedByUser() {
         //given

@@ -39,6 +39,9 @@ public class PeopleViewMetricsCalculator {
 						Entry::getKey,
 						Collectors.mapping(Entry::getValue, Collectors.toList())));
 
+		//TODO totals
+		//todo validation
+
 		return personMetricsByUser.entrySet().stream()
 				.map(entry -> PersonMetrics.builder()
 						.person(entry.getKey())

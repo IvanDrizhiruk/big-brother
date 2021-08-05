@@ -10,29 +10,24 @@ import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.TaskWorkLog;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TaskWorkingLogMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TimeSpentByDay;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValueWithValidation;
 
 public class TaskMetricsForPeopleCalculator {
 
 	public Map<String, TaskWorkingLogMetrics> calculatePersonsMetricsForPeopleFromTask(Task task, LocalDate startPeriod, LocalDate endPeriod) {
 
-		Map<String, Map<LocalDate, Integer>> spendTimeByDayForPerson = groupSpendTimeByDayForPerson(task);
-
-		return spendTimeByDayForPerson.entrySet().stream()
-				.collect(
-						Collectors.toMap(
-								Map.Entry::getKey,
-								entry -> toTaskWorkingLogMetrics(task, entry.getValue(), startPeriod, endPeriod)));
-	}
-
-	private Map<String, Map<LocalDate, Integer>> groupSpendTimeByDayForPerson(Task task) {
-		return task.getWorkLogs().stream()
+		Map<String, Map<LocalDate, Integer>> spendTimeByDayForPerson = task.getWorkLogs().stream()
 				.collect(
 						Collectors.groupingBy(
 								TaskWorkLog::getPerson,
 								Collectors.groupingBy(
 										taskWorkLog -> taskWorkLog.getStartDateTime().toLocalDate(),
 										Collectors.summingInt(TaskWorkLog::getMinutesSpent))));
+
+		return spendTimeByDayForPerson.entrySet().stream()
+				.collect(
+						Collectors.toMap(
+								Map.Entry::getKey,
+								entry -> toTaskWorkingLogMetrics(task, entry.getValue(), startPeriod, endPeriod)));
 	}
 
 	private TaskWorkingLogMetrics toTaskWorkingLogMetrics(
@@ -62,8 +57,8 @@ public class TaskMetricsForPeopleCalculator {
 				.taskId(task.getId())
 				.taskName(task.getName())
 				.timeSpentByDays(timeSpentByDays)
-				.timeSpentOnTaskInMinutesByPeriod(ValueWithValidation.valueWithNotEvaluatedValidationStatus(timeSpentOnTaskInMinutesByPeriod))
-				.timeSpentOnTaskInMinutes(ValueWithValidation.valueWithNotEvaluatedValidationStatus(timeSpentOnTaskInMinutes))
+				.timeSpentOnTaskInMinutesByPeriod(timeSpentOnTaskInMinutesByPeriod)
+				.timeSpentOnTaskInMinutes(timeSpentOnTaskInMinutes)
 				.build();
 	}
 }
