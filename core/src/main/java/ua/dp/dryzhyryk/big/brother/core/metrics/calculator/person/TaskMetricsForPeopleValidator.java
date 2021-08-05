@@ -6,6 +6,7 @@ import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.Valu
 public class TaskMetricsForPeopleValidator {
 
     public ValueWithValidation<TimeSpentByDay> validate(TimeSpentByDay timeSpentByDay) {
+        //TODO need implementation
         return ValueWithValidation.valueWithNotEvaluatedValidationStatus(timeSpentByDay);
     }
 }
