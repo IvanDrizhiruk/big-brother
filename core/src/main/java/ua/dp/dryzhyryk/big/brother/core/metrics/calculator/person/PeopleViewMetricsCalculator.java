@@ -54,7 +54,7 @@ public class PeopleViewMetricsCalculator {
                             .collect(Collectors.toList());
 
                     List<ValueWithValidation<TimeSpentByDay>> timeSpentByDaysForAllTask =
-                            calculateTimeSpentByDaysForAllTask(dailyTaskWorkingLogMetrics);
+                            calculateTimeSpentByDaysForAllTask(dailyTaskWorkingLogMetrics, peopleSearchConditions.getTeamName());
 
                     return PersonMetrics.builder()
                             .person(person)
@@ -67,7 +67,7 @@ public class PeopleViewMetricsCalculator {
     }
 
     private List<ValueWithValidation<TimeSpentByDay>> calculateTimeSpentByDaysForAllTask(
-            List<TaskWorkingLogMetrics> dailyTaskWorkingLogMetrics) {
+            List<TaskWorkingLogMetrics> dailyTaskWorkingLogMetrics, String teamName) {
         Map<LocalDate, Integer> timeSpentForAllTasksByDay = dailyTaskWorkingLogMetrics.stream()
                 .flatMap(metrics -> metrics.getTimeSpentByDays().stream())
                 .collect(Collectors.groupingBy(
@@ -82,7 +82,7 @@ public class PeopleViewMetricsCalculator {
                             .day(dayAndSpentTime.getKey())
                             .timeSpentMinutes(dayAndSpentTime.getValue())
                             .build();
-                    return taskMetricsForPeopleValidator.validate(timeSpentByDay);
+                    return taskMetricsForPeopleValidator.validate(timeSpentByDay, teamName);
                 })
                 .collect(Collectors.toList());
     }

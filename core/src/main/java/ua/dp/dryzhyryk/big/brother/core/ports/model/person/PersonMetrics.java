@@ -4,7 +4,6 @@ import java.util.List;
 
 import lombok.Builder;
 import lombok.Value;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidationInfo;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValueWithValidation;
 
 @Value

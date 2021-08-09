@@ -175,9 +175,9 @@ class PeopleViewMetricsCalculatorTest {
                                                 newTimeSpentByDay(day5, 77)))
                         ))
                         .timeSpentByDaysForAllTask(List.of(
-                                ValueWithValidation.valueWithNotEvaluatedValidationStatus(newTimeSpentByDay(day3, 110)),
-                                ValueWithValidation.valueWithNotEvaluatedValidationStatus(newTimeSpentByDay(day4, 25)),
-                                ValueWithValidation.valueWithNotEvaluatedValidationStatus(newTimeSpentByDay(day5, 154))))
+                                ValueWithValidation.valueWithNotEvaluatedStatus(newTimeSpentByDay(day3, 110)),
+                                ValueWithValidation.valueWithNotEvaluatedStatus(newTimeSpentByDay(day4, 25)),
+                                ValueWithValidation.valueWithNotEvaluatedStatus(newTimeSpentByDay(day5, 154))))
                         .build());
 
         //when
@@ -192,8 +192,8 @@ class PeopleViewMetricsCalculatorTest {
 
     private TaskMetricsForPeopleValidator mockTaskMetricsForPeopleValidator() {
         TaskMetricsForPeopleValidator taskMetricsForPeopleValidator = mock(TaskMetricsForPeopleValidator.class);
-        when(taskMetricsForPeopleValidator.validate(any()))
-                .then(invocation -> ValueWithValidation.valueWithNotEvaluatedValidationStatus(invocation.getArgument(0)));
+        when(taskMetricsForPeopleValidator.validate(any(), any()))
+                .then(invocation -> ValueWithValidation.valueWithNotEvaluatedStatus(invocation.getArgument(0)));
 
         return taskMetricsForPeopleValidator;
     }

@@ -5,7 +5,7 @@ import lombok.Value;
 
 @Value
 @Builder(toBuilder = true)
-public class ValidationInfo {
+public class ValidationNote {
 
 	private final NoteType noteType;
 	private final String note;
