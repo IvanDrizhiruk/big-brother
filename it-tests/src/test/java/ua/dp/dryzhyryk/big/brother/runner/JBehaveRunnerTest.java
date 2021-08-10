@@ -18,9 +18,7 @@ import ua.dp.dryzhyryk.big.brother.app.ReportGeneratorMock;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolderImpl;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
-import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
-import ua.dp.dryzhyryk.big.brother.core.validator.ReportByPersonValidator;
 import ua.dp.dryzhyryk.big.brother.resources.jira.BigBrotherConsoleApplication;
 import ua.dp.dryzhyryk.big.brother.resources.jira.inicialisation.Configurations;
 import ua.dp.dryzhyryk.big.brother.tests.JiraInformationHolderMockingSteps;
@@ -72,11 +70,6 @@ public class JBehaveRunnerTest extends JUnitStories {
                                                                          Configurations config) {
                 return jiraInformationHolderMock;
             }
-
-            @Override
-            protected ReportGenerator newExcelReportGenerator(String absolutePath, ReportByPersonValidator reportByPersonValidator) {
-                return reportGeneratorMock;
-            }
         };
 
         List<Steps> stepFileList = Arrays.asList(
@@ -91,7 +84,7 @@ public class JBehaveRunnerTest extends JUnitStories {
     protected List<String> storyPaths() {
         return new StoryFinder().
                 findPaths(CodeLocations.codeLocationFromClass(
-                        this.getClass()),
+                                this.getClass()),
                         Collections.singletonList("**/*.story"),
                         Collections.singletonList(""));
     }

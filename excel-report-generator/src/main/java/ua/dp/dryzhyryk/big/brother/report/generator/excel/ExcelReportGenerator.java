@@ -1,66 +1,40 @@
 package ua.dp.dryzhyryk.big.brother.report.generator.excel;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.*;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.PersonMetrics;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.TaskWorkingLogMetrics;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.TimeSpentByDay;
+import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
+import ua.dp.dryzhyryk.big.brother.core.utils.TimeUtils;
+import ua.dp.dryzhyryk.big.brother.core.validator.model.ValidationInformation;
+import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.SheetWrapper;
+import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.TableBuilder;
+import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.WorkbookBuilder;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import org.apache.commons.collections4.ListUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.ClientAnchor;
-import org.apache.poi.ss.usermodel.Comment;
-import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.ss.usermodel.Drawing;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import lombok.extern.slf4j.Slf4j;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.SprintView;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskMetrics;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskTimeMetrics;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksRootView;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksTreeView;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.WorkLogByDay;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.WorkLogByPerson;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.PersonMetrics;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.TaskWorkingLogMetrics;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.TimeSpentByDay;
-import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
-import ua.dp.dryzhyryk.big.brother.core.utils.TimeUtils;
-import ua.dp.dryzhyryk.big.brother.core.validator.ReportByPersonValidator;
-import ua.dp.dryzhyryk.big.brother.core.validator.model.ValidationInformation;
-import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.SheetWrapper;
-import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.TableBuilder;
-import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.WorkbookBuilder;
 
 @Slf4j
 public class ExcelReportGenerator implements ReportGenerator {
 
     private final File reportRoot;
-    private final ReportByPersonValidator reportValidator;
     private final WorkbookBuilderFactory workbookBuilderFactory;
 
-    public ExcelReportGenerator(String reportRoot, ReportByPersonValidator reportByPersonValidator) {
+    public ExcelReportGenerator(String reportRoot) {
         this.reportRoot = new File(reportRoot);
-        this.reportValidator = reportByPersonValidator;
         this.workbookBuilderFactory = new WorkbookBuilderFactoryImpl();
 
         if (!this.reportRoot.isDirectory()) {
@@ -359,21 +333,21 @@ public class ExcelReportGenerator implements ReportGenerator {
     private void generatePeopleReport(PeopleView peopleView, WorkbookBuilder workbookBuilder) {
         SheetWrapper sheetWrapper = workbookBuilder.sheet("People view")
                 .row()
-                        .cell("Team: ")
-                            .withStyle(Style.H1)
-                        .buildCell()
-                        .cell(peopleView.getTeamName())
-                        .buildCell()
-                    .withStyle(Style.H1)
-                    .withHeightInPoints(25)
+                .cell("Team: ")
+                .withStyle(Style.H1)
+                .buildCell()
+                .cell(peopleView.getTeamName())
+                .buildCell()
+                .withStyle(Style.H1)
+                .withHeightInPoints(25)
                 .buildRow()
                 .row()
-                        .cell("Period:")
-                        .buildCell()
-                        .cell(peopleView.getStartPeriod().toString() + " " + peopleView.getEndPeriod().toString())
-                        .buildCell()
-                    .withStyle(Style.H2)
-                    .withHeightInPoints(25)
+                .cell("Period:")
+                .buildCell()
+                .cell(peopleView.getStartPeriod().toString() + " " + peopleView.getEndPeriod().toString())
+                .buildCell()
+                .withStyle(Style.H2)
+                .withHeightInPoints(25)
                 .buildRow()
                 .whiteLine();
 
@@ -382,10 +356,10 @@ public class ExcelReportGenerator implements ReportGenerator {
         peopleView.getPersonMetrics()
                 .forEach(personMetric -> {
                     sheetWrapper.row()
-                                    .cell(personMetric.getPerson())
-                                    .buildCell()
-                                .withStyle(Style.H3)
-                                .withHeightInPoints(25)
+                            .cell(personMetric.getPerson())
+                            .buildCell()
+                            .withStyle(Style.H3)
+                            .withHeightInPoints(25)
                             .buildRow();
 
                     sheetWrapper.buildTable(builder -> weeklyTable(builder, days, personMetric));

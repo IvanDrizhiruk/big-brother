@@ -16,13 +16,11 @@ import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
-import ua.dp.dryzhyryk.big.brother.core.validator.ReportByPersonValidator;
 import ua.dp.dryzhyryk.big.brother.data.extractor.jira.JiraDataExtractor;
 import ua.dp.dryzhyryk.big.brother.data.storage.jira.JiraFileDataStorage;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
 import ua.dp.dryzhyryk.big.brother.resources.jira.inicialisation.Configurations;
 import ua.dp.dryzhyryk.big.brother.resources.jira.processors.ReportByPersonProcessor;
-import ua.dp.dryzhyryk.big.brother.resources.jira.processors.ReportBySprintProcessor;
 import ua.dp.dryzhyryk.big.brother.resources.jira.search.PeopleSearchRequest;
 import ua.dp.dryzhyryk.big.brother.resources.jira.search.SearchRequests;
 import ua.dp.dryzhyryk.big.brother.resources.jira.utils.JsonUtils;
@@ -34,7 +32,6 @@ import java.util.List;
 public class BigBrotherConsoleApplication {
 
     private final Configurations config;
-    private final ReportBySprintProcessor reportBySprintProcessor;
     private final ReportByPersonProcessor reportByPersonProcessor;
 
     public BigBrotherConsoleApplication(Configurations config) {
@@ -64,12 +61,8 @@ public class BigBrotherConsoleApplication {
 
         BigJiraBrotherPeopleViewProviderOld bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProviderOld(jiraInformationHolder, peopleViewMetricsCalculator);
 
-        ReportByPersonValidator reportByPersonValidator = new ReportByPersonValidator();
+        ReportGenerator reportGenerator = new ExcelReportGenerator(reportRoot.getAbsolutePath());
 
-        ReportGenerator reportGenerator = newExcelReportGenerator(reportRoot.getAbsolutePath(), reportByPersonValidator);
-
-
-        reportBySprintProcessor = new ReportBySprintProcessor(bigJiraBrother, reportGenerator);
         reportByPersonProcessor = new ReportByPersonProcessor(
                 bigJiraBrotherPeopleViewProvider,
                 reportGenerator,
@@ -86,10 +79,6 @@ public class BigBrotherConsoleApplication {
         return config.isDebugEnabled() ? new LogProxy(jiraInformationHolder) : jiraInformationHolder;
     }
 
-    protected ReportGenerator newExcelReportGenerator(String absolutePath, ReportByPersonValidator reportByPersonValidator) {
-        return new ExcelReportGenerator(absolutePath, reportByPersonValidator);
-    }
-
     public static void main(String[] args) {
 
         Configurations config = Configurations.loadFromAppArguments(args);
@@ -97,9 +86,6 @@ public class BigBrotherConsoleApplication {
         BigBrotherConsoleApplication app = new BigBrotherConsoleApplication(config);
 
         SearchRequests searchRequests = app.loadSearchRequests();
-
-//		reportBySprintProcessor.prepareReportBySprint(searchRequests.getSprintSearchConditions());
-//      reportByPersonProcessor.prepareReportByPerson(searchRequests.getPeopleSearchConditions());
 
         app.prepareReportByPersonForLastFinishedWeek(searchRequests);
     }
