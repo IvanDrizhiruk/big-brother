@@ -15,7 +15,7 @@ import org.jbehave.core.steps.InstanceStepsFactory;
 import org.jbehave.core.steps.Steps;
 import org.mockito.Mockito;
 import ua.dp.dryzhyryk.big.brother.app.ReportGeneratorMock;
-import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
+import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolderImpl;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
@@ -57,7 +57,7 @@ public class JBehaveRunnerTest extends JUnitStories {
                 .build();
 
         DateTimeProvider dateTimeProviderMock = Mockito.mock(DateTimeProvider.class);
-        JiraInformationHolder jiraInformationHolderMock = Mockito.mock(JiraInformationHolder.class);
+        JiraInformationHolderImpl jiraInformationHolderMock = Mockito.mock(JiraInformationHolderImpl.class);
         ReportGeneratorMock reportGeneratorMock = new ReportGeneratorMock();
 
         BigBrotherConsoleApplication app = new BigBrotherConsoleApplication(config) {
@@ -68,8 +68,8 @@ public class JBehaveRunnerTest extends JUnitStories {
             }
 
             @Override
-            protected JiraInformationHolder newJiraInformationHolder(JiraResource jiraResource, JiraDataStorage jiraDataStorage,
-					Configurations config) {
+            protected JiraInformationHolderImpl newJiraInformationHolder(JiraResource jiraResource, JiraDataStorage jiraDataStorage,
+                                                                         Configurations config) {
                 return jiraInformationHolderMock;
             }
 

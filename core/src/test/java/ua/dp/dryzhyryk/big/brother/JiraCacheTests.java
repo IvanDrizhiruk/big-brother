@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrother;
-import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
+import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolderImpl;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.SprintViewMetricsCalculator;
@@ -35,7 +35,7 @@ class JiraCacheTests {
 
     @BeforeEach
     private void beforeEachTest() {
-        JiraInformationHolder jiraInformationHolder = new JiraInformationHolder(jiraResource, jiraDataStorage);
+        JiraInformationHolderImpl jiraInformationHolder = new JiraInformationHolderImpl(jiraResource, jiraDataStorage);
         TasksTreeViewMetricsCalculator tasksTreeViewMetricsCalculator = new TasksTreeViewMetricsCalculator();
         TasksRootViewMetricsCalculator tasksRootViewMetricsCalculator = new TasksRootViewMetricsCalculator();
         SprintViewMetricsCalculator sprintViewMetricsCalculator = new SprintViewMetricsCalculator();

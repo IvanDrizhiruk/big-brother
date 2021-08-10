@@ -6,7 +6,7 @@ import org.jbehave.core.annotations.Named;
 import org.jbehave.core.model.ExamplesTable;
 import org.mockito.Mockito;
 import ua.dp.dryzhyryk.big.brother.base.BaseSteps;
-import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
+import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolderImpl;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.TaskWorkLog;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SearchConditions;
@@ -22,10 +22,10 @@ import static ua.dp.dryzhyryk.big.brother.Utilities.valueAs;
 
 public class JiraInformationHolderMockingSteps extends BaseSteps {
 
-    private final JiraInformationHolder jiraInformationHolderMock;
+    private final JiraInformationHolderImpl jiraInformationHolderMock;
     private Map<String, Task> tasks = new HashMap<>();
 
-    public JiraInformationHolderMockingSteps(JiraInformationHolder jiraInformationHolderMock) {
+    public JiraInformationHolderMockingSteps(JiraInformationHolderImpl jiraInformationHolderMock) {
         this.jiraInformationHolderMock = jiraInformationHolderMock;
     }
 

@@ -8,10 +8,10 @@ import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SearchCondition
 import ua.dp.dryzhyryk.big.brother.core.utils.PrintUtils;
 
 @Slf4j
-public class LogProxy implements IJiraInformationHolder {
-	private final IJiraInformationHolder jiraInformationHolder;
+public class LogProxy implements JiraInformationHolder {
+	private final JiraInformationHolder jiraInformationHolder;
 
-	public LogProxy(IJiraInformationHolder jiraInformationHolder) {
+	public LogProxy(JiraInformationHolder jiraInformationHolder) {
 		this.jiraInformationHolder = jiraInformationHolder;
 	}
 

@@ -3,7 +3,7 @@ package ua.dp.dryzhyryk.big.brother.core;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
+import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolderImpl;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PersonSearchConditions;
@@ -39,7 +39,7 @@ class BigJiraBrotherPeopleViewProviderTest {
                 .endPeriod(endPeriod)
                 .build();
 
-        JiraInformationHolder jiraInformationHolder = mock(JiraInformationHolder.class);
+        JiraInformationHolderImpl jiraInformationHolder = mock(JiraInformationHolderImpl.class);
         when(jiraInformationHolder.getTasks(any(SearchConditions.class)))
                 .thenReturn(new ArrayList<>());
 
@@ -62,7 +62,7 @@ class BigJiraBrotherPeopleViewProviderTest {
                 .build();
 
         //when
-        BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProvider(
+        BigJiraBrotherPeopleViewProviderOld bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProviderOld(
                 jiraInformationHolder, new PeopleViewMetricsCalculatorOld());
 
         bigJiraBrotherPeopleViewProvider.preparePeopleView(peopleSearchConditions);
@@ -86,12 +86,12 @@ class BigJiraBrotherPeopleViewProviderTest {
         List<Task> tasks = new ArrayList<>();
 
 
-        JiraInformationHolder jiraInformationHolder = mock(JiraInformationHolder.class);
+        JiraInformationHolderImpl jiraInformationHolder = mock(JiraInformationHolderImpl.class);
 //        Mockito.when(jiraInformationHolder.getTasks()).then(tasks);
 
 
         //when
-        BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProvider(
+        BigJiraBrotherPeopleViewProviderOld bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProviderOld(
                 jiraInformationHolder, new PeopleViewMetricsCalculatorOld());
 
         PeopleView actual = bigJiraBrotherPeopleViewProvider.preparePeopleView(peopleSearchConditions);

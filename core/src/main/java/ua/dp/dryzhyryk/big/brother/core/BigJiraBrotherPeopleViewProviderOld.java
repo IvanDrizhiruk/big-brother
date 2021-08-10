@@ -5,22 +5,22 @@ import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PersonSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.PeopleViewMetricsCalculator;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.person.PeopleView;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.person.PersonMetrics;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.PeopleViewMetricsCalculatorOld;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.PersonMetrics;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class BigJiraBrotherPeopleViewProvider {
+public class BigJiraBrotherPeopleViewProviderOld {
 
     private final JiraInformationHolder jiraInformationHolder;
-    private final PeopleViewMetricsCalculator peopleViewMetricsCalculator;
+    private final PeopleViewMetricsCalculatorOld peopleViewMetricsCalculator;
 
-    public BigJiraBrotherPeopleViewProvider(
+    public BigJiraBrotherPeopleViewProviderOld(
             JiraInformationHolder jiraInformationHolder,
-            PeopleViewMetricsCalculator peopleViewMetricsCalculator) {
+            PeopleViewMetricsCalculatorOld peopleViewMetricsCalculator) {
         this.jiraInformationHolder = jiraInformationHolder;
         this.peopleViewMetricsCalculator = peopleViewMetricsCalculator;
     }
@@ -39,7 +39,7 @@ public class BigJiraBrotherPeopleViewProvider {
                 .distinct()
                 .collect(Collectors.toList());
 
-        List<PersonMetrics> personMetrics = peopleViewMetricsCalculator.calculatePersonsMetrics(tasks, peopleSearchConditions);
+        List<PersonMetrics> personMetrics = peopleViewMetricsCalculator.calculateFor(tasks, peopleSearchConditions);
 
         return PeopleView.builder()
                 .teamName(peopleSearchConditions.getTeamName())

@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
+import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProviderOld;
 import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 class ReportByPersonProcessorTest {
 
     @Mock
-    private BigJiraBrotherPeopleViewProvider viewProvider;
+    private BigJiraBrotherPeopleViewProviderOld viewProvider;
 
     @Mock
     private ExcelReportGenerator reportGenerator;

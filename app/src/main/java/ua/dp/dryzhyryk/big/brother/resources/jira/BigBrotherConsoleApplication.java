@@ -4,9 +4,9 @@ import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrother;
-import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
-import ua.dp.dryzhyryk.big.brother.core.data.source.IJiraInformationHolder;
+import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProviderOld;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
+import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolderImpl;
 import ua.dp.dryzhyryk.big.brother.core.data.source.LogProxy;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.SprintViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.TasksRootViewMetricsCalculator;
@@ -52,7 +52,7 @@ public class BigBrotherConsoleApplication {
                 .createWithBasicHttpAuthentication(config.getJiraUri(), config.getJiraUsername(), config.getJiraPassword());
         JiraResource jiraResource = new JiraDataExtractor(jiraRestClient);
         JiraDataStorage jiraDataStorage = new JiraFileDataStorage(storageRoot.getAbsolutePath());
-        IJiraInformationHolder jiraInformationHolder = newJiraInformationHolder(jiraResource, jiraDataStorage, config);
+        JiraInformationHolder jiraInformationHolder = newJiraInformationHolder(jiraResource, jiraDataStorage, config);
         TasksTreeViewMetricsCalculator tasksTreeViewMetricsCalculator = new TasksTreeViewMetricsCalculator();
         TasksRootViewMetricsCalculator tasksRootViewMetricsCalculator = new TasksRootViewMetricsCalculator();
         PeopleViewMetricsCalculatorOld peopleViewMetricsCalculator = new PeopleViewMetricsCalculatorOld();
@@ -62,7 +62,7 @@ public class BigBrotherConsoleApplication {
 
         DateTimeProvider dateTimeProvider = newDateTimeProvider();
 
-        BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProvider(jiraInformationHolder, peopleViewMetricsCalculator);
+        BigJiraBrotherPeopleViewProviderOld bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProviderOld(jiraInformationHolder, peopleViewMetricsCalculator);
 
         ReportByPersonValidator reportByPersonValidator = new ReportByPersonValidator();
 
@@ -80,9 +80,9 @@ public class BigBrotherConsoleApplication {
         return new DateTimeProvider();
     }
 
-    protected IJiraInformationHolder newJiraInformationHolder(JiraResource jiraResource, JiraDataStorage jiraDataStorage,
-            Configurations config) {
-        IJiraInformationHolder jiraInformationHolder = new JiraInformationHolder(jiraResource, jiraDataStorage);
+    protected JiraInformationHolder newJiraInformationHolder(JiraResource jiraResource, JiraDataStorage jiraDataStorage,
+                                                             Configurations config) {
+        JiraInformationHolder jiraInformationHolder = new JiraInformationHolderImpl(jiraResource, jiraDataStorage);
         return config.isDebugEnabled() ? new LogProxy(jiraInformationHolder) : jiraInformationHolder;
     }
 
