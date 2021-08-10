@@ -19,17 +19,17 @@ public class TaskMetricsForPeopleValidator {
         TeamConfiguration teamConfiguration = configurationService.getConfigurationForTeam(teamName);
 
         if (timeSpentByDay.getTimeSpentMinutes() < teamConfiguration.getNotEnoughTimeLoggedByDayInMinutes()) {
-            String note = "Time logged in day less " + TimeUtils.convertMinutesToHour(timeSpentByDay.getTimeSpentMinutes()) + "h";
+            String note = "Time logged in day less then " + TimeUtils.convertMinutesToHour(teamConfiguration.getNotEnoughTimeLoggedByDayInMinutes()) + "h";
             return ValueWithValidation.valueWithErrorStatus(timeSpentByDay, note);
         }
 
         if (timeSpentByDay.getTimeSpentMinutes() < teamConfiguration.getMinTimeLoggedByDayInMinutes()) {
-            String note = "Time logged in day less " + TimeUtils.convertMinutesToHour(timeSpentByDay.getTimeSpentMinutes()) + "h";
+            String note = "Time logged in day less then " + TimeUtils.convertMinutesToHour(teamConfiguration.getMinTimeLoggedByDayInMinutes()) + "h";
             return ValueWithValidation.valueWithWarningStatus(timeSpentByDay, note);
         }
 
         if (timeSpentByDay.getTimeSpentMinutes() > teamConfiguration.getMaxTimeLoggedByDayInMinutes()) {
-            String note = "Time logged in day more then " + TimeUtils.convertMinutesToHour(timeSpentByDay.getTimeSpentMinutes()) + "h";
+            String note = "Time logged in day more then " + TimeUtils.convertMinutesToHour(teamConfiguration.getMaxTimeLoggedByDayInMinutes()) + "h";
             return ValueWithValidation.valueWithErrorStatus(timeSpentByDay, note);
         }
 
