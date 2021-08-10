@@ -5,7 +5,7 @@ import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchCon
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.PersonMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TaskWorkingLogMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TimeSpentByDay;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValueWithValidation;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
 
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -53,7 +53,7 @@ public class PeopleViewMetricsCalculator {
                             .sorted(Comparator.comparing(TaskWorkingLogMetrics::getTaskId))
                             .collect(Collectors.toList());
 
-                    List<ValueWithValidation<TimeSpentByDay>> timeSpentByDaysForAllTask =
+                    List<ValidatedValue<TimeSpentByDay>> timeSpentByDaysForAllTask =
                             calculateTimeSpentByDaysForAllTask(dailyTaskWorkingLogMetrics, peopleSearchConditions.getTeamName());
 
                     return PersonMetrics.builder()
@@ -66,7 +66,7 @@ public class PeopleViewMetricsCalculator {
                 .collect(Collectors.toList());
     }
 
-    private List<ValueWithValidation<TimeSpentByDay>> calculateTimeSpentByDaysForAllTask(
+    private List<ValidatedValue<TimeSpentByDay>> calculateTimeSpentByDaysForAllTask(
             List<TaskWorkingLogMetrics> dailyTaskWorkingLogMetrics, String teamName) {
         Map<LocalDate, Integer> timeSpentForAllTasksByDay = dailyTaskWorkingLogMetrics.stream()
                 .flatMap(metrics -> metrics.getTimeSpentByDays().stream())

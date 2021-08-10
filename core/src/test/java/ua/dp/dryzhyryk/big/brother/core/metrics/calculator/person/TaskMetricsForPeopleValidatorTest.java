@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import ua.dp.dryzhyryk.big.brother.core.configuration.ConfigurationService;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.configuration.TeamConfiguration;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TimeSpentByDay;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValueWithValidation;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
 
 import java.time.LocalDate;
 
@@ -23,12 +23,12 @@ class TaskMetricsForPeopleValidatorTest {
         ConfigurationService configurationService = mockConfigurationService(teamName);
 
 
-        ValueWithValidation<TimeSpentByDay> expected = ValueWithValidation.valueWithOkStatus(
+        ValidatedValue<TimeSpentByDay> expected = ValidatedValue.valueWithOkStatus(
                 newTimeSpentByDay(timeSpentMinutes));
 
         //when
         TaskMetricsForPeopleValidator validator = new TaskMetricsForPeopleValidator(configurationService);
-        ValueWithValidation<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
+        ValidatedValue<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
 
         //then
         Assertions.assertThat(actual).isEqualTo(expected);
@@ -43,12 +43,12 @@ class TaskMetricsForPeopleValidatorTest {
         ConfigurationService configurationService = mockConfigurationService(teamName);
         TimeSpentByDay timeSpentByDay = newTimeSpentByDay(timeSpentMinutes);
 
-        ValueWithValidation<TimeSpentByDay> expected = ValueWithValidation.valueWithOkStatus(
+        ValidatedValue<TimeSpentByDay> expected = ValidatedValue.valueWithOkStatus(
                 newTimeSpentByDay(timeSpentMinutes));
 
         //when
         TaskMetricsForPeopleValidator validator = new TaskMetricsForPeopleValidator(configurationService);
-        ValueWithValidation<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
+        ValidatedValue<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
 
         //then
         Assertions.assertThat(actual).isEqualTo(expected);
@@ -76,13 +76,13 @@ class TaskMetricsForPeopleValidatorTest {
         ConfigurationService configurationService = mockConfigurationService(teamName);
 
 
-        ValueWithValidation<TimeSpentByDay> expected = ValueWithValidation.valueWithWarningStatus(
+        ValidatedValue<TimeSpentByDay> expected = ValidatedValue.valueWithWarningStatus(
                 newTimeSpentByDay(timeSpentMinutes),
                 "Time logged in day less then 7.0h");
 
         //when
         TaskMetricsForPeopleValidator validator = new TaskMetricsForPeopleValidator(configurationService);
-        ValueWithValidation<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
+        ValidatedValue<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
 
         //then
         Assertions.assertThat(actual).isEqualTo(expected);
@@ -99,13 +99,13 @@ class TaskMetricsForPeopleValidatorTest {
         ConfigurationService configurationService = mockConfigurationService(teamName);
 
 
-        ValueWithValidation<TimeSpentByDay> expected = ValueWithValidation.valueWithWarningStatus(
+        ValidatedValue<TimeSpentByDay> expected = ValidatedValue.valueWithWarningStatus(
                 newTimeSpentByDay(timeSpentMinutes),
                 "Time logged in day less then 7.0h");
 
         //when
         TaskMetricsForPeopleValidator validator = new TaskMetricsForPeopleValidator(configurationService);
-        ValueWithValidation<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
+        ValidatedValue<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
 
         //then
         Assertions.assertThat(actual).isEqualTo(expected);
@@ -122,13 +122,13 @@ class TaskMetricsForPeopleValidatorTest {
         ConfigurationService configurationService = mockConfigurationService(teamName);
 
 
-        ValueWithValidation<TimeSpentByDay> expected = ValueWithValidation.valueWithErrorStatus(
+        ValidatedValue<TimeSpentByDay> expected = ValidatedValue.valueWithErrorStatus(
                 newTimeSpentByDay(timeSpentMinutes),
                 "Time logged in day less then 5.0h");
 
         //when
         TaskMetricsForPeopleValidator validator = new TaskMetricsForPeopleValidator(configurationService);
-        ValueWithValidation<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
+        ValidatedValue<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
 
         //then
         Assertions.assertThat(actual).isEqualTo(expected);
@@ -145,13 +145,13 @@ class TaskMetricsForPeopleValidatorTest {
         ConfigurationService configurationService = mockConfigurationService(teamName);
 
 
-        ValueWithValidation<TimeSpentByDay> expected = ValueWithValidation.valueWithErrorStatus(
+        ValidatedValue<TimeSpentByDay> expected = ValidatedValue.valueWithErrorStatus(
                 newTimeSpentByDay(timeSpentMinutes),
                 "Time logged in day more then 8.0h");
 
         //when
         TaskMetricsForPeopleValidator validator = new TaskMetricsForPeopleValidator(configurationService);
-        ValueWithValidation<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
+        ValidatedValue<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
 
         //then
         Assertions.assertThat(actual).isEqualTo(expected);

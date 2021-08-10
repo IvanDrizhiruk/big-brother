@@ -7,7 +7,7 @@ import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchCon
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.PersonMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TaskWorkingLogMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TimeSpentByDay;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValueWithValidation;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -175,9 +175,9 @@ class PeopleViewMetricsCalculatorTest {
                                                 newTimeSpentByDay(day5, 77)))
                         ))
                         .timeSpentByDaysForAllTask(List.of(
-                                ValueWithValidation.valueWithNotEvaluatedStatus(newTimeSpentByDay(day3, 110)),
-                                ValueWithValidation.valueWithNotEvaluatedStatus(newTimeSpentByDay(day4, 25)),
-                                ValueWithValidation.valueWithNotEvaluatedStatus(newTimeSpentByDay(day5, 154))))
+                                ValidatedValue.valueWithNotEvaluatedStatus(newTimeSpentByDay(day3, 110)),
+                                ValidatedValue.valueWithNotEvaluatedStatus(newTimeSpentByDay(day4, 25)),
+                                ValidatedValue.valueWithNotEvaluatedStatus(newTimeSpentByDay(day5, 154))))
                         .build());
 
         //when
@@ -193,7 +193,7 @@ class PeopleViewMetricsCalculatorTest {
     private TaskMetricsForPeopleValidator mockTaskMetricsForPeopleValidator() {
         TaskMetricsForPeopleValidator taskMetricsForPeopleValidator = mock(TaskMetricsForPeopleValidator.class);
         when(taskMetricsForPeopleValidator.validate(any(), any()))
-                .then(invocation -> ValueWithValidation.valueWithNotEvaluatedStatus(invocation.getArgument(0)));
+                .then(invocation -> ValidatedValue.valueWithNotEvaluatedStatus(invocation.getArgument(0)));
 
         return taskMetricsForPeopleValidator;
     }
