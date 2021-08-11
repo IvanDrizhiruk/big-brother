@@ -7,11 +7,10 @@ import com.atlassian.jira.rest.client.api.domain.TimeTracking;
 import com.atlassian.jira.rest.client.api.domain.Worklog;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.TaskWorkLog;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PersonSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.PersonSearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.JiraSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 
 import java.time.LocalDateTime;
@@ -37,43 +36,15 @@ public class JiraDataExtractor implements JiraResource {
     }
 
     @Override
-    public List<Task> loadTasks(SearchConditions searchConditions) {
+    public List<Task> loadTasks(JiraSearchConditions searchConditions) {
 
         switch(searchConditions.getSearchConditionType()) {
-            case SPRINT:
-                return getTasksForSprint((SprintSearchConditions)searchConditions);
             case PERSON:
                 return getTasksForPerson((PersonSearchConditions)searchConditions);
         }
 
         throw new IllegalArgumentException(
                 "Unable to load tasks. Unsupported search type " + searchConditions.getSearchConditionType());
-    }
-
-
-    private List<Task> getTasksForSprint(SprintSearchConditions searchConditions) {
-        String jql = String.format("project = '%s' AND sprint = '%s' AND issuetype in standardIssueTypes()",
-                searchConditions.getProject(),
-                searchConditions.getSprint());
-
-        List<Issue> rootIssues = loadIssues(jql);
-
-        log.info("Root task has loaded {} ", rootIssues);
-
-        return rootIssues.stream()
-                .map(issue -> loadIssueFully(issue.getKey()))
-                .map(fullIssue -> {
-                    List<Task> subIssues = StreamSupport.stream(fullIssue.getSubtasks().spliterator(), false)
-                            .map(subIssue -> loadIssueFully(subIssue.getIssueKey()))
-                            .map(this::toTask)
-                            .collect(Collectors.toList());
-
-                    return toTask(fullIssue)
-                            .toBuilder()
-                            .subTasks(subIssues)
-                            .build();
-                })
-                .collect(Collectors.toList());
     }
 
     private List<Task> getTasksForPerson(PersonSearchConditions searchConditions) {

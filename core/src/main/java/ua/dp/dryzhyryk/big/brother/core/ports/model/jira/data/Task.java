@@ -1,4 +1,4 @@
-package ua.dp.dryzhyryk.big.brother.core.data.source.model;
+package ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data;
 
 import lombok.Builder;
 import lombok.Value;

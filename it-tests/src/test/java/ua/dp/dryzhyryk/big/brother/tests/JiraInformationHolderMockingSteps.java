@@ -7,9 +7,9 @@ import org.jbehave.core.model.ExamplesTable;
 import org.mockito.Mockito;
 import ua.dp.dryzhyryk.big.brother.base.BaseSteps;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolderImpl;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.TaskWorkLog;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.JiraSearchConditions;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -76,7 +76,7 @@ public class JiraInformationHolderMockingSteps extends BaseSteps {
     public void givenRequestWithResponse() {
         List<Task> value = new ArrayList<>(tasks.values());
 
-        Mockito.when(jiraInformationHolderMock.getTasks(Mockito.any(SearchConditions.class)))
+        Mockito.when(jiraInformationHolderMock.getTasks(Mockito.any(JiraSearchConditions.class)))
                 .thenReturn(value);
     }
 }

@@ -2,9 +2,9 @@ package ua.dp.dryzhyryk.big.brother.core;
 
 import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PersonSearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.PeopleSearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.PersonSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.PeopleViewMetricsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.PeopleView;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.PersonMetrics;

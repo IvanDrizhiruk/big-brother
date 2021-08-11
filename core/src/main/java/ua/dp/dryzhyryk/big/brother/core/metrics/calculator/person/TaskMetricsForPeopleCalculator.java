@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.TaskWorkLog;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TaskWorkingLogMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TimeSpentByDay;
 

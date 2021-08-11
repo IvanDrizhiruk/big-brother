@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 
 import lombok.Builder;
 import lombok.Value;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskTimeMetrics;
 
 public class SprintViewMetricsCalculator {

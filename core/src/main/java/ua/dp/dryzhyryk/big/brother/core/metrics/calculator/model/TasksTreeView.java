@@ -5,7 +5,7 @@ import java.util.Map;
 
 import lombok.Builder;
 import lombok.Value;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 
 @Value
 @Builder

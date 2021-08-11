@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolderImpl;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PeopleSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PersonSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.PeopleSearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.PersonSearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.JiraSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.PeopleViewMetricsCalculatorOld;
 
@@ -40,7 +40,7 @@ class BigJiraBrotherPeopleViewProviderTest {
                 .build();
 
         JiraInformationHolderImpl jiraInformationHolder = mock(JiraInformationHolderImpl.class);
-        when(jiraInformationHolder.getTasks(any(SearchConditions.class)))
+        when(jiraInformationHolder.getTasks(any(JiraSearchConditions.class)))
                 .thenReturn(new ArrayList<>());
 
         PersonSearchConditions firstExpectedSearchCondition = PersonSearchConditions.builder()

@@ -13,14 +13,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import lombok.extern.slf4j.Slf4j;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.PersonSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.search.SprintSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.ports.JiraDataStorage;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.PersonSearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.JiraSearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.DataStorage;
 
 @Slf4j
-public class JiraFileDataStorage implements JiraDataStorage {
+public class JiraFileDataStorage implements DataStorage {
 
 	private final File rootStorageDirectory;
 	private final Gson gson;
@@ -36,7 +35,7 @@ public class JiraFileDataStorage implements JiraDataStorage {
 	}
 
 	@Override
-	public void saveProjectSprint(SearchConditions searchConditions, List<Task> tasks) {
+	public void saveProjectSprint(JiraSearchConditions searchConditions, List<Task> tasks) {
 		String filename = toFileName(searchConditions);
 		File fileForStoring = new File(rootStorageDirectory, filename);
 
@@ -45,12 +44,12 @@ public class JiraFileDataStorage implements JiraDataStorage {
 			gson.toJson(tasks, writer);
 		}
 		catch (IOException e) {
-			log.error("Unable to store data for " + searchConditions.toString(), e);
+			log.error("Unable to store data for " + searchConditions, e);
 		}
 	}
 
 	@Override
-	public List<Task> loadTasks(SearchConditions searchConditions) {
+	public List<Task> loadTasks(JiraSearchConditions searchConditions) {
 		String filename = toFileName(searchConditions);
 		File fileForStoring = new File(rootStorageDirectory, filename);
 
@@ -71,20 +70,14 @@ public class JiraFileDataStorage implements JiraDataStorage {
 		}
 	}
 
-	private String toFileName(SearchConditions searchConditions) {
+	private String toFileName(JiraSearchConditions searchConditions) {
 		switch (searchConditions.getSearchConditionType()) {
-			case SPRINT:
-				return toFileName((SprintSearchConditions) searchConditions);
 			case PERSON:
 				return toFileName((PersonSearchConditions) searchConditions);
 		}
 
 		throw new IllegalArgumentException(
 				"Unable to prepare filename. Unsupported search type " + searchConditions.getSearchConditionType());
-	}
-
-	private String toFileName(SprintSearchConditions searchConditions) {
-		return String.format("[%s] [%s].json", searchConditions.getProject(), searchConditions.getSprint());
 	}
 
 	private String toFileName(PersonSearchConditions searchConditions) {

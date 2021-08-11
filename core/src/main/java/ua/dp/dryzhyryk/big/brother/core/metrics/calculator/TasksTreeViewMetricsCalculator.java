@@ -9,8 +9,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.TaskWorkLog;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.WorkLogByDay;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PersonWorkLog;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TaskMetrics;

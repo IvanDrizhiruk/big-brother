@@ -1,8 +1,8 @@
 package ua.dp.dryzhyryk.big.brother.core.utils;
 
 import org.slf4j.Logger;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.Task;
-import ua.dp.dryzhyryk.big.brother.core.data.source.model.TaskWorkLog;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.PersonMetrics;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.TaskWorkingLogMetrics;
