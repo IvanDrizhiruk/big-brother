@@ -14,11 +14,6 @@ public class ReportGeneratorMock implements ReportGenerator {
     private PeopleView lastGeneratedPeopleView;
 
     @Override
-    public void generateReport(TasksTreeView tasksTreeView, SprintView sprintView, TasksRootView tasksRootView) {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public void generatePeopleReport(PeopleView peopleView) {
         this.lastGeneratedPeopleView = peopleView;
     }

@@ -3,11 +3,14 @@ package ua.dp.dryzhyryk.big.brother.resources.jira;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import lombok.extern.slf4j.Slf4j;
-import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProviderOld;
+import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
+import ua.dp.dryzhyryk.big.brother.core.configuration.ConfigurationService;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolderImpl;
 import ua.dp.dryzhyryk.big.brother.core.data.source.LogProxy;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.PeopleViewMetricsCalculatorOld;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.PeopleViewMetricsCalculator;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.TaskMetricsForPeopleCalculator;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.TaskMetricsForPeopleValidator;
 import ua.dp.dryzhyryk.big.brother.core.ports.DataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
@@ -46,11 +49,16 @@ public class BigBrotherConsoleApplication {
         JiraResource jiraResource = new JiraDataExtractor(jiraRestClient);
         DataStorage jiraDataStorage = new JiraFileDataStorage(storageRoot.getAbsolutePath());
         JiraInformationHolder jiraInformationHolder = newJiraInformationHolder(jiraResource, jiraDataStorage, config);
-        PeopleViewMetricsCalculatorOld peopleViewMetricsCalculator = new PeopleViewMetricsCalculatorOld();
+
+
+        ConfigurationService configurationService = new ConfigurationService();
+        TaskMetricsForPeopleCalculator taskMetricsForPeopleCalculator = new TaskMetricsForPeopleCalculator();
+        TaskMetricsForPeopleValidator taskMetricsForPeopleValidator = new TaskMetricsForPeopleValidator(configurationService);
+        PeopleViewMetricsCalculator peopleViewMetricsCalculator = new PeopleViewMetricsCalculator(taskMetricsForPeopleCalculator, taskMetricsForPeopleValidator);
 
         DateTimeProvider dateTimeProvider = newDateTimeProvider();
 
-        BigJiraBrotherPeopleViewProviderOld bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProviderOld(jiraInformationHolder, peopleViewMetricsCalculator);
+        BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProvider(jiraInformationHolder, peopleViewMetricsCalculator);
 
         ReportGenerator reportGenerator = new ExcelReportGenerator(reportRoot.getAbsolutePath());
 

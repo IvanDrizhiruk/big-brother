@@ -7,7 +7,5 @@ import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksTreeView;
 
 public interface ReportGenerator {
 
-    void generateReport(TasksTreeView tasksTreeView, SprintView sprintView, TasksRootView tasksRootView);
-
     void generatePeopleReport(PeopleView peopleView);
 }

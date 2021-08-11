@@ -1,7 +1,7 @@
 package ua.dp.dryzhyryk.big.brother.resources.jira.processors;
 
 import lombok.extern.slf4j.Slf4j;
-import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProviderOld;
+import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
 import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
@@ -16,11 +16,11 @@ import java.util.List;
 @Slf4j
 public class ReportByPersonProcessor {
 
-    private final BigJiraBrotherPeopleViewProviderOld bigJiraBrotherPeopleViewProvider;
+    private final BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider;
     private final ReportGenerator reportGenerator;
     private final DateTimeProvider dateTimeProvider;
 
-    public ReportByPersonProcessor(BigJiraBrotherPeopleViewProviderOld bigJiraBrotherPeopleViewProvider, ReportGenerator reportGenerator, DateTimeProvider dateTimeProvider) {
+    public ReportByPersonProcessor(BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider, ReportGenerator reportGenerator, DateTimeProvider dateTimeProvider) {
         this.bigJiraBrotherPeopleViewProvider = bigJiraBrotherPeopleViewProvider;
         this.reportGenerator = reportGenerator;
         this.dateTimeProvider = dateTimeProvider;
