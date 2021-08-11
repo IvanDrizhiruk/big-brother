@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import ua.dp.dryzhyryk.big.brother.core.configuration.ConfigurationService;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.configuration.TeamConfiguration;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TimeSpentByDay;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TimeSpentByDay;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
 
 import java.time.LocalDate;

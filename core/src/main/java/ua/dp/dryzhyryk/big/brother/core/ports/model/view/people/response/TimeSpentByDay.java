@@ -1,4 +1,4 @@
-package ua.dp.dryzhyryk.big.brother.core.ports.model.person;
+package ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response;
 
 import java.time.LocalDate;
 

@@ -2,8 +2,8 @@ package ua.dp.dryzhyryk.big.brother.resources.jira.processors;
 
 import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProviderOld;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.PeopleSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
 import ua.dp.dryzhyryk.big.brother.core.utils.PrintUtils;
 import ua.dp.dryzhyryk.big.brother.resources.jira.search.PeopleSearchRequest;

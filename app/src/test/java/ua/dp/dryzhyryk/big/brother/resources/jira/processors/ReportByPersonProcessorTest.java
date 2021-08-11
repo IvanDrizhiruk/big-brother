@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProviderOld;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.PeopleSearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
 import ua.dp.dryzhyryk.big.brother.resources.jira.search.PeopleSearchRequest;
@@ -50,8 +50,8 @@ class ReportByPersonProcessorTest {
         LocalDate nowMonday = LocalDate.of(2020, 1, 6);
         when(dateTimeProvider.nowLocalDate()).thenReturn(nowMonday);
 
-        LocalDate startPeriod = LocalDate.of(2019,12, 30);
-        LocalDate endPeriod = LocalDate.of(2020,1, 6);
+        LocalDate startPeriod = LocalDate.of(2019, 12, 30);
+        LocalDate endPeriod = LocalDate.of(2020, 1, 6);
 
         PeopleSearchConditions peopleSearchConditions = PeopleSearchConditions.builder()
                 .teamName(teamName)
@@ -86,8 +86,8 @@ class ReportByPersonProcessorTest {
         LocalDate nowMonday = LocalDate.of(2020, 1, 5);
         when(dateTimeProvider.nowLocalDate()).thenReturn(nowMonday);
 
-        LocalDate startPeriod = LocalDate.of(2019,12, 23);
-        LocalDate endPeriod = LocalDate.of(2019,12, 30);
+        LocalDate startPeriod = LocalDate.of(2019, 12, 23);
+        LocalDate endPeriod = LocalDate.of(2019, 12, 30);
 
         PeopleSearchConditions peopleSearchConditions = PeopleSearchConditions.builder()
                 .teamName(teamName)

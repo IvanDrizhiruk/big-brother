@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.PersonSearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.JiraPersonSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.JiraSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 
@@ -40,14 +40,14 @@ public class JiraDataExtractor implements JiraResource {
 
         switch(searchConditions.getSearchConditionType()) {
             case PERSON:
-                return getTasksForPerson((PersonSearchConditions)searchConditions);
+                return getTasksForPerson((JiraPersonSearchConditions)searchConditions);
         }
 
         throw new IllegalArgumentException(
                 "Unable to load tasks. Unsupported search type " + searchConditions.getSearchConditionType());
     }
 
-    private List<Task> getTasksForPerson(PersonSearchConditions searchConditions) {
+    private List<Task> getTasksForPerson(JiraPersonSearchConditions searchConditions) {
 
         String jql = String.format("worklogAuthor = %s AND  worklogDate >=  %s AND  worklogDate <= %s",
                 searchConditions.getPersonName(),

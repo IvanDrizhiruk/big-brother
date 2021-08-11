@@ -4,12 +4,12 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolderImpl;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.PeopleSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.PersonSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.JiraSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.PeopleViewMetricsCalculatorOld;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.JiraSearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.JiraPersonSearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -43,19 +43,19 @@ class BigJiraBrotherPeopleViewProviderTest {
         when(jiraInformationHolder.getTasks(any(JiraSearchConditions.class)))
                 .thenReturn(new ArrayList<>());
 
-        PersonSearchConditions firstExpectedSearchCondition = PersonSearchConditions.builder()
+        JiraPersonSearchConditions firstExpectedSearchCondition = JiraPersonSearchConditions.builder()
                 .personName(firstPerson)
                 .startPeriod(startPeriod)
                 .endPeriod(endPeriod)
                 .build();
 
-        PersonSearchConditions secondExpectedSearchCondition = PersonSearchConditions.builder()
+        JiraPersonSearchConditions secondExpectedSearchCondition = JiraPersonSearchConditions.builder()
                 .personName(secondPerson)
                 .startPeriod(startPeriod)
                 .endPeriod(endPeriod)
                 .build();
 
-        PersonSearchConditions thirdExpectedSearchCondition = PersonSearchConditions.builder()
+        JiraPersonSearchConditions thirdExpectedSearchCondition = JiraPersonSearchConditions.builder()
                 .personName(thirdPerson)
                 .startPeriod(startPeriod)
                 .endPeriod(endPeriod)

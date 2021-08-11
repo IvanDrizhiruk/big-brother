@@ -14,7 +14,7 @@ import com.google.gson.reflect.TypeToken;
 
 import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.PersonSearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.JiraPersonSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.JiraSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.ports.DataStorage;
 
@@ -73,14 +73,14 @@ public class JiraFileDataStorage implements DataStorage {
 	private String toFileName(JiraSearchConditions searchConditions) {
 		switch (searchConditions.getSearchConditionType()) {
 			case PERSON:
-				return toFileName((PersonSearchConditions) searchConditions);
+				return toFileName((JiraPersonSearchConditions) searchConditions);
 		}
 
 		throw new IllegalArgumentException(
 				"Unable to prepare filename. Unsupported search type " + searchConditions.getSearchConditionType());
 	}
 
-	private String toFileName(PersonSearchConditions searchConditions) {
+	private String toFileName(JiraPersonSearchConditions searchConditions) {
 		return String.format("[%s] %s-%s.json", searchConditions.getPersonName(),
 				searchConditions.getStartPeriod().format(DateTimeFormatter.ISO_LOCAL_DATE),
 				searchConditions.getEndPeriod().format(DateTimeFormatter.ISO_LOCAL_DATE));

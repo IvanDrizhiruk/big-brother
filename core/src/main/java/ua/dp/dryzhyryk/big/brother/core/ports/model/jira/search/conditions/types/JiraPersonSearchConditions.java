@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 @Value
 @Builder(toBuilder = true)
-public class PersonSearchConditions implements JiraSearchConditions {
+public class JiraPersonSearchConditions implements JiraSearchConditions {
 
     @NonNull
     private final String personName;

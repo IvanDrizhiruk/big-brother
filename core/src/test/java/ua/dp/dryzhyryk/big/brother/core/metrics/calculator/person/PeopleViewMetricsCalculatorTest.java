@@ -3,11 +3,11 @@ package ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.PeopleSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.person.PersonMetrics;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TaskWorkingLogMetrics;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TimeSpentByDay;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PersonMetrics;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TaskWorkingLogMetrics;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TimeSpentByDay;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
 
 import java.time.LocalDate;
 import java.util.Collections;

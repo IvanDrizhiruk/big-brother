@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TaskWorkingLogMetrics;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.person.TimeSpentByDay;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TaskWorkingLogMetrics;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TimeSpentByDay;
 
 public class TaskMetricsForPeopleCalculator {
 
