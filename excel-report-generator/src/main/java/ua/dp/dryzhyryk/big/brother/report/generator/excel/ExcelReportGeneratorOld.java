@@ -2,12 +2,12 @@ package ua.dp.dryzhyryk.big.brother.report.generator.excel;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PeopleView;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PersonMetrics;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TaskWorkingLogMetrics;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TimeSpentByDay;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.PersonMetrics;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.TaskWorkingLogMetrics;
+import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.model.TimeSpentByDay;
 import ua.dp.dryzhyryk.big.brother.core.utils.TimeUtils;
-import ua.dp.dryzhyryk.big.brother.report.generator.ReportGenerator;
+import ua.dp.dryzhyryk.big.brother.report.generator.ReportGeneratorOld;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.SheetWrapper;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.TableBuilder;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.WorkbookBuilder;
@@ -24,12 +24,12 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Slf4j
-public class ExcelReportGenerator implements ReportGenerator {
+public class ExcelReportGeneratorOld implements ReportGeneratorOld {
 
     private final File reportRoot;
     private final WorkbookBuilderFactory workbookBuilderFactory;
 
-    public ExcelReportGenerator(String reportRoot) {
+    public ExcelReportGeneratorOld(String reportRoot) {
         this.reportRoot = new File(reportRoot);
         this.workbookBuilderFactory = new WorkbookBuilderFactoryImpl();
 
@@ -48,15 +48,13 @@ public class ExcelReportGenerator implements ReportGenerator {
     }
 
     private void weeklyTable(TableBuilder tableBuilder, List<LocalDate> days, PersonMetrics personMetric) {
-        List<TaskWorkingLogMetrics> dailyTaskLogs = personMetric.getDailyTaskWorkingLogMetrics();
+        List<TaskWorkingLogMetrics> dailyTaskLogs = personMetric.getDailyTaskLogs();
         if (dailyTaskLogs.isEmpty()) {
             return;
         }
 
-        Map<LocalDate, Integer> totalTimeSpentByDay = personMetric.getTimeSpentByDaysForAllTask().stream()
-                .collect(Collectors.toMap(
-                        x -> x.getValue().getDay(),
-                        y -> y.getValue().getTimeSpentMinutes()));
+        Map<LocalDate, Integer> totalTimeSpentByDay = personMetric.getTotalTimeSpentByDay().stream()
+                .collect(Collectors.toMap(TimeSpentByDay::getDay, TimeSpentByDay::getTimeSpentMinutes));
 
         List<LocalDate> daysWithoutFreeWeekends = days.stream()
                 .filter(day -> (day.getDayOfWeek() != DayOfWeek.SATURDAY
@@ -72,7 +70,7 @@ public class ExcelReportGenerator implements ReportGenerator {
                 Arrays.asList("Total", "Total", "-", "Task id", "Task name"));
 
         List<List<String>> bodyData = dailyTaskLogs.stream()
-                .filter(dailyTaskLog -> dailyTaskLog.getTimeSpentOnTaskInMinutesByPeriod() != 0)
+                .filter(dailyTaskLog -> dailyTaskLog.getTotalTimeSpentByPeriodInMinutes() != 0)
                 .map(dailyTaskLog -> {
                     List<String> bodyDataRow = new ArrayList<>();
 
@@ -80,8 +78,8 @@ public class ExcelReportGenerator implements ReportGenerator {
                             .collect(Collectors.toMap(TimeSpentByDay::getDay, TimeSpentByDay::getTimeSpentMinutes));
                     daysWithoutFreeWeekends.forEach(day -> bodyDataRow.add(safeGetIntAsString(timeSpentByDays, day)));
 
-                    bodyDataRow.add(String.valueOf(convertMinutesToHour(dailyTaskLog.getTimeSpentOnTaskInMinutesByPeriod())));
-                    bodyDataRow.add(String.valueOf(convertMinutesToHour(dailyTaskLog.getTimeSpentOnTaskInMinutes())));
+                    bodyDataRow.add(String.valueOf(convertMinutesToHour(dailyTaskLog.getTotalTimeSpentByPeriodInMinutes())));
+                    bodyDataRow.add(String.valueOf(convertMinutesToHour(dailyTaskLog.getTotalTimeSpentOnTaskInMinutes())));
                     bodyDataRow.add("-");
 
                     bodyDataRow.add(dailyTaskLog.getTaskId());
@@ -94,8 +92,8 @@ public class ExcelReportGenerator implements ReportGenerator {
         List<String> footerData = daysWithoutFreeWeekends.stream()
                 .map(day -> safeGetIntAsString(totalTimeSpentByDay, day))
                 .collect(Collectors.toList());
-//        footerData.add(String.valueOf(convertMinutesToHour(personMetric.getTotalTimeSpentInCurrentPeriodInMinutes())));
-//        footerData.add(String.valueOf(convertMinutesToHour(personMetric.getTimeSpentOnTaskInMinutesByPeriod())));
+        footerData.add(String.valueOf(convertMinutesToHour(personMetric.getTotalTimeSpentInCurrentPeriodInMinutes())));
+        footerData.add(String.valueOf(convertMinutesToHour(personMetric.getTotalTimeSpentOnTaskInMinutes())));
 
         tableBuilder
                 .header(headerData)

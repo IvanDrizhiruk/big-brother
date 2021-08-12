@@ -9,7 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProviderOld;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
-import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
+import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGeneratorOld;
 import ua.dp.dryzhyryk.big.brother.resources.jira.search.PeopleSearchRequest;
 
 import java.time.LocalDate;
@@ -26,7 +26,7 @@ class ReportByPersonProcessorTest {
     private BigJiraBrotherPeopleViewProviderOld viewProvider;
 
     @Mock
-    private ExcelReportGenerator reportGenerator;
+    private ExcelReportGeneratorOld reportGenerator;
 
     @Mock
     private DateTimeProvider dateTimeProvider;

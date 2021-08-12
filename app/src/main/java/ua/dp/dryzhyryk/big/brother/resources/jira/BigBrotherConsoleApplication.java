@@ -13,10 +13,10 @@ import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.TaskMetricsFor
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.TaskMetricsForPeopleValidator;
 import ua.dp.dryzhyryk.big.brother.core.ports.DataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
-import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
 import ua.dp.dryzhyryk.big.brother.data.extractor.jira.JiraDataExtractor;
 import ua.dp.dryzhyryk.big.brother.data.storage.jira.JiraFileDataStorage;
+import ua.dp.dryzhyryk.big.brother.report.generator.ReportGenerator;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
 import ua.dp.dryzhyryk.big.brother.resources.jira.inicialisation.Configurations;
 import ua.dp.dryzhyryk.big.brother.resources.jira.processors.ReportByPersonProcessor;

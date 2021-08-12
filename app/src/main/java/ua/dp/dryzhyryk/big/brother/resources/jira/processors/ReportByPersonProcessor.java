@@ -2,10 +2,10 @@ package ua.dp.dryzhyryk.big.brother.resources.jira.processors;
 
 import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
-import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
 import ua.dp.dryzhyryk.big.brother.core.utils.PrintUtils;
+import ua.dp.dryzhyryk.big.brother.report.generator.ReportGenerator;
 import ua.dp.dryzhyryk.big.brother.resources.jira.search.PeopleSearchRequest;
 
 import java.time.DayOfWeek;
@@ -40,7 +40,15 @@ public class ReportByPersonProcessor {
 
     private PeopleSearchConditions toPeopleSearchConditionsForLastFinishedWeek(PeopleSearchRequest peopleSearchRequest) {
 
-        LocalDate mondayOfLastFinishedWeek = dateTimeProvider.nowLocalDate()
+
+//      now    2021-08-02-2021-08-09
+//      need   2020-12-28-2021-01-04
+
+
+//        LocalDate now = dateTimeProvider.nowLocalDate();
+        LocalDate now = LocalDate.of(2021, 1, 5);
+
+        LocalDate mondayOfLastFinishedWeek = now
                 .with(DayOfWeek.MONDAY)
                 .minusWeeks(1);
 

@@ -1,15 +1,11 @@
 package ua.dp.dryzhyryk.big.brother.app;
 
 import lombok.Getter;
-import org.apache.commons.lang3.NotImplementedException;
 import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.PeopleView;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.SprintView;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksRootView;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.model.TasksTreeView;
-import ua.dp.dryzhyryk.big.brother.core.ports.ReportGenerator;
+import ua.dp.dryzhyryk.big.brother.report.generator.ReportGeneratorOld;
 
 @Getter
-public class ReportGeneratorMock implements ReportGenerator {
+public class ReportGeneratorMock implements ReportGeneratorOld {
 
     private PeopleView lastGeneratedPeopleView;
 

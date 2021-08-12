@@ -8,8 +8,6 @@ public class WorkbookBuilderFactoryImpl implements WorkbookBuilderFactory {
 		switch(reportFileExtension) {
 			case XLSX:
 				return new WorkbookPoiBuilder();
-//			case CSV:
-//				return new WorkbookCsvBuilder();
 			default:
 				throw new IllegalArgumentException(String.format("Not supported reportFileExtension %s", reportFileExtension));
 		}
