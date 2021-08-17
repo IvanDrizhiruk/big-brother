@@ -16,7 +16,6 @@ import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
 import ua.dp.dryzhyryk.big.brother.data.extractor.jira.JiraDataExtractor;
 import ua.dp.dryzhyryk.big.brother.data.storage.jira.JiraFileDataStorage;
-import ua.dp.dryzhyryk.big.brother.report.generator.ReportGenerator;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
 import ua.dp.dryzhyryk.big.brother.resources.jira.inicialisation.Configurations;
 import ua.dp.dryzhyryk.big.brother.resources.jira.processors.ReportByPersonProcessor;
@@ -60,7 +59,7 @@ public class BigBrotherConsoleApplication {
 
         BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProvider(jiraInformationHolder, peopleViewMetricsCalculator);
 
-        ReportGenerator reportGenerator = new ExcelReportGenerator(reportRoot.getAbsolutePath());
+        ExcelReportGenerator reportGenerator = new ExcelReportGenerator(reportRoot.getAbsolutePath());
 
         reportByPersonProcessor = new ReportByPersonProcessor(
                 bigJiraBrotherPeopleViewProvider,

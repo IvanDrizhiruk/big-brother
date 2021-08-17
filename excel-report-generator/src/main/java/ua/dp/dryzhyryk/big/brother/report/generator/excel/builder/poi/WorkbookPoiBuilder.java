@@ -59,7 +59,7 @@ public class WorkbookPoiBuilder implements WorkbookBuilder {
 		stylesMap.put(Style.H1, styleH1);
 
 		Font titleFontH2 = workbook.createFont();
-		titleFontH2.setFontHeightInPoints((short) 18);
+		titleFontH2.setFontHeightInPoints((short) 16);
 		titleFontH2.setFontName("Trebuchet MS");
 		CellStyle styleH2 = workbook.createCellStyle();
 		styleH2.setFont(titleFontH2);

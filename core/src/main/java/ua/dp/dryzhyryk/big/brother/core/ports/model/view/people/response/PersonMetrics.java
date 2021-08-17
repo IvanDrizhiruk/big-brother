@@ -14,5 +14,7 @@ public class PersonMetrics {
 
     private final List<TaskWorkingLogMetrics> dailyTaskWorkingLogMetrics;
 
-    private final List<ValidatedValue<TimeSpentByDay>> timeSpentByDaysForAllTask;
+    private final List<ValidatedValue<TimeSpentByDay>> totalTimeSpentByDays;
+
+    private final int totalTimeSpentOnTaskInMinutesByPeriod;
 }

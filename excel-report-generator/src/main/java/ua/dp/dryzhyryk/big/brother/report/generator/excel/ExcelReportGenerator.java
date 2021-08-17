@@ -7,7 +7,6 @@ import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PersonM
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TaskWorkingLogMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TimeSpentByDay;
 import ua.dp.dryzhyryk.big.brother.core.utils.TimeUtils;
-import ua.dp.dryzhyryk.big.brother.report.generator.ReportGenerator;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.SheetWrapper;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.TableBuilder;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.WorkbookBuilder;
@@ -17,14 +16,13 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Slf4j
-public class ExcelReportGenerator implements ReportGenerator {
+public class ExcelReportGenerator {
 
     private final File reportRoot;
     private final WorkbookBuilderFactory workbookBuilderFactory;
@@ -40,10 +38,14 @@ public class ExcelReportGenerator implements ReportGenerator {
 
     public void generatePeopleReport(PeopleView peopleView) {
         WorkbookBuilder workbookBuilder = workbookBuilderFactory.prepareBuilder(ReportFileExtension.XLSX);
+
         generatePeopleReport(peopleView, workbookBuilder);
 
-        String reportFileName =
-                String.format("%s:%s-%s", peopleView.getTeamName(), peopleView.getStartPeriod(), peopleView.getEndPeriod());
+        String reportFileName = String.format("%s:%s-%s",
+                peopleView.getTeamName(),
+                peopleView.getStartPeriod(),
+                peopleView.getEndPeriod());
+
         workbookBuilder.saveReportFile(reportRoot, reportFileName);
     }
 
@@ -53,7 +55,7 @@ public class ExcelReportGenerator implements ReportGenerator {
             return;
         }
 
-        Map<LocalDate, Integer> totalTimeSpentByDay = personMetric.getTimeSpentByDaysForAllTask().stream()
+        Map<LocalDate, Integer> totalTimeSpentByDay = personMetric.getTotalTimeSpentByDays().stream()
                 .collect(Collectors.toMap(
                         x -> x.getValue().getDay(),
                         y -> y.getValue().getTimeSpentMinutes()));
@@ -64,15 +66,13 @@ public class ExcelReportGenerator implements ReportGenerator {
                         || (null != totalTimeSpentByDay.get(day)
                         && !totalTimeSpentByDay.get(day).equals(0)))
                 .collect(Collectors.toList());
+
         List<String> dateHeaders = daysWithoutFreeWeekends.stream()
                 .map(LocalDate::toString)
                 .collect(Collectors.toList());
-
-        List<String> headerData = ListUtils.union(dateHeaders,
-                Arrays.asList("Total", "Total", "-", "Task id", "Task name"));
+        List<String> headerData = ListUtils.union(dateHeaders, List.of("By period", "Total", "Task id", "Task name"));
 
         List<List<String>> bodyData = dailyTaskLogs.stream()
-                .filter(dailyTaskLog -> dailyTaskLog.getTimeSpentOnTaskInMinutesByPeriod() != 0)
                 .map(dailyTaskLog -> {
                     List<String> bodyDataRow = new ArrayList<>();
 
@@ -82,7 +82,6 @@ public class ExcelReportGenerator implements ReportGenerator {
 
                     bodyDataRow.add(String.valueOf(convertMinutesToHour(dailyTaskLog.getTimeSpentOnTaskInMinutesByPeriod())));
                     bodyDataRow.add(String.valueOf(convertMinutesToHour(dailyTaskLog.getTimeSpentOnTaskInMinutes())));
-                    bodyDataRow.add("-");
 
                     bodyDataRow.add(dailyTaskLog.getTaskId());
                     bodyDataRow.add(dailyTaskLog.getTaskName());
@@ -94,8 +93,8 @@ public class ExcelReportGenerator implements ReportGenerator {
         List<String> footerData = daysWithoutFreeWeekends.stream()
                 .map(day -> safeGetIntAsString(totalTimeSpentByDay, day))
                 .collect(Collectors.toList());
-//        footerData.add(String.valueOf(convertMinutesToHour(personMetric.getTotalTimeSpentInCurrentPeriodInMinutes())));
-//        footerData.add(String.valueOf(convertMinutesToHour(personMetric.getTimeSpentOnTaskInMinutesByPeriod())));
+        footerData.add(String.valueOf(convertMinutesToHour(personMetric.getTotalTimeSpentOnTaskInMinutesByPeriod())));
+
 
         tableBuilder
                 .header(headerData)
@@ -105,6 +104,7 @@ public class ExcelReportGenerator implements ReportGenerator {
 
     private void generatePeopleReport(PeopleView peopleView, WorkbookBuilder workbookBuilder) {
         SheetWrapper sheetWrapper = workbookBuilder.sheet("People view");
+
         sheetWrapper
                 .row()
                 .withStyle(Style.H1)
@@ -126,7 +126,7 @@ public class ExcelReportGenerator implements ReportGenerator {
                 .cell("Period:")
                 .buildCell()
 
-                .cell(peopleView.getStartPeriod().toString() + " " + peopleView.getEndPeriod().toString())
+                .cell(peopleView.getStartPeriod() + " " + peopleView.getEndPeriod())
                 .buildCell()
 
                 .buildRow()

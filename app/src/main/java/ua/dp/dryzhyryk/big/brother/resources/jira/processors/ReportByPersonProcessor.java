@@ -5,7 +5,7 @@ import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
 import ua.dp.dryzhyryk.big.brother.core.utils.PrintUtils;
-import ua.dp.dryzhyryk.big.brother.report.generator.ReportGenerator;
+import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
 import ua.dp.dryzhyryk.big.brother.resources.jira.search.PeopleSearchRequest;
 
 import java.time.DayOfWeek;
@@ -17,10 +17,10 @@ import java.util.List;
 public class ReportByPersonProcessor {
 
     private final BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider;
-    private final ReportGenerator reportGenerator;
+    private final ExcelReportGenerator reportGenerator;
     private final DateTimeProvider dateTimeProvider;
 
-    public ReportByPersonProcessor(BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider, ReportGenerator reportGenerator, DateTimeProvider dateTimeProvider) {
+    public ReportByPersonProcessor(BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider, ExcelReportGenerator reportGenerator, DateTimeProvider dateTimeProvider) {
         this.bigJiraBrotherPeopleViewProvider = bigJiraBrotherPeopleViewProvider;
         this.reportGenerator = reportGenerator;
         this.dateTimeProvider = dateTimeProvider;
@@ -39,12 +39,6 @@ public class ReportByPersonProcessor {
     }
 
     private PeopleSearchConditions toPeopleSearchConditionsForLastFinishedWeek(PeopleSearchRequest peopleSearchRequest) {
-
-
-//      now    2021-08-02-2021-08-09
-//      need   2020-12-28-2021-01-04
-
-
 //        LocalDate now = dateTimeProvider.nowLocalDate();
         LocalDate now = LocalDate.of(2021, 1, 5);
 

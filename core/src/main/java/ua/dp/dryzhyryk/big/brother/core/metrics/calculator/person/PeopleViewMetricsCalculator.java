@@ -28,19 +28,19 @@ public class PeopleViewMetricsCalculator {
 
     public List<PersonMetrics> calculatePersonsMetrics(List<Task> tasks, PeopleSearchConditions peopleSearchConditions) {
         Map<String, List<TaskWorkingLogMetrics>> personMetricsByUser = tasks.stream()
-                .flatMap(task ->
-                        {
-                            Map<String, TaskWorkingLogMetrics> stringTaskWorkingLogMetricsMap = taskMetricsForPeopleCalculator.calculatePersonsMetricsForPeopleFromTask(
-                                    task,
-                                    peopleSearchConditions.getStartPeriod(),
-                                    peopleSearchConditions.getEndPeriod());
+                .flatMap(task -> {
+                            Map<String, TaskWorkingLogMetrics> taskWorkingLogMetricsByPerson = taskMetricsForPeopleCalculator
+                                    .calculatePersonsMetricsForPeopleFromTask(
+                                            task,
+                                            peopleSearchConditions.getStartPeriod(),
+                                            peopleSearchConditions.getEndPeriod());
 
-                            return stringTaskWorkingLogMetricsMap
+                            return taskWorkingLogMetricsByPerson
                                     .entrySet().stream();
                         }
                 )
-                .filter(taskWorkingLogMetricsForUser -> isExcludePersonFromPersonMetrics(taskWorkingLogMetricsForUser.getKey(),
-                        peopleSearchConditions.getPeopleNames()))
+                .filter(taskWorkingLogMetricsForUser -> isExcludePersonFromPersonMetrics(taskWorkingLogMetricsForUser.getKey(), peopleSearchConditions.getPeopleNames()))
+                .filter(taskWorkingLogMetricsForUser -> wasTimeSpentOnTaskByPeriod(taskWorkingLogMetricsForUser.getValue()))
                 .collect(Collectors.groupingBy(
                         Entry::getKey,
                         Collectors.mapping(Entry::getValue, Collectors.toList())));
@@ -56,14 +56,23 @@ public class PeopleViewMetricsCalculator {
                     List<ValidatedValue<TimeSpentByDay>> timeSpentByDaysForAllTask =
                             calculateTimeSpentByDaysForAllTask(dailyTaskWorkingLogMetrics, peopleSearchConditions.getTeamName());
 
+                    int totalTimeSpentOnTaskInMinutesByPeriod = timeSpentByDaysForAllTask.stream()
+                            .mapToInt(validatedTimeSpentByDay -> validatedTimeSpentByDay.getValue().getTimeSpentMinutes())
+                            .sum();
+
                     return PersonMetrics.builder()
                             .person(person)
                             .dailyTaskWorkingLogMetrics(dailyTaskWorkingLogMetrics)
-                            .timeSpentByDaysForAllTask(timeSpentByDaysForAllTask)
+                            .totalTimeSpentByDays(timeSpentByDaysForAllTask)
+                            .totalTimeSpentOnTaskInMinutesByPeriod(totalTimeSpentOnTaskInMinutesByPeriod)
                             .build();
                 })
                 .sorted(Comparator.comparing(PersonMetrics::getPerson))
                 .collect(Collectors.toList());
+    }
+
+    private boolean wasTimeSpentOnTaskByPeriod(TaskWorkingLogMetrics value) {
+        return value.getTimeSpentOnTaskInMinutesByPeriod() > 0;
     }
 
     private List<ValidatedValue<TimeSpentByDay>> calculateTimeSpentByDaysForAllTask(
