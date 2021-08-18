@@ -2,6 +2,7 @@ package ua.dp.dryzhyryk.big.brother.report.generator.excel;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PeopleView;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PersonMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TaskWorkingLogMetrics;
@@ -55,16 +56,16 @@ public class ExcelReportGenerator {
             return;
         }
 
-        Map<LocalDate, Integer> totalTimeSpentByDay = personMetric.getTotalTimeSpentByDays().stream()
+        Map<LocalDate, ValidatedValue<TimeSpentByDay>> totalTimeSpentByDay = personMetric.getTotalTimeSpentByDays().stream()
                 .collect(Collectors.toMap(
                         x -> x.getValue().getDay(),
-                        y -> y.getValue().getTimeSpentMinutes()));
+                        y -> y));
 
         List<LocalDate> daysWithoutFreeWeekends = days.stream()
                 .filter(day -> (day.getDayOfWeek() != DayOfWeek.SATURDAY
                         && day.getDayOfWeek() != DayOfWeek.SUNDAY)
                         || (null != totalTimeSpentByDay.get(day)
-                        && !totalTimeSpentByDay.get(day).equals(0)))
+                        && totalTimeSpentByDay.get(day).getValue().getTimeSpentMinutes() != 0))
                 .collect(Collectors.toList());
 
         List<String> dateHeaders = daysWithoutFreeWeekends.stream()
@@ -91,7 +92,7 @@ public class ExcelReportGenerator {
                 .collect(Collectors.toList());
 
         List<String> footerData = daysWithoutFreeWeekends.stream()
-                .map(day -> safeGetIntAsString(totalTimeSpentByDay, day))
+                .map(day -> safeGetIntAsString2(totalTimeSpentByDay, day))
                 .collect(Collectors.toList());
         footerData.add(String.valueOf(convertMinutesToHour(personMetric.getTotalTimeSpentOnTaskInMinutesByPeriod())));
 
@@ -101,6 +102,27 @@ public class ExcelReportGenerator {
                 .body(bodyData)
                 .footer(footerData);
     }
+
+//    private void processValidationInfo(XSSFWorkbook workbook, XSSFSheet sheet, Cell cell, ValidationInformation validationInformation, Map<Styles, CellStyle> styles) {
+//        switch (validationInformation.getValidationStatus()) {
+//            case OK:
+//                cell.setCellStyle(styles.get(Styles.OK));
+//                break;
+//            case WARNING:
+//                cell.setCellStyle(styles.get(Styles.WARNING));
+//                break;
+//            case ERROR_NOT_ENOUGH:
+//                cell.setCellStyle(styles.get(Styles.ERROR_NOT_ENOUGH));
+//                break;
+//            case ERROR_TOO_MUCH:
+//                cell.setCellStyle(styles.get(Styles.ERROR_TOO_MUCH));
+//                break;
+//        }
+//
+//        if (null != validationInformation.getMessage()) {
+//            addComment(workbook, sheet, cell, "Big Brother", validationInformation.getMessage());
+//        }
+//    }
 
     private void generatePeopleReport(PeopleView peopleView, WorkbookBuilder workbookBuilder) {
         SheetWrapper sheetWrapper = workbookBuilder.sheet("People view");
@@ -151,6 +173,14 @@ public class ExcelReportGenerator {
                 });
 
         sheetWrapper.buildSheet();
+    }
+
+    private String safeGetIntAsString2(Map<LocalDate, ValidatedValue<TimeSpentByDay>> timeSpentByDays, LocalDate day) {
+        int res = timeSpentByDays.get(day).getValue().getTimeSpentMinutes();
+
+        return res == 0
+                ? ""
+                : convertMinutesToHour(res).toString();
     }
 
     private String safeGetIntAsString(Map<LocalDate, Integer> timeSpentByDays, LocalDate day) {
