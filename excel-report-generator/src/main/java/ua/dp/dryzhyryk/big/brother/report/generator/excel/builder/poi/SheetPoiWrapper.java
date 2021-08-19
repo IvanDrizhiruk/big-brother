@@ -8,17 +8,20 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.Style;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.RowWrapper;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.SheetWrapper;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.TableBuilder;
 
 public class SheetPoiWrapper implements SheetWrapper {
-	private final XSSFSheet sheet;
+	protected final XSSFWorkbook workbook;
+	protected final XSSFSheet sheet;
 	private final Map<Style, CellStyle> styles;
 	private final AtomicInteger rowNum = new AtomicInteger(0);
 
-	public SheetPoiWrapper(XSSFSheet sheet, Map<Style, CellStyle> styles) {
+	public SheetPoiWrapper(XSSFWorkbook workbook, XSSFSheet sheet, Map<Style, CellStyle> styles) {
+		this.workbook = workbook;
 		this.sheet = sheet;
 		this.styles = styles;
 	}

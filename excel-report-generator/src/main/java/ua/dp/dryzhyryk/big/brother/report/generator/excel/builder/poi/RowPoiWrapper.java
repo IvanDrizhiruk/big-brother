@@ -13,12 +13,12 @@ import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.RowWrapper;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.SheetWrapper;
 
 public class RowPoiWrapper implements RowWrapper {
-	private final SheetWrapper sheetWrapper;
+	protected final SheetPoiWrapper sheetWrapper;
 	private final XSSFRow row;
 	private final Map<Style, CellStyle> styles;
 	private final AtomicInteger cellNum = new AtomicInteger(0);
 
-	public RowPoiWrapper(SheetWrapper sheetWrapper, XSSFRow row, Map<Style, CellStyle> styles) {
+	public RowPoiWrapper(SheetPoiWrapper sheetWrapper, XSSFRow row, Map<Style, CellStyle> styles) {
 		this.sheetWrapper = sheetWrapper;
 		this.row = row;
 		this.styles = styles;

@@ -30,7 +30,7 @@ public class WorkbookPoiBuilder implements WorkbookBuilder {
 	@Override
 	public SheetWrapper sheet(String sheetName) {
 		XSSFSheet xssfSheet = workbook.createSheet(sheetName);
-		return new SheetPoiWrapper(xssfSheet, styles);
+		return new SheetPoiWrapper(workbook, xssfSheet, styles);
 	}
 
 	@Override
@@ -76,15 +76,11 @@ public class WorkbookPoiBuilder implements WorkbookBuilder {
 		styleH3.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		stylesMap.put(Style.H3, styleH3);
 
-		CellStyle styleError = workbook.createCellStyle();
-		styleError.setFillForegroundColor(IndexedColors.ROSE.getIndex());
-		styleError.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-		stylesMap.put(Style.ERROR_NOT_ENOUGH, styleError);
-
 		CellStyle styleErrorNotEnough = workbook.createCellStyle();
 		styleErrorNotEnough.setFillForegroundColor(IndexedColors.RED1.getIndex());
 		styleErrorNotEnough.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-		stylesMap.put(Style.ERROR_TOO_MUCH, styleErrorNotEnough);
+		stylesMap.put(Style.ERROR, styleErrorNotEnough);
+
 
 		CellStyle styleWarning = workbook.createCellStyle();
 		styleWarning.setFillForegroundColor(IndexedColors.LIGHT_YELLOW.getIndex());
