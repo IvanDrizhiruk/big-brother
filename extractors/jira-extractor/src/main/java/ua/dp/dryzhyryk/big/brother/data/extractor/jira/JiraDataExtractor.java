@@ -7,11 +7,11 @@ import com.atlassian.jira.rest.client.api.domain.TimeTracking;
 import com.atlassian.jira.rest.client.api.domain.Worklog;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
+import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.JiraPersonSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.JiraSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.JiraPersonSearchConditions;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -38,9 +38,9 @@ public class JiraDataExtractor implements JiraResource {
     @Override
     public List<Task> loadTasks(JiraSearchConditions searchConditions) {
 
-        switch(searchConditions.getSearchConditionType()) {
+        switch (searchConditions.getSearchConditionType()) {
             case PERSON:
-                return getTasksForPerson((JiraPersonSearchConditions)searchConditions);
+                return getTasksForPerson((JiraPersonSearchConditions) searchConditions);
         }
 
         throw new IllegalArgumentException(
@@ -54,11 +54,11 @@ public class JiraDataExtractor implements JiraResource {
                 searchConditions.getStartPeriod().format(DATA_FORMATTER),
                 searchConditions.getEndPeriod().format(DATA_FORMATTER));
 
-        List<Issue>  issues = loadIssues(jql);
+        List<Issue> issues = loadIssues(jql);
 
-        log.info("Root task has loaded {} ",  issues);
+        log.info("Root task has loaded {} ", issues);
 
-        return  issues.stream()
+        return issues.stream()
                 //TODO load work log fully
                 .map(issue -> loadIssueFully(issue.getKey()))
                 .map(this::toTask)
@@ -68,19 +68,19 @@ public class JiraDataExtractor implements JiraResource {
 
     private List<Issue> loadIssues(String jql) {
         return Flux.<List<Issue>, Integer>generate(() -> 0, (index, sink) -> {
-            //TODO add retry on exception
-            SearchResult result = jiraRestClient.getSearchClient().searchJql(jql, ONE_STEP_SIZE, index, null).claim();
+                    //TODO add retry on exception
+                    SearchResult result = jiraRestClient.getSearchClient().searchJql(jql, ONE_STEP_SIZE, index, null).claim();
 
-            List<Issue> issues = StreamSupport.stream(result.getIssues().spliterator(), false)
-                    .collect(Collectors.toList());
+                    List<Issue> issues = StreamSupport.stream(result.getIssues().spliterator(), false)
+                            .collect(Collectors.toList());
 
-            if (issues.isEmpty()) {
-                sink.complete();
-            } else {
-                sink.next(issues);
-            }
-            return index + ONE_STEP_SIZE;
-        }).retry(REQUEST_RETRIES_NUMBER)
+                    if (issues.isEmpty()) {
+                        sink.complete();
+                    } else {
+                        sink.next(issues);
+                    }
+                    return index + ONE_STEP_SIZE;
+                }).retry(REQUEST_RETRIES_NUMBER)
                 .flatMap(issues -> Flux.fromStream(issues.stream()))
                 .toStream()
                 .collect(Collectors.toList());
@@ -89,6 +89,11 @@ public class JiraDataExtractor implements JiraResource {
     private Issue loadIssueFully(String issueKey) {
 
         log.info("Load issue fully {} ", issueKey);
+
+//        AsynchronousIssueRestClient c = (AsynchronousIssueRestClient) jiraRestClient.getIssueClient();
+//        c.getIssue("123");
+//
+//        new OwnRestClient().loadWorkLog();
 
         //TODO add cache for full loaded task
 

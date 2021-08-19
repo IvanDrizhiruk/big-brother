@@ -43,8 +43,8 @@ public class BigBrotherConsoleApplication {
         reportRoot.mkdirs();
 
         AsynchronousJiraRestClientFactory jiraRestClientFactory = new AsynchronousJiraRestClientFactory();
-        JiraRestClient jiraRestClient = jiraRestClientFactory
-                .createWithBasicHttpAuthentication(config.getJiraUri(), config.getJiraUsername(), config.getJiraPassword());
+        JiraRestClient jiraRestClient = jiraRestClientFactory.createWithBasicHttpAuthentication(
+                config.getJiraUri(), config.getJiraUsername(), config.getJiraPassword());
         JiraResource jiraResource = new JiraDataExtractor(jiraRestClient);
         DataStorage jiraDataStorage = new JiraFileDataStorage(storageRoot.getAbsolutePath());
         JiraInformationHolder jiraInformationHolder = newJiraInformationHolder(jiraResource, jiraDataStorage, config);
