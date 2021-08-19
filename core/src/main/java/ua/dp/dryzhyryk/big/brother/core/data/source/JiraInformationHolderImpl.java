@@ -13,13 +13,13 @@ import java.util.*;
 public class JiraInformationHolderImpl implements JiraInformationHolder {
 
     private final JiraResource jiraResource;
-    private final DataStorage jiraDataStorage;
+    private final DataStorage dataStorage;
 
     private final Map<JiraSearchConditions, List<Task>> tasksBySearchConditions = new HashMap<>();
 
     public JiraInformationHolderImpl(JiraResource jiraResource, DataStorage jiraDataStorage) {
         this.jiraResource = jiraResource;
-        this.jiraDataStorage = jiraDataStorage;
+        this.dataStorage = jiraDataStorage;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class JiraInformationHolderImpl implements JiraInformationHolder {
     }
 
     private List<Task> loadTask(JiraSearchConditions searchConditions) {
-        List<Task> tasksFromStorage = jiraDataStorage.loadTasks(searchConditions);
+        List<Task> tasksFromStorage = dataStorage.loadTasks(searchConditions);
         if (null != tasksFromStorage) {
             return tasksFromStorage;
         }
@@ -36,7 +36,7 @@ public class JiraInformationHolderImpl implements JiraInformationHolder {
         List<Task> loadedTaskFromResources = jiraResource.loadTasks(searchConditions);
         List<Task> tasksFromResource = Optional.ofNullable(loadedTaskFromResources).orElse(Collections.emptyList());
 
-        jiraDataStorage.saveProjectSprint(searchConditions, tasksFromResource);
+        dataStorage.saveProjectSprint(searchConditions, tasksFromResource);
 
         return tasksFromResource;
     }

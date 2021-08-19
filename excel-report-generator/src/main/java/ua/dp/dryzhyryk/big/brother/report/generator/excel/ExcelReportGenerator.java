@@ -1,17 +1,5 @@
 package ua.dp.dryzhyryk.big.brother.report.generator.excel;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.ListUtils;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PeopleView;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PersonMetrics;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TaskWorkingLogMetrics;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TimeSpentByDay;
-import ua.dp.dryzhyryk.big.brother.core.utils.TimeUtils;
-import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.SheetWrapper;
-import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.TableBuilder;
-import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.WorkbookBuilder;
-
 import java.io.File;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -22,185 +10,208 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.commons.collections4.ListUtils;
+
+import lombok.extern.slf4j.Slf4j;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidationStatus;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PeopleView;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PersonMetrics;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TaskWorkingLogMetrics;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TimeSpentByDay;
+import ua.dp.dryzhyryk.big.brother.core.utils.TimeUtils;
+import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.SheetWrapper;
+import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.TableBuilder;
+import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.TableCell;
+import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.WorkbookBuilder;
+
 @Slf4j
 public class ExcelReportGenerator {
 
-    private final File reportRoot;
-    private final WorkbookBuilderFactory workbookBuilderFactory;
+	private final File reportRoot;
+	private final WorkbookBuilderFactory workbookBuilderFactory;
 
-    public ExcelReportGenerator(String reportRoot) {
-        this.reportRoot = new File(reportRoot);
-        this.workbookBuilderFactory = new WorkbookBuilderFactoryImpl();
+	public ExcelReportGenerator(String reportRoot) {
+		this.reportRoot = new File(reportRoot);
+		this.workbookBuilderFactory = new WorkbookBuilderFactoryImpl();
 
-        if (!this.reportRoot.isDirectory()) {
-            throw new IllegalArgumentException("Report root directory does not exist. Path: " + reportRoot);
-        }
-    }
+		if (!this.reportRoot.isDirectory()) {
+			throw new IllegalArgumentException("Report root directory does not exist. Path: " + reportRoot);
+		}
+	}
 
-    public void generatePeopleReport(PeopleView peopleView) {
-        WorkbookBuilder workbookBuilder = workbookBuilderFactory.prepareBuilder(ReportFileExtension.XLSX);
+	public void generatePeopleReport(PeopleView peopleView) {
+		WorkbookBuilder workbookBuilder = workbookBuilderFactory.prepareBuilder(ReportFileExtension.XLSX);
 
-        generatePeopleReport(peopleView, workbookBuilder);
+		generatePeopleReport(peopleView, workbookBuilder);
 
-        String reportFileName = String.format("%s:%s-%s",
-                peopleView.getTeamName(),
-                peopleView.getStartPeriod(),
-                peopleView.getEndPeriod());
+		String reportFileName = String.format("%s:%s-%s",
+				peopleView.getTeamName(),
+				peopleView.getStartPeriod(),
+				peopleView.getEndPeriod());
 
-        workbookBuilder.saveReportFile(reportRoot, reportFileName);
-    }
+		workbookBuilder.saveReportFile(reportRoot, reportFileName);
+	}
 
-    private void weeklyTable(TableBuilder tableBuilder, List<LocalDate> days, PersonMetrics personMetric) {
-        List<TaskWorkingLogMetrics> dailyTaskLogs = personMetric.getDailyTaskWorkingLogMetrics();
-        if (dailyTaskLogs.isEmpty()) {
-            return;
-        }
+	private void weeklyTable(TableBuilder tableBuilder, List<LocalDate> days, PersonMetrics personMetric) {
+		List<TaskWorkingLogMetrics> dailyTaskLogs = personMetric.getDailyTaskWorkingLogMetrics();
+		if (dailyTaskLogs.isEmpty()) {
+			return;
+		}
 
-        Map<LocalDate, ValidatedValue<TimeSpentByDay>> totalTimeSpentByDay = personMetric.getTotalTimeSpentByDays().stream()
-                .collect(Collectors.toMap(
-                        x -> x.getValue().getDay(),
-                        y -> y));
+		Map<LocalDate, ValidatedValue<TimeSpentByDay>> totalTimeSpentByDay = personMetric.getTotalTimeSpentByDays().stream()
+				.collect(Collectors.toMap(
+						x -> x.getValue().getDay(),
+						y -> y));
 
-        List<LocalDate> daysWithoutFreeWeekends = days.stream()
-                .filter(day -> (day.getDayOfWeek() != DayOfWeek.SATURDAY
-                        && day.getDayOfWeek() != DayOfWeek.SUNDAY)
-                        || (null != totalTimeSpentByDay.get(day)
-                        && totalTimeSpentByDay.get(day).getValue().getTimeSpentMinutes() != 0))
-                .collect(Collectors.toList());
+		List<LocalDate> daysWithoutFreeWeekends = days.stream()
+				.filter(day -> (day.getDayOfWeek() != DayOfWeek.SATURDAY
+						&& day.getDayOfWeek() != DayOfWeek.SUNDAY)
+						|| (null != totalTimeSpentByDay.get(day)
+						&& totalTimeSpentByDay.get(day).getValue().getTimeSpentMinutes() != 0))
+				.collect(Collectors.toList());
 
-        List<String> dateHeaders = daysWithoutFreeWeekends.stream()
-                .map(LocalDate::toString)
-                .collect(Collectors.toList());
-        List<String> headerData = ListUtils.union(dateHeaders, List.of("By period", "Total", "Task id", "Task name"));
+		List<String> dateHeaders = daysWithoutFreeWeekends.stream()
+				.map(LocalDate::toString)
+				.collect(Collectors.toList());
+		List<String> headerData = ListUtils.union(dateHeaders, List.of("By period", "Total", "Task id", "Task name"));
 
-        List<List<String>> bodyData = dailyTaskLogs.stream()
-                .map(dailyTaskLog -> {
-                    List<String> bodyDataRow = new ArrayList<>();
+		List<List<String>> bodyData = dailyTaskLogs.stream()
+				.map(dailyTaskLog -> {
+					List<String> bodyDataRow = new ArrayList<>();
 
-                    Map<LocalDate, Integer> timeSpentByDays = dailyTaskLog.getTimeSpentByDays().stream()
-                            .collect(Collectors.toMap(TimeSpentByDay::getDay, TimeSpentByDay::getTimeSpentMinutes));
-                    daysWithoutFreeWeekends.forEach(day -> bodyDataRow.add(safeGetIntAsString(timeSpentByDays, day)));
+					Map<LocalDate, Integer> timeSpentByDays = dailyTaskLog.getTimeSpentByDays().stream()
+							.collect(Collectors.toMap(TimeSpentByDay::getDay, TimeSpentByDay::getTimeSpentMinutes));
+					daysWithoutFreeWeekends.forEach(day -> bodyDataRow.add(safeGetIntAsString(timeSpentByDays, day)));
 
-                    bodyDataRow.add(String.valueOf(convertMinutesToHour(dailyTaskLog.getTimeSpentOnTaskInMinutesByPeriod())));
-                    bodyDataRow.add(String.valueOf(convertMinutesToHour(dailyTaskLog.getTimeSpentOnTaskInMinutes())));
+					bodyDataRow.add(String.valueOf(convertMinutesToHour(dailyTaskLog.getTimeSpentOnTaskInMinutesByPeriod())));
+					bodyDataRow.add(String.valueOf(convertMinutesToHour(dailyTaskLog.getTimeSpentOnTaskInMinutes())));
 
-                    bodyDataRow.add(dailyTaskLog.getTaskId());
-                    bodyDataRow.add(dailyTaskLog.getTaskName());
+					bodyDataRow.add(dailyTaskLog.getTaskId());
+					bodyDataRow.add(dailyTaskLog.getTaskName());
 
-                    return bodyDataRow;
-                })
-                .collect(Collectors.toList());
+					return bodyDataRow;
+				})
+				.collect(Collectors.toList());
 
-        List<String> footerData = daysWithoutFreeWeekends.stream()
-                .map(day -> safeGetIntAsString2(totalTimeSpentByDay, day))
-                .collect(Collectors.toList());
-        footerData.add(String.valueOf(convertMinutesToHour(personMetric.getTotalTimeSpentOnTaskInMinutesByPeriod())));
+		List<TableCell> footerData = daysWithoutFreeWeekends.stream()
+				.map(day -> {
 
+					ValidatedValue<TimeSpentByDay> validatedValue = totalTimeSpentByDay.get(day);
+					String value = safeGetIntAsString2(totalTimeSpentByDay, day);
 
-        tableBuilder
-                .header(headerData)
-                .body(bodyData)
-                .footer(footerData);
-    }
+					ValidationStatus status = validatedValue.getValidationStatus(); //=> Style.ERROR
+					Style style = toStyle(status);
 
-//    private void processValidationInfo(XSSFWorkbook workbook, XSSFSheet sheet, Cell cell, ValidationInformation validationInformation, Map<Styles, CellStyle> styles) {
-//        switch (validationInformation.getValidationStatus()) {
-//            case OK:
-//                cell.setCellStyle(styles.get(Styles.OK));
-//                break;
-//            case WARNING:
-//                cell.setCellStyle(styles.get(Styles.WARNING));
-//                break;
-//            case ERROR_NOT_ENOUGH:
-//                cell.setCellStyle(styles.get(Styles.ERROR_NOT_ENOUGH));
-//                break;
-//            case ERROR_TOO_MUCH:
-//                cell.setCellStyle(styles.get(Styles.ERROR_TOO_MUCH));
-//                break;
-//        }
-//
-//        if (null != validationInformation.getMessage()) {
-//            addComment(workbook, sheet, cell, "Big Brother", validationInformation.getMessage());
-//        }
-//    }
+					String notes = validatedValue.getValidationNotes().stream()
+							.map(note -> note.getNoteType() + ": " + note.getNote())
+							.collect(Collectors.joining("\n"));
 
-    private void generatePeopleReport(PeopleView peopleView, WorkbookBuilder workbookBuilder) {
-        SheetWrapper sheetWrapper = workbookBuilder.sheet("People view");
+					return TableCell.builder()
+							.value(value)
+							.style(style)
+							.cellComment(notes)
+							.build();
+				})
+				.collect(Collectors.toList());
 
-        sheetWrapper
-                .row()
-                .withStyle(Style.H1)
-                .withHeightInPoints(25)
+		footerData.add(TableCell.builder()
+				.value(String.valueOf(convertMinutesToHour(personMetric.getTotalTimeSpentOnTaskInMinutesByPeriod())))
+				.build());
 
-                .cell("Team: ")
-                .withStyle(Style.H1)
-                .buildCell()
+		tableBuilder
+				.header(headerData)
+				.body(bodyData)
+				.footerCells(footerData);
+	}
 
-                .cell(peopleView.getTeamName()).buildCell()
+	private Style toStyle(ValidationStatus status) {
+		switch (status) {
+			case ERROR:
+				return Style.ERROR;
+			case WARNING:
+				return Style.WARNING;
+			default:
+				return Style.OK;
+		}
+	}
 
+	private void generatePeopleReport(PeopleView peopleView, WorkbookBuilder workbookBuilder) {
+		SheetWrapper sheetWrapper = workbookBuilder.sheet("People view");
 
-                .buildRow()
+		sheetWrapper
+				.row()
+				.withStyle(Style.H1)
+				.withHeightInPoints(25)
 
-                .row()
-                .withStyle(Style.H2)
-                .withHeightInPoints(25)
+				.cell("Team: ")
+				.withStyle(Style.H1)
+				.buildCell()
 
-                .cell("Period:")
-                .buildCell()
+				.cell(peopleView.getTeamName()).buildCell()
 
-                .cell(peopleView.getStartPeriod() + " " + peopleView.getEndPeriod())
-                .buildCell()
+				.buildRow()
 
-                .buildRow()
-                .whiteLine();
+				.row()
+				.withStyle(Style.H2)
+				.withHeightInPoints(25)
 
-        List<LocalDate> days = getDatesBetween(peopleView.getStartPeriod(), peopleView.getEndPeriod());
+				.cell("Period:")
+				.buildCell()
 
-        peopleView.getPersonMetrics()
-                .forEach(personMetric -> {
-                    sheetWrapper
-                            .row()
-                            .withStyle(Style.H3)
-                            .withHeightInPoints(25)
-                            .cell(personMetric.getPerson())
-                            .buildCell()
-                            .buildRow()
+				.cell(peopleView.getStartPeriod() + " " + peopleView.getEndPeriod())
+				.buildCell()
 
-                            .buildTable(builder -> weeklyTable(builder, days, personMetric))
-                            .whiteLine()
-                            //TODO second table
-                            .whiteLine();
-                });
+				.buildRow()
+				.whiteLine();
 
-        sheetWrapper.buildSheet();
-    }
+		List<LocalDate> days = getDatesBetween(peopleView.getStartPeriod(), peopleView.getEndPeriod());
 
-    private String safeGetIntAsString2(Map<LocalDate, ValidatedValue<TimeSpentByDay>> timeSpentByDays, LocalDate day) {
-        int res = timeSpentByDays.get(day).getValue().getTimeSpentMinutes();
+		peopleView.getPersonMetrics()
+				.forEach(personMetric -> {
+					sheetWrapper
+							.row()
+							.withStyle(Style.H3)
+							.withHeightInPoints(25)
+							.cell(personMetric.getPerson())
+							.buildCell()
+							.buildRow()
 
-        return res == 0
-                ? ""
-                : convertMinutesToHour(res).toString();
-    }
+							.buildTable(builder -> weeklyTable(builder, days, personMetric))
+							.whiteLine()
+							//TODO second table
+							.whiteLine();
+				});
 
-    private String safeGetIntAsString(Map<LocalDate, Integer> timeSpentByDays, LocalDate day) {
-        Integer res = timeSpentByDays.get(day);
+		sheetWrapper.buildSheet();
+	}
 
-        return res == null || res.equals(0)
-                ? ""
-                : convertMinutesToHour(res).toString();
-    }
+	private String safeGetIntAsString2(Map<LocalDate, ValidatedValue<TimeSpentByDay>> timeSpentByDays, LocalDate day) {
+		int res = timeSpentByDays.get(day).getValue().getTimeSpentMinutes();
 
-    private static List<LocalDate> getDatesBetween(LocalDate startDate, LocalDate endDate) {
+		return res == 0
+				? ""
+				: convertMinutesToHour(res).toString();
+	}
 
-        long numOfDaysBetween = ChronoUnit.DAYS.between(startDate, endDate);
-        return IntStream.iterate(0, i -> i + 1)
-                .limit(numOfDaysBetween)
-                .mapToObj(startDate::plusDays)
-                .collect(Collectors.toList());
-    }
+	private String safeGetIntAsString(Map<LocalDate, Integer> timeSpentByDays, LocalDate day) {
+		Integer res = timeSpentByDays.get(day);
 
-    private static Float convertMinutesToHour(Integer minutes) {
-        return TimeUtils.convertMinutesToHour(minutes);
-    }
+		return res == null || res.equals(0)
+				? ""
+				: convertMinutesToHour(res).toString();
+	}
+
+	private static List<LocalDate> getDatesBetween(LocalDate startDate, LocalDate endDate) {
+
+		long numOfDaysBetween = ChronoUnit.DAYS.between(startDate, endDate);
+		return IntStream.iterate(0, i -> i + 1)
+				.limit(numOfDaysBetween)
+				.mapToObj(startDate::plusDays)
+				.collect(Collectors.toList());
+	}
+
+	private static Float convertMinutesToHour(Integer minutes) {
+		return TimeUtils.convertMinutesToHour(minutes);
+	}
 }

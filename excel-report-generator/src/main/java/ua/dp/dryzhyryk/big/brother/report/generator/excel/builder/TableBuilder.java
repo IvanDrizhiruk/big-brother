@@ -8,4 +8,6 @@ public interface TableBuilder {
 	TableBuilder body(List<List<String>> bodyData);
 
 	TableBuilder footer(List<String> footerData);
+
+	TableBuilder footerCells(List<TableCell> footerData);
 }

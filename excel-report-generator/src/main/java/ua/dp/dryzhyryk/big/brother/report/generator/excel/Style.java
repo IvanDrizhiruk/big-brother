@@ -4,8 +4,9 @@ public enum Style {
 	H1,
 	H2,
 	H3,
-	ERROR_NOT_ENOUGH,
-	ERROR_TOO_MUCH,
+	@Deprecated ERROR_NOT_ENOUGH,
+	@Deprecated ERROR_TOO_MUCH,
+	ERROR,
 	WARNING,
 	OK
 }

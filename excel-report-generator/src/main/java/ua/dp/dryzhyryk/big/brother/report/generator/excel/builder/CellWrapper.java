@@ -9,5 +9,7 @@ public interface CellWrapper {
 
 	CellWrapper withValue(double cellValue);
 
+	CellWrapper withComment(String cellComment);
+
 	RowWrapper buildCell();
 }

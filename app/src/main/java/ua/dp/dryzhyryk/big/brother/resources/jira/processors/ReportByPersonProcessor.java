@@ -39,9 +39,8 @@ public class ReportByPersonProcessor {
     }
 
     private PeopleSearchConditions toPeopleSearchConditionsForLastFinishedWeek(PeopleSearchRequest peopleSearchRequest) {
-//        LocalDate now = dateTimeProvider.nowLocalDate();
-        LocalDate now = LocalDate.of(2021, 1, 5);
-
+        LocalDate now = dateTimeProvider.nowLocalDate();
+//        LocalDate now = LocalDate.of(2021, 1, 5);
         LocalDate mondayOfLastFinishedWeek = now
                 .with(DayOfWeek.MONDAY)
                 .minusWeeks(1);

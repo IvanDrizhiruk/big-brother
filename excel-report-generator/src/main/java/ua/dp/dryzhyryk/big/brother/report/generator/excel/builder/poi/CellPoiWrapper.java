@@ -10,14 +10,16 @@ import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.CellWrapper;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.RowWrapper;
 
 public class CellPoiWrapper implements CellWrapper {
-	private final RowWrapper row;
+	private final RowPoiWrapper row;
 	private final XSSFCell cell;
 	private final Map<Style, CellStyle> styles;
+	private final CellPoiCommentCreator cellCommentCreator;
 
-	public CellPoiWrapper(RowWrapper row, XSSFCell cell, Map<Style, CellStyle> styles) {
+	public CellPoiWrapper(RowPoiWrapper row, XSSFCell cell, Map<Style, CellStyle> styles, CellPoiCommentCreator cellCommentCreator) {
 		this.row = row;
 		this.cell = cell;
 		this.styles = styles;
+		this.cellCommentCreator = cellCommentCreator;
 	}
 
 	@Override
@@ -35,6 +37,16 @@ public class CellPoiWrapper implements CellWrapper {
 	@Override
 	public CellWrapper withValue(double cellValue) {
 		cell.setCellValue(cellValue);
+		return this;
+	}
+
+	@Override
+	public CellWrapper withComment(String cellComment) {
+
+		CellPoiCommentWrapper comment = cellCommentCreator.newComment(cellComment);
+
+		cell.setCellComment(comment.comment);
+
 		return this;
 	}
 

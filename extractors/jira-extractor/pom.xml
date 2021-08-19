@@ -12,7 +12,7 @@
 
     <properties>
         <atlassian.product.version>8.4.2</atlassian.product.version>
-        <jira-rest-java-client-core.version>5.1.6</jira-rest-java-client-core.version>
+        <jira-rest-java-client-core.version>5.2.2</jira-rest-java-client-core.version>
         <fugue.version>4.7.2</fugue.version>
     </properties>
 
