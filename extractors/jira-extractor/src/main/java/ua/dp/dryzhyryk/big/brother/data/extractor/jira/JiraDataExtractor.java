@@ -1,10 +1,19 @@
 package ua.dp.dryzhyryk.big.brother.data.extractor.jira;
 
-import com.atlassian.jira.rest.client.api.JiraRestClient;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import com.atlassian.jira.rest.client.api.domain.Issue;
 import com.atlassian.jira.rest.client.api.domain.SearchResult;
 import com.atlassian.jira.rest.client.api.domain.TimeTracking;
 import com.atlassian.jira.rest.client.api.domain.Worklog;
+
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
@@ -12,130 +21,122 @@ import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.JiraSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.JiraPersonSearchConditions;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import ua.dp.dryzhyryk.big.brother.data.extractor.jira.extention.JiraRestClientExtended;
 
 @Slf4j
 public class JiraDataExtractor implements JiraResource {
 
-    private static final String DATETIME_FORMAT_PATTERN = "yyyy-MM-dd'T'HH:mm:ssZ";
-    private static final int ONE_STEP_SIZE = 5;
-    private static final int TIMOUT_IN_SECONDS = 10;
-    private static final long REQUEST_RETRIES_NUMBER = 3;
-    private static final DateTimeFormatter DATA_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	private static final String DATETIME_FORMAT_PATTERN = "yyyy-MM-dd'T'HH:mm:ssZ";
+	private static final int ONE_STEP_SIZE = 5;
+	private static final int TIMOUT_IN_SECONDS = 10;
+	private static final long REQUEST_RETRIES_NUMBER = 3;
+	private static final DateTimeFormatter DATA_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    private final JiraRestClient jiraRestClient;
+	private final JiraRestClientExtended jiraRestClient;
 
-    public JiraDataExtractor(JiraRestClient jiraRestClient) {
-        this.jiraRestClient = jiraRestClient;
-    }
+	public JiraDataExtractor(JiraRestClientExtended jiraRestClient) {
+		this.jiraRestClient = jiraRestClient;
+	}
 
-    @Override
-    public List<Task> loadTasks(JiraSearchConditions searchConditions) {
+	@Override
+	public List<Task> loadTasks(JiraSearchConditions searchConditions) {
 
-        switch (searchConditions.getSearchConditionType()) {
-            case PERSON:
-                return getTasksForPerson((JiraPersonSearchConditions) searchConditions);
-        }
+		switch (searchConditions.getSearchConditionType()) {
+			case PERSON:
+				return getTasksForPerson((JiraPersonSearchConditions) searchConditions);
+		}
 
-        throw new IllegalArgumentException(
-                "Unable to load tasks. Unsupported search type " + searchConditions.getSearchConditionType());
-    }
+		throw new IllegalArgumentException(
+				"Unable to load tasks. Unsupported search type " + searchConditions.getSearchConditionType());
+	}
 
-    private List<Task> getTasksForPerson(JiraPersonSearchConditions searchConditions) {
+	private List<Task> getTasksForPerson(JiraPersonSearchConditions searchConditions) {
 
-        String jql = String.format("worklogAuthor = %s AND  worklogDate >=  %s AND  worklogDate <= %s",
-                searchConditions.getPersonName(),
-                searchConditions.getStartPeriod().format(DATA_FORMATTER),
-                searchConditions.getEndPeriod().format(DATA_FORMATTER));
+		String jql = String.format("worklogAuthor = %s AND  worklogDate >=  %s AND  worklogDate <= %s",
+				searchConditions.getPersonName(),
+				searchConditions.getStartPeriod().format(DATA_FORMATTER),
+				searchConditions.getEndPeriod().format(DATA_FORMATTER));
 
-        List<Issue> issues = loadIssues(jql);
+		List<Issue> issues = loadIssues(jql);
 
-        log.info("Root task has loaded {} ", issues);
+		log.info("Root task has loaded {} ", issues);
 
-        return issues.stream()
-                //TODO load work log fully
-                .map(issue -> loadIssueFully(issue.getKey()))
-                .map(this::toTask)
-                .collect(Collectors.toList());
-    }
+		return issues.stream()
+				.map(issue -> loadIssueFully(issue.getKey()))
+				.map(this::toTask)
+				.collect(Collectors.toList());
+	}
 
+	private List<Issue> loadIssues(String jql) {
+		return Flux.<List<Issue>, Integer> generate(() -> 0, (index, sink) -> {
+					//TODO add retry on exception
+					SearchResult result = jiraRestClient.getSearchClient().searchJql(jql, ONE_STEP_SIZE, index, null).claim();
 
-    private List<Issue> loadIssues(String jql) {
-        return Flux.<List<Issue>, Integer>generate(() -> 0, (index, sink) -> {
-                    //TODO add retry on exception
-                    SearchResult result = jiraRestClient.getSearchClient().searchJql(jql, ONE_STEP_SIZE, index, null).claim();
+					List<Issue> issues = StreamSupport.stream(result.getIssues().spliterator(), false)
+							.collect(Collectors.toList());
 
-                    List<Issue> issues = StreamSupport.stream(result.getIssues().spliterator(), false)
-                            .collect(Collectors.toList());
+					if (issues.isEmpty()) {
+						sink.complete();
+					} else {
+						sink.next(issues);
+					}
+					return index + ONE_STEP_SIZE;
+				}).retry(REQUEST_RETRIES_NUMBER)
+				.flatMap(issues -> Flux.fromStream(issues.stream()))
+				.toStream()
+				.collect(Collectors.toList());
+	}
 
-                    if (issues.isEmpty()) {
-                        sink.complete();
-                    } else {
-                        sink.next(issues);
-                    }
-                    return index + ONE_STEP_SIZE;
-                }).retry(REQUEST_RETRIES_NUMBER)
-                .flatMap(issues -> Flux.fromStream(issues.stream()))
-                .toStream()
-                .collect(Collectors.toList());
-    }
+	@SneakyThrows
+	private Issue loadIssueFully(String issueKey) {
 
-    private Issue loadIssueFully(String issueKey) {
+		log.info("Load issue fully {} ", issueKey);
 
-        log.info("Load issue fully {} ", issueKey);
+		//TODO add cache for full loaded task
 
-//        AsynchronousIssueRestClient c = (AsynchronousIssueRestClient) jiraRestClient.getIssueClient();
-//        c.getIssue("123");
-//
-//        new OwnRestClient().loadWorkLog();
+		//TODO add retry on exception
+		Issue issue = jiraRestClient.getIssueClient().getIssue(issueKey).get();
 
-        //TODO add cache for full loaded task
+		Collection<Worklog> fullWorkLogs = jiraRestClient.getWorklogsClient().getWorkLogs(issueKey).get();
 
-        try {
-            //TODO add retry on exception
-            return jiraRestClient.getIssueClient().getIssue(issueKey).get();//.get(TIMOUT_IN_SECONDS, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+		List<Worklog> workLogs = ((List<Worklog>) issue.getWorklogs());
+		workLogs.clear();
+		workLogs.addAll(fullWorkLogs);
 
-    private Task toTask(Issue issue) {
-        TimeTracking timeTracking = issue.getTimeTracking();
+		return issue;//.get(TIMOUT_IN_SECONDS, TimeUnit.SECONDS);
+	}
 
-        List<TaskWorkLog> taskWorkLogs = StreamSupport.stream(issue.getWorklogs().spliterator(), false)
-                .map(this::toTaskWorkLog)
-                .collect(Collectors.toList());
+	private Task toTask(Issue issue) {
+		TimeTracking timeTracking = issue.getTimeTracking();
 
-        return Task.builder()
-                .id(issue.getKey())
-                .name(issue.getSummary())
-                .type(issue.getIssueType().getName())
-                .isSubTask(issue.getIssueType().isSubtask())
-                .status(issue.getStatus().getName())
-                .originalEstimateMinutes(timeTracking.getOriginalEstimateMinutes())
-                .remainingEstimateMinutes(timeTracking.getRemainingEstimateMinutes())
-                .timeSpentMinutes(timeTracking.getTimeSpentMinutes())
-                .workLogs(taskWorkLogs)
-                .subTasks(new ArrayList<>())
-                .build();
-    }
+		List<TaskWorkLog> taskWorkLogs = StreamSupport.stream(issue.getWorklogs().spliterator(), false)
+				.map(this::toTaskWorkLog)
+				.collect(Collectors.toList());
 
-    private TaskWorkLog toTaskWorkLog(Worklog worklog) {
-        LocalDateTime dateTime = LocalDateTime.parse(
-                worklog.getStartDate().toDateTime().toString(DATETIME_FORMAT_PATTERN),
-                DateTimeFormatter.ofPattern(DATETIME_FORMAT_PATTERN));
+		return Task.builder()
+				.id(issue.getKey())
+				.name(issue.getSummary())
+				.type(issue.getIssueType().getName())
+				.isSubTask(issue.getIssueType().isSubtask())
+				.status(issue.getStatus().getName())
+				.originalEstimateMinutes(timeTracking.getOriginalEstimateMinutes())
+				.remainingEstimateMinutes(timeTracking.getRemainingEstimateMinutes())
+				.timeSpentMinutes(timeTracking.getTimeSpentMinutes())
+				.workLogs(taskWorkLogs)
+				.subTasks(new ArrayList<>())
+				.build();
+	}
 
-        return TaskWorkLog
-                .builder()
-                .person(worklog.getUpdateAuthor().getName())
-                .startDateTime(dateTime)
-                .minutesSpent(worklog.getMinutesSpent())
-                .build();
-    }
+	private TaskWorkLog toTaskWorkLog(Worklog worklog) {
+		LocalDateTime dateTime = LocalDateTime.parse(
+				worklog.getStartDate().toDateTime().toString(DATETIME_FORMAT_PATTERN),
+				DateTimeFormatter.ofPattern(DATETIME_FORMAT_PATTERN));
+
+		return TaskWorkLog
+				.builder()
+				.person(worklog.getUpdateAuthor().getName())
+				.startDateTime(dateTime)
+				.minutesSpent(worklog.getMinutesSpent())
+				.build();
+	}
 }

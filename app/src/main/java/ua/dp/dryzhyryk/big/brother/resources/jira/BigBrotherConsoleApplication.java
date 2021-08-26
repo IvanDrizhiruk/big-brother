@@ -1,7 +1,9 @@
 package ua.dp.dryzhyryk.big.brother.resources.jira;
 
-import com.atlassian.jira.rest.client.api.JiraRestClient;
-import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
+import com.atlassian.jira.rest.client.auth.BasicHttpAuthenticationHandler;
+import com.atlassian.jira.rest.client.internal.async.AsynchronousHttpClientFactory;
+import com.atlassian.jira.rest.client.internal.async.DisposableHttpClient;
+
 import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
 import ua.dp.dryzhyryk.big.brother.core.configuration.ConfigurationService;
@@ -15,6 +17,8 @@ import ua.dp.dryzhyryk.big.brother.core.ports.DataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
 import ua.dp.dryzhyryk.big.brother.data.extractor.jira.JiraDataExtractor;
+import ua.dp.dryzhyryk.big.brother.data.extractor.jira.extention.JiraRestClientExtended;
+import ua.dp.dryzhyryk.big.brother.data.extractor.jira.extention.JiraRestClientExtendedImpl;
 import ua.dp.dryzhyryk.big.brother.data.storage.jira.JiraFileDataStorage;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
 import ua.dp.dryzhyryk.big.brother.resources.jira.inicialisation.Configurations;
@@ -42,9 +46,8 @@ public class BigBrotherConsoleApplication {
         File reportRoot = new File(config.getRootDir(), "/reports");
         reportRoot.mkdirs();
 
-        AsynchronousJiraRestClientFactory jiraRestClientFactory = new AsynchronousJiraRestClientFactory();
-        JiraRestClient jiraRestClient = jiraRestClientFactory.createWithBasicHttpAuthentication(
-                config.getJiraUri(), config.getJiraUsername(), config.getJiraPassword());
+        JiraRestClientExtended jiraRestClient = newJiraRestClient(config);
+
         JiraResource jiraResource = new JiraDataExtractor(jiraRestClient);
         DataStorage jiraDataStorage = new JiraFileDataStorage(storageRoot.getAbsolutePath());
         JiraInformationHolder jiraInformationHolder = newJiraInformationHolder(jiraResource, jiraDataStorage, config);
@@ -65,6 +68,13 @@ public class BigBrotherConsoleApplication {
                 bigJiraBrotherPeopleViewProvider,
                 reportGenerator,
                 dateTimeProvider);
+    }
+
+    private JiraRestClientExtended newJiraRestClient(Configurations config) {
+        final DisposableHttpClient httpClient = new AsynchronousHttpClientFactory()
+                .createClient(config.getJiraUri(), new BasicHttpAuthenticationHandler(config.getJiraUsername(), config.getJiraPassword()));
+
+        return new JiraRestClientExtendedImpl(config.getJiraUri(), httpClient) ;
     }
 
     protected DateTimeProvider newDateTimeProvider() {
