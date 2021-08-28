@@ -1,4 +1,4 @@
-package ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response;
+package ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log;
 
 import lombok.Builder;
 import lombok.Value;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Value
 @Builder(toBuilder = true)
-public class PersonMetrics {
+public class TasksWorkingLogsForPerson {
 
     private final String person;
 

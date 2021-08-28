@@ -2,6 +2,7 @@ package ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response;
 
 import lombok.Builder;
 import lombok.Value;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TasksWorkingLogsForPerson;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,6 +15,5 @@ public class PeopleView {
     private final LocalDate startPeriod;
     private final LocalDate endPeriod;
 
-    //TODO rename
-    private final List<PersonMetrics> personMetrics;
+    private final List<TasksWorkingLogsForPerson> tasksWorkingLogsForPersons;
 }

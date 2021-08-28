@@ -2,7 +2,7 @@ package ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person;
 
 import ua.dp.dryzhyryk.big.brother.core.configuration.ConfigurationService;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.configuration.TeamConfiguration;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TimeSpentByDay;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TimeSpentByDay;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
 import ua.dp.dryzhyryk.big.brother.core.utils.TimeUtils;
 

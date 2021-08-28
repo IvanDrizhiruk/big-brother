@@ -1,4 +1,4 @@
-package ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response;
+package ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log;
 
 import java.util.List;
 

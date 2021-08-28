@@ -5,9 +5,9 @@ import org.apache.commons.collections4.ListUtils;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidationStatus;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PeopleView;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PersonMetrics;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TaskWorkingLogMetrics;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TimeSpentByDay;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TasksWorkingLogsForPerson;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TaskWorkingLogMetrics;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TimeSpentByDay;
 import ua.dp.dryzhyryk.big.brother.core.utils.TimeUtils;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.SheetWrapper;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.TableBuilder;
@@ -53,7 +53,7 @@ public class ExcelReportGenerator {
         workbookBuilder.saveReportFile(reportRoot, reportFileName);
     }
 
-    private void weeklyTable(TableBuilder tableBuilder, List<LocalDate> days, PersonMetrics personMetric) {
+    private void weeklyTable(TableBuilder tableBuilder, List<LocalDate> days, TasksWorkingLogsForPerson personMetric) {
         List<TaskWorkingLogMetrics> dailyTaskLogs = personMetric.getDailyTaskWorkingLogMetrics();
         if (dailyTaskLogs.isEmpty()) {
             return;
@@ -174,7 +174,7 @@ public class ExcelReportGenerator {
 
         List<LocalDate> days = getDatesBetween(peopleView.getStartPeriod(), peopleView.getEndPeriod());
 
-        peopleView.getPersonMetrics()
+        peopleView.getTasksWorkingLogsForPersons()
                 .forEach(personMetric -> {
                     sheetWrapper
                             .row()

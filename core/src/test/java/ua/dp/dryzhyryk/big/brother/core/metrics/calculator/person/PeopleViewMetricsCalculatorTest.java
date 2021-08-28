@@ -4,9 +4,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PersonMetrics;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TaskWorkingLogMetrics;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.TimeSpentByDay;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TasksWorkingLogsForPerson;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TaskWorkingLogMetrics;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TimeSpentByDay;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
 
 import java.time.LocalDate;
@@ -56,8 +56,8 @@ class PeopleViewMetricsCalculatorTest {
 
         TaskMetricsForPeopleValidator taskMetricsForPeopleValidator = mockTaskMetricsForPeopleValidator();
 
-        List<PersonMetrics> expected = List.of(
-                PersonMetrics.builder()
+        List<TasksWorkingLogsForPerson> expected = List.of(
+                TasksWorkingLogsForPerson.builder()
                         .person("person#1")
                         .dailyTaskWorkingLogMetrics(List.of(
                                 newTaskWorkingLogMetrics("#1", "Task name 1", 100,
@@ -68,7 +68,7 @@ class PeopleViewMetricsCalculatorTest {
                                 ValidatedValue.valueWithNotEvaluatedStatus(newTimeSpentByDay(day3, 200))))
                         .totalTimeSpentOnTaskInMinutesByPeriod(200)
                         .build(),
-                PersonMetrics.builder()
+                TasksWorkingLogsForPerson.builder()
                         .person("person#2")
                         .dailyTaskWorkingLogMetrics(List.of(
                                 newTaskWorkingLogMetrics("#1", "Task name 1", 100,
@@ -79,9 +79,9 @@ class PeopleViewMetricsCalculatorTest {
                         .build());
 
         //when
-        PeopleViewMetricsCalculator calculator = new PeopleViewMetricsCalculator(
+        TasksWorkingLogsForPersonsCalculator calculator = new TasksWorkingLogsForPersonsCalculator(
                 taskMetricsForPeopleCalculator, taskMetricsForPeopleValidator);
-        List<PersonMetrics> actual = calculator.calculatePersonsMetrics(tasks, peopleSearchConditions);
+        List<TasksWorkingLogsForPerson> actual = calculator.calculateTasksWorkingLogsForPersons(tasks, peopleSearchConditions);
 
         //then
         Assertions.assertThat(actual)
@@ -117,8 +117,8 @@ class PeopleViewMetricsCalculatorTest {
 
         TaskMetricsForPeopleValidator taskMetricsForPeopleValidator = mockTaskMetricsForPeopleValidator();
 
-        List<PersonMetrics> expected = List.of(
-                PersonMetrics.builder()
+        List<TasksWorkingLogsForPerson> expected = List.of(
+                TasksWorkingLogsForPerson.builder()
                         .person("person#1")
                         .dailyTaskWorkingLogMetrics(List.of(
                                 newTaskWorkingLogMetrics("#1", "Task name 1", 100,
@@ -130,8 +130,9 @@ class PeopleViewMetricsCalculatorTest {
         );
 
         //when
-        PeopleViewMetricsCalculator calculator = new PeopleViewMetricsCalculator(taskMetricsForPeopleCalculator, taskMetricsForPeopleValidator);
-        List<PersonMetrics> actual = calculator.calculatePersonsMetrics(tasks, peopleSearchConditions);
+        TasksWorkingLogsForPersonsCalculator
+                calculator = new TasksWorkingLogsForPersonsCalculator(taskMetricsForPeopleCalculator, taskMetricsForPeopleValidator);
+        List<TasksWorkingLogsForPerson> actual = calculator.calculateTasksWorkingLogsForPersons(tasks, peopleSearchConditions);
 
         //then
         Assertions.assertThat(actual)
@@ -177,8 +178,8 @@ class PeopleViewMetricsCalculatorTest {
 
         TaskMetricsForPeopleValidator taskMetricsForPeopleValidator = mockTaskMetricsForPeopleValidator();
 
-        List<PersonMetrics> expected = List.of(
-                PersonMetrics.builder()
+        List<TasksWorkingLogsForPerson> expected = List.of(
+                TasksWorkingLogsForPerson.builder()
                         .person("person#1")
                         .dailyTaskWorkingLogMetrics(List.of(
                                 newTaskWorkingLogMetrics("#1", "Task name 1", 205,
@@ -198,9 +199,9 @@ class PeopleViewMetricsCalculatorTest {
                         .build());
 
         //when
-        PeopleViewMetricsCalculator calculator = new PeopleViewMetricsCalculator(
+        TasksWorkingLogsForPersonsCalculator calculator = new TasksWorkingLogsForPersonsCalculator(
                 taskMetricsForPeopleCalculator, taskMetricsForPeopleValidator);
-        List<PersonMetrics> actual = calculator.calculatePersonsMetrics(tasks, peopleSearchConditions);
+        List<TasksWorkingLogsForPerson> actual = calculator.calculateTasksWorkingLogsForPersons(tasks, peopleSearchConditions);
 
         //then
         Assertions.assertThat(actual)
@@ -238,8 +239,9 @@ class PeopleViewMetricsCalculatorTest {
         TaskMetricsForPeopleValidator taskMetricsForPeopleValidator = mockTaskMetricsForPeopleValidator();
 
         //when
-        PeopleViewMetricsCalculator calculator = new PeopleViewMetricsCalculator(taskMetricsForPeopleCalculator, taskMetricsForPeopleValidator);
-        List<PersonMetrics> actual = calculator.calculatePersonsMetrics(tasks, peopleSearchConditions);
+        TasksWorkingLogsForPersonsCalculator
+                calculator = new TasksWorkingLogsForPersonsCalculator(taskMetricsForPeopleCalculator, taskMetricsForPeopleValidator);
+        List<TasksWorkingLogsForPerson> actual = calculator.calculateTasksWorkingLogsForPersons(tasks, peopleSearchConditions);
 
         //then
         Assertions.assertThat(actual)
@@ -283,11 +285,12 @@ class PeopleViewMetricsCalculatorTest {
         TaskMetricsForPeopleValidator taskMetricsForPeopleValidator = mockTaskMetricsForPeopleValidator();
 
         //when
-        PeopleViewMetricsCalculator calculator = new PeopleViewMetricsCalculator(taskMetricsForPeopleCalculator, taskMetricsForPeopleValidator);
-        List<PersonMetrics> actual = calculator.calculatePersonsMetrics(tasks, peopleSearchConditions);
+        TasksWorkingLogsForPersonsCalculator
+                calculator = new TasksWorkingLogsForPersonsCalculator(taskMetricsForPeopleCalculator, taskMetricsForPeopleValidator);
+        List<TasksWorkingLogsForPerson> actual = calculator.calculateTasksWorkingLogsForPersons(tasks, peopleSearchConditions);
 
-        List<PersonMetrics> expected = List.of(
-                PersonMetrics.builder()
+        List<TasksWorkingLogsForPerson> expected = List.of(
+                TasksWorkingLogsForPerson.builder()
                         .person("person#2")
                         .dailyTaskWorkingLogMetrics(List.of(
                                 newTaskWorkingLogMetrics("#2", "Task name 2", 100,
