@@ -1,11 +1,13 @@
 package ua.dp.dryzhyryk.big.brother.core;
 
 import lombok.extern.slf4j.Slf4j;
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.metrics.TasksMetricsForPersonCalculator;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.TasksWorkingLogsForPersonsCalculator;
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.work.log.TasksWorkingLogsForPersonsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.search.conditions.types.JiraPersonSearchConditions;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PeopleView;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.metrics.TasksMetricsForPerson;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TasksWorkingLogsForPerson;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
 
@@ -16,13 +18,16 @@ import java.util.stream.Collectors;
 public class BigJiraBrotherPeopleViewProvider {
 
     private final JiraInformationHolder jiraInformationHolder;
-    private final TasksWorkingLogsForPersonsCalculator peopleViewMetricsCalculator;
+    private final TasksWorkingLogsForPersonsCalculator tasksWorkingLogsForPersonsCalculator;
+    private final TasksMetricsForPersonCalculator tasksMetricsForPersonCalculator;
 
     public BigJiraBrotherPeopleViewProvider(
             JiraInformationHolder jiraInformationHolder,
-            TasksWorkingLogsForPersonsCalculator peopleViewMetricsCalculator) {
+            TasksWorkingLogsForPersonsCalculator tasksWorkingLogsForPersonsCalculator,
+            TasksMetricsForPersonCalculator tasksMetricsForPersonCalculator) {
         this.jiraInformationHolder = jiraInformationHolder;
-        this.peopleViewMetricsCalculator = peopleViewMetricsCalculator;
+        this.tasksWorkingLogsForPersonsCalculator = tasksWorkingLogsForPersonsCalculator;
+        this.tasksMetricsForPersonCalculator = tasksMetricsForPersonCalculator;
     }
 
 
@@ -39,15 +44,16 @@ public class BigJiraBrotherPeopleViewProvider {
                 .distinct()
                 .collect(Collectors.toList());
 
-        List<TasksWorkingLogsForPerson> personMetrics = peopleViewMetricsCalculator.calculateTasksWorkingLogsForPersons(tasks, peopleSearchConditions);
+        List<TasksWorkingLogsForPerson> personMetrics = tasksWorkingLogsForPersonsCalculator.calculateTasksWorkingLogsForPersons(tasks, peopleSearchConditions);
 
-        //TODO add calculation
+        List<TasksMetricsForPerson> tasksMetricsForPersons = tasksMetricsForPersonCalculator.calculateTasksMetricsForPerson(tasks, peopleSearchConditions);;
 
         return PeopleView.builder()
                 .teamName(peopleSearchConditions.getTeamName())
                 .startPeriod(peopleSearchConditions.getStartPeriod())
                 .endPeriod(peopleSearchConditions.getEndPeriod())
                 .tasksWorkingLogsForPersons(personMetrics)
+                .tasksMetricsForPersons(tasksMetricsForPersons)
                 .build();
     }
 }

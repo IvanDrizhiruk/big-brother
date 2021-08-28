@@ -1,4 +1,4 @@
-package ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person;
+package ua.dp.dryzhyryk.big.brother.core.calculator.task.work.log;
 
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -9,27 +9,27 @@ import java.util.stream.Collectors;
 
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TaskWorkingLogMetrics;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TaskWorkingLogs;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TasksWorkingLogsForPerson;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TimeSpentByDay;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
 
 public class TasksWorkingLogsForPersonsCalculator {
 
-	private final TaskMetricsForPeopleCalculator taskMetricsForPeopleCalculator;
-	private final TaskMetricsForPeopleValidator taskMetricsForPeopleValidator;
+	private final TaskWorkingLogsForPeopleCalculator taskWorkingLogsForPeopleCalculator;
+	private final TaskWorkingLogsForPeopleValidator taskWorkingLogsForPeopleValidator;
 
 	public TasksWorkingLogsForPersonsCalculator(
-			TaskMetricsForPeopleCalculator taskMetricsForPeopleCalculator,
-			TaskMetricsForPeopleValidator taskMetricsForPeopleValidator) {
-		this.taskMetricsForPeopleCalculator = taskMetricsForPeopleCalculator;
-		this.taskMetricsForPeopleValidator = taskMetricsForPeopleValidator;
+			TaskWorkingLogsForPeopleCalculator taskMetricsForPeopleCalculator,
+			TaskWorkingLogsForPeopleValidator taskMetricsForPeopleValidator) {
+		this.taskWorkingLogsForPeopleCalculator = taskMetricsForPeopleCalculator;
+		this.taskWorkingLogsForPeopleValidator = taskMetricsForPeopleValidator;
 	}
 
 	public List<TasksWorkingLogsForPerson> calculateTasksWorkingLogsForPersons(List<Task> tasks, PeopleSearchConditions peopleSearchConditions) {
-		Map<String, List<TaskWorkingLogMetrics>> personMetricsByUser = tasks.stream()
+		Map<String, List<TaskWorkingLogs>> personTaskWorkingLogsByUser = tasks.stream()
 				.flatMap(task -> {
-							Map<String, TaskWorkingLogMetrics> taskWorkingLogMetricsByPerson = taskMetricsForPeopleCalculator
+							Map<String, TaskWorkingLogs> taskWorkingLogMetricsByPerson = taskWorkingLogsForPeopleCalculator
 									.calculatePersonsMetricsForPeopleFromTask(
 											task,
 											peopleSearchConditions.getStartPeriod(),
@@ -46,12 +46,12 @@ public class TasksWorkingLogsForPersonsCalculator {
 						Entry::getKey,
 						Collectors.mapping(Entry::getValue, Collectors.toList())));
 
-		return personMetricsByUser.entrySet().stream()
+		return personTaskWorkingLogsByUser.entrySet().stream()
 				.map(entry -> {
 					String person = entry.getKey();
 
-					List<TaskWorkingLogMetrics> dailyTaskWorkingLogMetrics = entry.getValue().stream()
-							.sorted(Comparator.comparing(TaskWorkingLogMetrics::getTaskId))
+					List<TaskWorkingLogs> dailyTaskWorkingLogMetrics = entry.getValue().stream()
+							.sorted(Comparator.comparing(TaskWorkingLogs::getTaskId))
 							.collect(Collectors.toList());
 
 					List<ValidatedValue<TimeSpentByDay>> timeSpentByDaysForAllTask =
@@ -63,7 +63,7 @@ public class TasksWorkingLogsForPersonsCalculator {
 
 					return TasksWorkingLogsForPerson.builder()
 							.person(person)
-							.dailyTaskWorkingLogMetrics(dailyTaskWorkingLogMetrics)
+							.dailyTaskWorkingLogs(dailyTaskWorkingLogMetrics)
 							.totalTimeSpentByDays(timeSpentByDaysForAllTask)
 							.totalTimeSpentOnTaskInMinutesByPeriod(totalTimeSpentOnTaskInMinutesByPeriod)
 							.build();
@@ -72,12 +72,12 @@ public class TasksWorkingLogsForPersonsCalculator {
 				.collect(Collectors.toList());
 	}
 
-	private boolean wasTimeSpentOnTaskByPeriod(TaskWorkingLogMetrics value) {
+	private boolean wasTimeSpentOnTaskByPeriod(TaskWorkingLogs value) {
 		return value.getTimeSpentOnTaskInMinutesByPeriod() > 0;
 	}
 
 	private List<ValidatedValue<TimeSpentByDay>> calculateTimeSpentByDaysForAllTask(
-			List<TaskWorkingLogMetrics> dailyTaskWorkingLogMetrics, String teamName) {
+			List<TaskWorkingLogs> dailyTaskWorkingLogMetrics, String teamName) {
 		Map<LocalDate, Integer> timeSpentForAllTasksByDay = dailyTaskWorkingLogMetrics.stream()
 				.flatMap(metrics -> metrics.getTimeSpentByDays().stream())
 				.collect(Collectors.groupingBy(
@@ -92,7 +92,7 @@ public class TasksWorkingLogsForPersonsCalculator {
 							.day(dayAndSpentTime.getKey())
 							.timeSpentMinutes(dayAndSpentTime.getValue())
 							.build();
-					return taskMetricsForPeopleValidator.validate(timeSpentByDay, teamName);
+					return taskWorkingLogsForPeopleValidator.validate(timeSpentByDay, teamName);
 				})
 				.collect(Collectors.toList());
 	}

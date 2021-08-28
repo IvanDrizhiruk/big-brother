@@ -12,7 +12,7 @@ public class TasksWorkingLogsForPerson {
 
     private final String person;
 
-    private final List<TaskWorkingLogMetrics> dailyTaskWorkingLogMetrics;
+    private final List<TaskWorkingLogs> dailyTaskWorkingLogs;
 
     private final List<ValidatedValue<TimeSpentByDay>> totalTimeSpentByDays;
 

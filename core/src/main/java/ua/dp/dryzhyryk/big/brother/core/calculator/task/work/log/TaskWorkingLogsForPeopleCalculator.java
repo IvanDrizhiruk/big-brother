@@ -1,4 +1,4 @@
-package ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person;
+package ua.dp.dryzhyryk.big.brother.core.calculator.task.work.log;
 
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -8,12 +8,12 @@ import java.util.stream.Collectors;
 
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TaskWorkingLogMetrics;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TaskWorkingLogs;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TimeSpentByDay;
 
-public class TaskMetricsForPeopleCalculator {
+public class TaskWorkingLogsForPeopleCalculator {
 
-	public Map<String, TaskWorkingLogMetrics> calculatePersonsMetricsForPeopleFromTask(Task task, LocalDate startPeriod, LocalDate endPeriod) {
+	public Map<String, TaskWorkingLogs> calculatePersonsMetricsForPeopleFromTask(Task task, LocalDate startPeriod, LocalDate endPeriod) {
 
 		Map<String, Map<LocalDate, Integer>> spendTimeByDayForPerson = task.getWorkLogs().stream()
 				.collect(
@@ -30,7 +30,7 @@ public class TaskMetricsForPeopleCalculator {
 								entry -> toTaskWorkingLogMetrics(task, entry.getValue(), startPeriod, endPeriod)));
 	}
 
-	private TaskWorkingLogMetrics toTaskWorkingLogMetrics(
+	private TaskWorkingLogs toTaskWorkingLogMetrics(
 			Task task,
 			Map<LocalDate, Integer> spentMinutesForDay,
 			LocalDate startPeriod,
@@ -53,7 +53,7 @@ public class TaskMetricsForPeopleCalculator {
 				.mapToInt(TimeSpentByDay::getTimeSpentMinutes)
 				.sum();
 
-		return TaskWorkingLogMetrics.builder()
+		return TaskWorkingLogs.builder()
 				.taskId(task.getId())
 				.taskName(task.getName())
 				.timeSpentByDays(timeSpentByDays)

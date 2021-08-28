@@ -7,7 +7,7 @@ import lombok.Value;
 
 @Value
 @Builder(toBuilder = true)
-public class TaskWorkingLogMetrics {
+public class TaskWorkingLogs {
 
 	private final String taskId;
 	private final String taskName;

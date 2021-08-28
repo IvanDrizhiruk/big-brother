@@ -1,4 +1,4 @@
-package ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person;
+package ua.dp.dryzhyryk.big.brother.core.calculator.task.work.log;
 
 import ua.dp.dryzhyryk.big.brother.core.configuration.ConfigurationService;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.configuration.TeamConfiguration;
@@ -6,11 +6,11 @@ import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.wo
 import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
 import ua.dp.dryzhyryk.big.brother.core.utils.TimeUtils;
 
-public class TaskMetricsForPeopleValidator {
+public class TaskWorkingLogsForPeopleValidator {
 
     private final ConfigurationService configurationService;
 
-    public TaskMetricsForPeopleValidator(ConfigurationService configurationService) {
+    public TaskWorkingLogsForPeopleValidator(ConfigurationService configurationService) {
         this.configurationService = configurationService;
     }
 

@@ -3,6 +3,8 @@ package ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.work.log.TaskWorkingLogsForPeopleValidator;
 import ua.dp.dryzhyryk.big.brother.core.configuration.ConfigurationService;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.configuration.TeamConfiguration;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TimeSpentByDay;
@@ -27,7 +29,7 @@ class TaskMetricsForPeopleValidatorTest {
                 newTimeSpentByDay(timeSpentMinutes));
 
         //when
-        TaskMetricsForPeopleValidator validator = new TaskMetricsForPeopleValidator(configurationService);
+        TaskWorkingLogsForPeopleValidator validator = new TaskWorkingLogsForPeopleValidator(configurationService);
         ValidatedValue<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
 
         //then
@@ -47,7 +49,7 @@ class TaskMetricsForPeopleValidatorTest {
                 newTimeSpentByDay(timeSpentMinutes));
 
         //when
-        TaskMetricsForPeopleValidator validator = new TaskMetricsForPeopleValidator(configurationService);
+        TaskWorkingLogsForPeopleValidator validator = new TaskWorkingLogsForPeopleValidator(configurationService);
         ValidatedValue<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
 
         //then
@@ -81,7 +83,7 @@ class TaskMetricsForPeopleValidatorTest {
                 "Time logged in day less then 7.0h");
 
         //when
-        TaskMetricsForPeopleValidator validator = new TaskMetricsForPeopleValidator(configurationService);
+        TaskWorkingLogsForPeopleValidator validator = new TaskWorkingLogsForPeopleValidator(configurationService);
         ValidatedValue<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
 
         //then
@@ -104,7 +106,7 @@ class TaskMetricsForPeopleValidatorTest {
                 "Time logged in day less then 7.0h");
 
         //when
-        TaskMetricsForPeopleValidator validator = new TaskMetricsForPeopleValidator(configurationService);
+        TaskWorkingLogsForPeopleValidator validator = new TaskWorkingLogsForPeopleValidator(configurationService);
         ValidatedValue<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
 
         //then
@@ -127,7 +129,7 @@ class TaskMetricsForPeopleValidatorTest {
                 "Time logged in day less then 5.0h");
 
         //when
-        TaskMetricsForPeopleValidator validator = new TaskMetricsForPeopleValidator(configurationService);
+        TaskWorkingLogsForPeopleValidator validator = new TaskWorkingLogsForPeopleValidator(configurationService);
         ValidatedValue<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
 
         //then
@@ -150,7 +152,7 @@ class TaskMetricsForPeopleValidatorTest {
                 "Time logged in day more then 8.0h");
 
         //when
-        TaskMetricsForPeopleValidator validator = new TaskMetricsForPeopleValidator(configurationService);
+        TaskWorkingLogsForPeopleValidator validator = new TaskWorkingLogsForPeopleValidator(configurationService);
         ValidatedValue<TimeSpentByDay> actual = validator.validate(timeSpentByDay, teamName);
 
         //then

@@ -8,9 +8,10 @@ import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.work.log.TaskWorkingLogsForPeopleCalculator;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TaskWorkingLogMetrics;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TaskWorkingLogs;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TimeSpentByDay;
 
 class TaskMetricsForPeopleCalculatorTest {
@@ -41,7 +42,7 @@ class TaskMetricsForPeopleCalculatorTest {
 				.workLogs(List.of(workLog1, workLog2, workLog3, workLog4, workLog5))
 				.build();
 
-		TaskWorkingLogMetrics taskWorkingLogMetrics1 = TaskWorkingLogMetrics.builder()
+		TaskWorkingLogs taskWorkingLogMetrics1 = TaskWorkingLogs.builder()
 				.taskId("#1")
 				.taskName("Task name")
 				.timeSpentByDays(List.of(
@@ -52,11 +53,11 @@ class TaskMetricsForPeopleCalculatorTest {
 				.timeSpentOnTaskInMinutesByPeriod(150)
 				.build();
 
-		Map<String, TaskWorkingLogMetrics> expected = Map.of("person#1", taskWorkingLogMetrics1);
+		Map<String, TaskWorkingLogs> expected = Map.of("person#1", taskWorkingLogMetrics1);
 
 		//when
-		TaskMetricsForPeopleCalculator calculator = new TaskMetricsForPeopleCalculator();
-		Map<String, TaskWorkingLogMetrics> actual = calculator.calculatePersonsMetricsForPeopleFromTask(task, startPeriod, endPeriod);
+		TaskWorkingLogsForPeopleCalculator calculator = new TaskWorkingLogsForPeopleCalculator();
+		Map<String, TaskWorkingLogs> actual = calculator.calculatePersonsMetricsForPeopleFromTask(task, startPeriod, endPeriod);
 
 		//then
 		Assertions.assertThat(actual).isEqualTo(expected);
@@ -87,7 +88,7 @@ class TaskMetricsForPeopleCalculatorTest {
 				.workLogs(List.of(workLog1, workLog2, workLog3, workLog4))
 				.build();
 
-		TaskWorkingLogMetrics taskWorkingLogMetrics1 = TaskWorkingLogMetrics.builder()
+		TaskWorkingLogs taskWorkingLogMetrics1 = TaskWorkingLogs.builder()
 				.taskId("#1")
 				.taskName("Task name")
 				.timeSpentByDays(List.of(
@@ -97,7 +98,7 @@ class TaskMetricsForPeopleCalculatorTest {
 				.timeSpentOnTaskInMinutesByPeriod(100)
 				.build();
 
-		TaskWorkingLogMetrics taskWorkingLogMetrics2 = TaskWorkingLogMetrics.builder()
+		TaskWorkingLogs taskWorkingLogMetrics2 = TaskWorkingLogs.builder()
 				.taskId("#1")
 				.taskName("Task name")
 				.timeSpentByDays(List.of(
@@ -107,13 +108,13 @@ class TaskMetricsForPeopleCalculatorTest {
 				.timeSpentOnTaskInMinutesByPeriod(100)
 				.build();
 
-		Map<String, TaskWorkingLogMetrics> expected = Map.of(
+		Map<String, TaskWorkingLogs> expected = Map.of(
 				"person#1", taskWorkingLogMetrics1,
 				"person#2", taskWorkingLogMetrics2);
 
 		//when
-		TaskMetricsForPeopleCalculator calculator = new TaskMetricsForPeopleCalculator();
-		Map<String, TaskWorkingLogMetrics> actual = calculator.calculatePersonsMetricsForPeopleFromTask(task, startPeriod, endPeriod);
+		TaskWorkingLogsForPeopleCalculator calculator = new TaskWorkingLogsForPeopleCalculator();
+		Map<String, TaskWorkingLogs> actual = calculator.calculatePersonsMetricsForPeopleFromTask(task, startPeriod, endPeriod);
 
 		//then
 		Assertions.assertThat(actual).isEqualTo(expected);

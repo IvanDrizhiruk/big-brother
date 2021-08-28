@@ -2,10 +2,14 @@ package ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.work.log.TaskWorkingLogsForPeopleCalculator;
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.work.log.TaskWorkingLogsForPeopleValidator;
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.work.log.TasksWorkingLogsForPersonsCalculator;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TasksWorkingLogsForPerson;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TaskWorkingLogMetrics;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TaskWorkingLogs;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TimeSpentByDay;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
 
@@ -39,27 +43,27 @@ class PeopleViewMetricsCalculatorTest {
                 .endPeriod(day5)
                 .build();
 
-        Map<String, TaskWorkingLogMetrics> personsMetricsForPeopleFromTask1 = Map.of(
+        Map<String, TaskWorkingLogs> personsMetricsForPeopleFromTask1 = Map.of(
                 "person#1", newTaskWorkingLogMetrics("#1", "Task name 1", 100,
                         List.of(newTimeSpentByDay(day3, 100))),
                 "person#2", newTaskWorkingLogMetrics("#1", "Task name 1", 100,
                         List.of(newTimeSpentByDay(day3, 100))));
-        Map<String, TaskWorkingLogMetrics> personsMetricsForPeopleFromTask2 = Map.of(
+        Map<String, TaskWorkingLogs> personsMetricsForPeopleFromTask2 = Map.of(
                 "person#1", newTaskWorkingLogMetrics("#2", "Task name 2", 100,
                         List.of(newTimeSpentByDay(day3, 100))));
 
-        TaskMetricsForPeopleCalculator taskMetricsForPeopleCalculator = mock(TaskMetricsForPeopleCalculator.class);
+        TaskWorkingLogsForPeopleCalculator taskMetricsForPeopleCalculator = mock(TaskWorkingLogsForPeopleCalculator.class);
         when(taskMetricsForPeopleCalculator.calculatePersonsMetricsForPeopleFromTask(eq(task1), any(), any()))
                 .thenReturn(personsMetricsForPeopleFromTask1);
         when(taskMetricsForPeopleCalculator.calculatePersonsMetricsForPeopleFromTask(eq(task2), any(), any()))
                 .thenReturn(personsMetricsForPeopleFromTask2);
 
-        TaskMetricsForPeopleValidator taskMetricsForPeopleValidator = mockTaskMetricsForPeopleValidator();
+        TaskWorkingLogsForPeopleValidator taskMetricsForPeopleValidator = mockTaskMetricsForPeopleValidator();
 
         List<TasksWorkingLogsForPerson> expected = List.of(
                 TasksWorkingLogsForPerson.builder()
                         .person("person#1")
-                        .dailyTaskWorkingLogMetrics(List.of(
+                        .dailyTaskWorkingLogs(List.of(
                                 newTaskWorkingLogMetrics("#1", "Task name 1", 100,
                                         List.of(newTimeSpentByDay(day3, 100))),
                                 newTaskWorkingLogMetrics("#2", "Task name 2", 100,
@@ -70,7 +74,7 @@ class PeopleViewMetricsCalculatorTest {
                         .build(),
                 TasksWorkingLogsForPerson.builder()
                         .person("person#2")
-                        .dailyTaskWorkingLogMetrics(List.of(
+                        .dailyTaskWorkingLogs(List.of(
                                 newTaskWorkingLogMetrics("#1", "Task name 1", 100,
                                         List.of(newTimeSpentByDay(day3, 100)))))
                         .totalTimeSpentByDays(List.of(
@@ -105,22 +109,22 @@ class PeopleViewMetricsCalculatorTest {
                 .endPeriod(day5)
                 .build();
 
-        Map<String, TaskWorkingLogMetrics> personsMetricsForPeopleFromTask1 = Map.of(
+        Map<String, TaskWorkingLogs> personsMetricsForPeopleFromTask1 = Map.of(
                 "person#1", newTaskWorkingLogMetrics("#1", "Task name 1", 100,
                         List.of(newTimeSpentByDay(day3, 100))),
                 "person#2", newTaskWorkingLogMetrics("#1", "Task name 1", 100,
                         List.of(newTimeSpentByDay(day3, 100))));
 
-        TaskMetricsForPeopleCalculator taskMetricsForPeopleCalculator = mock(TaskMetricsForPeopleCalculator.class);
+        TaskWorkingLogsForPeopleCalculator taskMetricsForPeopleCalculator = mock(TaskWorkingLogsForPeopleCalculator.class);
         when(taskMetricsForPeopleCalculator.calculatePersonsMetricsForPeopleFromTask(eq(task1), any(), any()))
                 .thenReturn(personsMetricsForPeopleFromTask1);
 
-        TaskMetricsForPeopleValidator taskMetricsForPeopleValidator = mockTaskMetricsForPeopleValidator();
+        TaskWorkingLogsForPeopleValidator taskMetricsForPeopleValidator = mockTaskMetricsForPeopleValidator();
 
         List<TasksWorkingLogsForPerson> expected = List.of(
                 TasksWorkingLogsForPerson.builder()
                         .person("person#1")
-                        .dailyTaskWorkingLogMetrics(List.of(
+                        .dailyTaskWorkingLogs(List.of(
                                 newTaskWorkingLogMetrics("#1", "Task name 1", 100,
                                         List.of(newTimeSpentByDay(day3, 100)))))
                         .totalTimeSpentByDays(List.of(
@@ -158,30 +162,30 @@ class PeopleViewMetricsCalculatorTest {
                 .endPeriod(day5)
                 .build();
 
-        Map<String, TaskWorkingLogMetrics> personsMetricsForPeopleFromTask1 = Map.of(
+        Map<String, TaskWorkingLogs> personsMetricsForPeopleFromTask1 = Map.of(
                 "person#1", newTaskWorkingLogMetrics("#1", "Task name 1", 205,
                         List.of(newTimeSpentByDay(day3, 100),
                                 newTimeSpentByDay(day4, 25),
                                 newTimeSpentByDay(day5, 77))
                 ));
-        Map<String, TaskWorkingLogMetrics> personsMetricsForPeopleFromTask2 = Map.of(
+        Map<String, TaskWorkingLogs> personsMetricsForPeopleFromTask2 = Map.of(
                 "person#1", newTaskWorkingLogMetrics("#2", "Task name 2", 87,
                         List.of(newTimeSpentByDay(day3, 10),
                                 newTimeSpentByDay(day5, 77))
                 ));
 
-        TaskMetricsForPeopleCalculator taskMetricsForPeopleCalculator = mock(TaskMetricsForPeopleCalculator.class);
+        TaskWorkingLogsForPeopleCalculator taskMetricsForPeopleCalculator = mock(TaskWorkingLogsForPeopleCalculator.class);
         when(taskMetricsForPeopleCalculator.calculatePersonsMetricsForPeopleFromTask(eq(task1), any(), any()))
                 .thenReturn(personsMetricsForPeopleFromTask1);
         when(taskMetricsForPeopleCalculator.calculatePersonsMetricsForPeopleFromTask(eq(task2), any(), any()))
                 .thenReturn(personsMetricsForPeopleFromTask2);
 
-        TaskMetricsForPeopleValidator taskMetricsForPeopleValidator = mockTaskMetricsForPeopleValidator();
+        TaskWorkingLogsForPeopleValidator taskMetricsForPeopleValidator = mockTaskMetricsForPeopleValidator();
 
         List<TasksWorkingLogsForPerson> expected = List.of(
                 TasksWorkingLogsForPerson.builder()
                         .person("person#1")
-                        .dailyTaskWorkingLogMetrics(List.of(
+                        .dailyTaskWorkingLogs(List.of(
                                 newTaskWorkingLogMetrics("#1", "Task name 1", 205,
                                         List.of(newTimeSpentByDay(day3, 100),
                                                 newTimeSpentByDay(day4, 25),
@@ -227,16 +231,16 @@ class PeopleViewMetricsCalculatorTest {
                 .endPeriod(day5)
                 .build();
 
-        Map<String, TaskWorkingLogMetrics> personsMetricsForPeopleFromTask1 = Map.of(
+        Map<String, TaskWorkingLogs> personsMetricsForPeopleFromTask1 = Map.of(
                 "person#1", newTaskWorkingLogMetrics("#1", "Task name 1",
                         List.of(newTimeSpentByDay(day1, 100),
                                 newTimeSpentByDay(day7, 77))));
 
-        TaskMetricsForPeopleCalculator taskMetricsForPeopleCalculator = mock(TaskMetricsForPeopleCalculator.class);
+        TaskWorkingLogsForPeopleCalculator taskMetricsForPeopleCalculator = mock(TaskWorkingLogsForPeopleCalculator.class);
         when(taskMetricsForPeopleCalculator.calculatePersonsMetricsForPeopleFromTask(eq(task1), any(), any()))
                 .thenReturn(personsMetricsForPeopleFromTask1);
 
-        TaskMetricsForPeopleValidator taskMetricsForPeopleValidator = mockTaskMetricsForPeopleValidator();
+        TaskWorkingLogsForPeopleValidator taskMetricsForPeopleValidator = mockTaskMetricsForPeopleValidator();
 
         //when
         TasksWorkingLogsForPersonsCalculator
@@ -268,21 +272,21 @@ class PeopleViewMetricsCalculatorTest {
                 .endPeriod(day5)
                 .build();
 
-        Map<String, TaskWorkingLogMetrics> personsMetricsForPeopleFromTask1 = Map.of(
+        Map<String, TaskWorkingLogs> personsMetricsForPeopleFromTask1 = Map.of(
                 "person#1", newTaskWorkingLogMetrics("#1", "Task name 1", 0,
                         List.of(newTimeSpentByDay(day1, 100),
                                 newTimeSpentByDay(day7, 77))));
-        Map<String, TaskWorkingLogMetrics> personsMetricsForPeopleFromTask2 = Map.of(
+        Map<String, TaskWorkingLogs> personsMetricsForPeopleFromTask2 = Map.of(
                 "person#2", newTaskWorkingLogMetrics("#2", "Task name 2", 100,
                         List.of(newTimeSpentByDay(day3, 100))));
 
-        TaskMetricsForPeopleCalculator taskMetricsForPeopleCalculator = mock(TaskMetricsForPeopleCalculator.class);
+        TaskWorkingLogsForPeopleCalculator taskMetricsForPeopleCalculator = mock(TaskWorkingLogsForPeopleCalculator.class);
         when(taskMetricsForPeopleCalculator.calculatePersonsMetricsForPeopleFromTask(eq(task1), any(), any()))
                 .thenReturn(personsMetricsForPeopleFromTask1);
         when(taskMetricsForPeopleCalculator.calculatePersonsMetricsForPeopleFromTask(eq(task2), any(), any()))
                 .thenReturn(personsMetricsForPeopleFromTask2);
 
-        TaskMetricsForPeopleValidator taskMetricsForPeopleValidator = mockTaskMetricsForPeopleValidator();
+        TaskWorkingLogsForPeopleValidator taskMetricsForPeopleValidator = mockTaskMetricsForPeopleValidator();
 
         //when
         TasksWorkingLogsForPersonsCalculator
@@ -292,7 +296,7 @@ class PeopleViewMetricsCalculatorTest {
         List<TasksWorkingLogsForPerson> expected = List.of(
                 TasksWorkingLogsForPerson.builder()
                         .person("person#2")
-                        .dailyTaskWorkingLogMetrics(List.of(
+                        .dailyTaskWorkingLogs(List.of(
                                 newTaskWorkingLogMetrics("#2", "Task name 2", 100,
                                         List.of(newTimeSpentByDay(day3, 100)))
                         ))
@@ -306,27 +310,27 @@ class PeopleViewMetricsCalculatorTest {
                 .containsExactlyInAnyOrderElementsOf(expected);
     }
 
-    private TaskMetricsForPeopleValidator mockTaskMetricsForPeopleValidator() {
-        TaskMetricsForPeopleValidator taskMetricsForPeopleValidator = mock(TaskMetricsForPeopleValidator.class);
+    private TaskWorkingLogsForPeopleValidator mockTaskMetricsForPeopleValidator() {
+        TaskWorkingLogsForPeopleValidator taskMetricsForPeopleValidator = mock(TaskWorkingLogsForPeopleValidator.class);
         when(taskMetricsForPeopleValidator.validate(any(), any()))
                 .then(invocation -> ValidatedValue.valueWithNotEvaluatedStatus(invocation.getArgument(0)));
 
         return taskMetricsForPeopleValidator;
     }
 
-    private TaskWorkingLogMetrics newTaskWorkingLogMetrics(String taskId, String taskName) {
+    private TaskWorkingLogs newTaskWorkingLogMetrics(String taskId, String taskName) {
         return newTaskWorkingLogMetrics(taskId, taskName, Collections.emptyList());
     }
 
-    private TaskWorkingLogMetrics newTaskWorkingLogMetrics(String taskId, String taskName, List<TimeSpentByDay> timeSpentByDays) {
-        return TaskWorkingLogMetrics.builder()
+    private TaskWorkingLogs newTaskWorkingLogMetrics(String taskId, String taskName, List<TimeSpentByDay> timeSpentByDays) {
+        return TaskWorkingLogs.builder()
                 .taskId(taskId)
                 .taskName(taskName)
                 .timeSpentByDays(timeSpentByDays)
                 .build();
     }
 
-    private TaskWorkingLogMetrics newTaskWorkingLogMetrics(
+    private TaskWorkingLogs newTaskWorkingLogMetrics(
             String taskId,
             String taskName,
             int timeSpentOnTaskInMinutesByPeriod,

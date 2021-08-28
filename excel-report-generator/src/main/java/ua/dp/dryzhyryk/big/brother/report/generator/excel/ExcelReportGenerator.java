@@ -6,7 +6,7 @@ import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.Vali
 import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidationStatus;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PeopleView;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TasksWorkingLogsForPerson;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TaskWorkingLogMetrics;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TaskWorkingLogs;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TimeSpentByDay;
 import ua.dp.dryzhyryk.big.brother.core.utils.TimeUtils;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.SheetWrapper;
@@ -54,7 +54,7 @@ public class ExcelReportGenerator {
     }
 
     private void weeklyTable(TableBuilder tableBuilder, List<LocalDate> days, TasksWorkingLogsForPerson personMetric) {
-        List<TaskWorkingLogMetrics> dailyTaskLogs = personMetric.getDailyTaskWorkingLogMetrics();
+        List<TaskWorkingLogs> dailyTaskLogs = personMetric.getDailyTaskWorkingLogs();
         if (dailyTaskLogs.isEmpty()) {
             return;
         }

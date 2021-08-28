@@ -10,9 +10,9 @@ import ua.dp.dryzhyryk.big.brother.core.configuration.ConfigurationService;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolderImpl;
 import ua.dp.dryzhyryk.big.brother.core.data.source.LogProxy;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.TasksWorkingLogsForPersonsCalculator;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.TaskMetricsForPeopleCalculator;
-import ua.dp.dryzhyryk.big.brother.core.metrics.calculator.person.TaskMetricsForPeopleValidator;
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.work.log.TasksWorkingLogsForPersonsCalculator;
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.work.log.TaskWorkingLogsForPeopleCalculator;
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.work.log.TaskWorkingLogsForPeopleValidator;
 import ua.dp.dryzhyryk.big.brother.core.ports.DataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
@@ -54,13 +54,14 @@ public class BigBrotherConsoleApplication {
 
 
         ConfigurationService configurationService = new ConfigurationService();
-        TaskMetricsForPeopleCalculator taskMetricsForPeopleCalculator = new TaskMetricsForPeopleCalculator();
-        TaskMetricsForPeopleValidator taskMetricsForPeopleValidator = new TaskMetricsForPeopleValidator(configurationService);
+        TaskWorkingLogsForPeopleCalculator taskMetricsForPeopleCalculator = new TaskWorkingLogsForPeopleCalculator();
+        TaskWorkingLogsForPeopleValidator taskMetricsForPeopleValidator = new TaskWorkingLogsForPeopleValidator(configurationService);
         TasksWorkingLogsForPersonsCalculator peopleViewMetricsCalculator = new TasksWorkingLogsForPersonsCalculator(taskMetricsForPeopleCalculator, taskMetricsForPeopleValidator);
 
         DateTimeProvider dateTimeProvider = newDateTimeProvider();
 
-        BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProvider(jiraInformationHolder, peopleViewMetricsCalculator);
+        BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProvider(jiraInformationHolder, peopleViewMetricsCalculator,
+                tasksMetricsForPersonCalculator);
 
         ExcelReportGenerator reportGenerator = new ExcelReportGenerator(reportRoot.getAbsolutePath());
 
