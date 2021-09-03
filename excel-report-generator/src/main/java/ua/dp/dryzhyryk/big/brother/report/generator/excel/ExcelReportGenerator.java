@@ -5,6 +5,8 @@ import org.apache.commons.collections4.ListUtils;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidationStatus;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PeopleView;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.metrics.TaskMetrics;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.metrics.TasksMetricsForPerson;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TasksWorkingLogsForPerson;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TaskWorkingLogs;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TimeSpentByDay;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -132,6 +135,30 @@ public class ExcelReportGenerator {
                 .footerCells(footerData);
     }
 
+    private void metricsTable(TableBuilder tableBuilder, TasksMetricsForPerson tasksMetricForPerson) {
+        List<TaskMetrics> taskMetrics = tasksMetricForPerson.getTaskMetrics();
+        if (taskMetrics.isEmpty()) {
+            return;
+        }
+
+        List<String> headerData = List.of("Real","Estimated","TC","-","Status","Task id","Task name");
+        List<List<String>> bodyData = taskMetrics.stream()
+                .map(taskMetric -> {
+                    return List.of(
+                            String.valueOf(convertMinutesToHour(taskMetric.getRealSpendTimeInMinutes())),
+                            String.valueOf(convertMinutesToHour(taskMetric.getOriginalEstimateInMinutes())),
+                            String.valueOf(taskMetric.getTimeCoefficient()),
+                            "-",
+                            taskMetric.getTaskExternalStatus(),
+                            taskMetric.getTaskId(),
+                            taskMetric.getTaskName());
+                })
+                .collect(Collectors.toList());
+        tableBuilder
+                .header(headerData)
+                .body(bodyData);
+    }
+
     private Style toStyle(ValidationStatus status) {
         switch (status) {
             case ERROR:
@@ -174,8 +201,14 @@ public class ExcelReportGenerator {
 
         List<LocalDate> days = getDatesBetween(peopleView.getStartPeriod(), peopleView.getEndPeriod());
 
+        Map<String, TasksMetricsForPerson> tasksMetricsForPersons = peopleView.getTasksMetricsForPersons().stream()
+                .collect(Collectors.toMap(TasksMetricsForPerson::getPerson, Function.identity()));
+
         peopleView.getTasksWorkingLogsForPersons()
                 .forEach(personMetric -> {
+
+                    TasksMetricsForPerson tasksMetricForPerson = tasksMetricsForPersons.get(personMetric.getPerson());
+
                     sheetWrapper
                             .row()
                             .withStyle(Style.H3)
@@ -186,7 +219,7 @@ public class ExcelReportGenerator {
 
                             .buildTable(builder -> weeklyTable(builder, days, personMetric))
                             .whiteLine()
-                            //TODO second table
+                            .buildTable(builder -> metricsTable(builder, tasksMetricForPerson))
                             .whiteLine();
                 });
 

@@ -6,6 +6,9 @@ import com.atlassian.jira.rest.client.internal.async.DisposableHttpClient;
 
 import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.metrics.TaskMetricsForPersonCalculator;
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.metrics.TaskMetricsForPersonValidator;
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.metrics.TasksMetricsForPersonCalculator;
 import ua.dp.dryzhyryk.big.brother.core.configuration.ConfigurationService;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolder;
 import ua.dp.dryzhyryk.big.brother.core.data.source.JiraInformationHolderImpl;
@@ -60,8 +63,13 @@ public class BigBrotherConsoleApplication {
 
         DateTimeProvider dateTimeProvider = newDateTimeProvider();
 
-        BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProvider(jiraInformationHolder, peopleViewMetricsCalculator,
-                tasksMetricsForPersonCalculator);
+        TaskMetricsForPersonCalculator taskMetricsForPersonCalculator = new TaskMetricsForPersonCalculator();
+        TaskMetricsForPersonValidator taskMetricsForPersonValidator = new TaskMetricsForPersonValidator();
+        TasksMetricsForPersonCalculator tasksMetricsForPersonCalculator = new TasksMetricsForPersonCalculator(
+                taskMetricsForPersonCalculator, taskMetricsForPersonValidator);
+
+        BigJiraBrotherPeopleViewProvider bigJiraBrotherPeopleViewProvider = new BigJiraBrotherPeopleViewProvider(
+                jiraInformationHolder, peopleViewMetricsCalculator, tasksMetricsForPersonCalculator);
 
         ExcelReportGenerator reportGenerator = new ExcelReportGenerator(reportRoot.getAbsolutePath());
 
