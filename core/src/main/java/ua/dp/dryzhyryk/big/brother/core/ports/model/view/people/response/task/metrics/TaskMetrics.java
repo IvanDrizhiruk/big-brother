@@ -15,8 +15,9 @@ public class TaskMetrics {
 
 	private final String taskExternalStatus;
 
-	private final int realSpendTimeInMinutes;
 	private final int originalEstimateInMinutes;
+	private final int realSpendTimeInMinutes;
+	private final int realSpendTimeByPersonInMinutes;
 
 	private final float timeCoefficient;
 }

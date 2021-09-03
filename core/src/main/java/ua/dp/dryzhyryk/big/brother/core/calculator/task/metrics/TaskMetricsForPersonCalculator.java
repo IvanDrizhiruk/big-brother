@@ -48,13 +48,18 @@ public class TaskMetricsForPersonCalculator {
 		//				.mapToInt(TimeSpentByDay::getTimeSpentMinutes)
 		//				.sum();
 
+		//TODO calculate
+		int realSpendTimeByPersonInMinutes = 0;
+		float timeCoefficient = 0f;
+
 		return TaskMetrics.builder()
 				.taskId(task.getId())
 				.taskName(task.getName())
 				.taskExternalStatus(task.getStatus())
+				.originalEstimateInMinutes(task.getOriginalEstimateMinutes())
 				.realSpendTimeInMinutes(task.getTimeSpentMinutes())
-				.originalEstimateInMinutes(task.getRemainingEstimateMinutes())
-				.timeCoefficient(0f)
+				.realSpendTimeByPersonInMinutes(realSpendTimeByPersonInMinutes)
+				.timeCoefficient(timeCoefficient)
 				.build();
 	}
 }

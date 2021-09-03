@@ -145,7 +145,7 @@ public class ExcelReportGenerator {
         List<List<String>> bodyData = taskMetrics.stream()
                 .map(taskMetric -> {
                     return List.of(
-                            String.valueOf(convertMinutesToHour(taskMetric.getRealSpendTimeInMinutes())),
+                            String.valueOf(convertMinutesToHour(taskMetric.getRealSpendTimeByPersonInMinutes())),
                             String.valueOf(convertMinutesToHour(taskMetric.getOriginalEstimateInMinutes())),
                             String.valueOf(taskMetric.getTimeCoefficient()),
                             "-",
