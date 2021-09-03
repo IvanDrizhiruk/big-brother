@@ -50,7 +50,7 @@ class TaskMetricsForPeopleCalculatorTest {
 						newTimeSpentByDay(day4, 50),
 						newTimeSpentByDay(day5, 50)))
 				.timeSpentOnTaskInMinutes(250)
-				.timeSpentOnTaskInMinutesByPeriod(150)
+				.timeSpentOnTaskByPeriodInMinutes(150)
 				.build();
 
 		Map<String, TaskWorkingLogs> expected = Map.of("person#1", taskWorkingLogMetrics1);
@@ -95,7 +95,7 @@ class TaskMetricsForPeopleCalculatorTest {
 						newTimeSpentByDay(day3, 50),
 						newTimeSpentByDay(day5, 50)))
 				.timeSpentOnTaskInMinutes(100)
-				.timeSpentOnTaskInMinutesByPeriod(100)
+				.timeSpentOnTaskByPeriodInMinutes(100)
 				.build();
 
 		TaskWorkingLogs taskWorkingLogMetrics2 = TaskWorkingLogs.builder()
@@ -105,7 +105,7 @@ class TaskMetricsForPeopleCalculatorTest {
 						newTimeSpentByDay(day3, 50),
 						newTimeSpentByDay(day4, 50)))
 				.timeSpentOnTaskInMinutes(100)
-				.timeSpentOnTaskInMinutesByPeriod(100)
+				.timeSpentOnTaskByPeriodInMinutes(100)
 				.build();
 
 		Map<String, TaskWorkingLogs> expected = Map.of(

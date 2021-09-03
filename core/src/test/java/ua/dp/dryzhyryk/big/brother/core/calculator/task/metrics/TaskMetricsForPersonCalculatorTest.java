@@ -20,18 +20,16 @@ class TaskMetricsForPersonCalculatorTest {
 	public void workLogsOutOfTimeRangeShouldBeIgnored() {
 		//given
 		LocalDate day3 = LocalDate.of(2021, 1, 3);
-		LocalDate day4 = LocalDate.of(2021, 1, 4);
-		LocalDate day5 = LocalDate.of(2021, 1, 5);
 		LocalDate day6 = LocalDate.of(2021, 1, 6);
 
 		LocalDate startPeriod = day3;
 		LocalDate endPeriod = day6;
 
-		TaskWorkLog workLog1 = buildTaskWorkLog("person#1", 50, LocalDateTime.of(2021, 1, 2, 12, 45));
-		TaskWorkLog workLog2 = buildTaskWorkLog("person#1", 50, LocalDateTime.of(2021, 1, 3, 12, 45));
-		TaskWorkLog workLog3 = buildTaskWorkLog("person#1", 50, LocalDateTime.of(2021, 1, 4, 17, 00));
-		TaskWorkLog workLog4 = buildTaskWorkLog("person#1", 50, LocalDateTime.of(2021, 1, 5, 12, 45));
-		TaskWorkLog workLog5 = buildTaskWorkLog("person#1", 50, LocalDateTime.of(2021, 1, 6, 12, 45));
+		TaskWorkLog workLog1 = buildTaskWorkLog("person#1", 51, LocalDateTime.of(2021, 1, 2, 12, 45));
+		TaskWorkLog workLog2 = buildTaskWorkLog("person#1", 52, LocalDateTime.of(2021, 1, 3, 12, 45));
+		TaskWorkLog workLog3 = buildTaskWorkLog("person#1", 53, LocalDateTime.of(2021, 1, 4, 17, 00));
+		TaskWorkLog workLog4 = buildTaskWorkLog("person#1", 54, LocalDateTime.of(2021, 1, 5, 12, 45));
+		TaskWorkLog workLog5 = buildTaskWorkLog("person#1", 55, LocalDateTime.of(2021, 1, 6, 12, 45));
 
 		Task task = Task.builder()
 				.id("#1")
@@ -47,8 +45,9 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskId("#1")
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
-				.realSpendTimeInMinutes(251)
 				.originalEstimateInMinutes(301)
+				.realSpendTimeInMinutes(251)
+				.timeSpentOnTaskByPeriodInMinutes(159)
 				.timeCoefficient(0)
 				.build();
 
@@ -66,17 +65,15 @@ class TaskMetricsForPersonCalculatorTest {
 	public void workLogsShouldBeAggregatedByDayForFewPerson() {
 		//given
 		LocalDate day3 = LocalDate.of(2021, 1, 3);
-		LocalDate day4 = LocalDate.of(2021, 1, 4);
-		LocalDate day5 = LocalDate.of(2021, 1, 5);
 		LocalDate day6 = LocalDate.of(2021, 1, 6);
 
 		LocalDate startPeriod = day3;
 		LocalDate endPeriod = day6;
 
 		TaskWorkLog workLog1 = buildTaskWorkLog("person#1", 50, LocalDateTime.of(2021, 1, 3, 12, 45));
-		TaskWorkLog workLog2 = buildTaskWorkLog("person#2", 50, LocalDateTime.of(2021, 1, 3, 12, 45));
-		TaskWorkLog workLog3 = buildTaskWorkLog("person#2", 50, LocalDateTime.of(2021, 1, 4, 12, 45));
-		TaskWorkLog workLog4 = buildTaskWorkLog("person#1", 50, LocalDateTime.of(2021, 1, 5, 12, 45));
+		TaskWorkLog workLog2 = buildTaskWorkLog("person#2", 51, LocalDateTime.of(2021, 1, 3, 12, 45));
+		TaskWorkLog workLog3 = buildTaskWorkLog("person#2", 55, LocalDateTime.of(2021, 1, 4, 12, 45));
+		TaskWorkLog workLog4 = buildTaskWorkLog("person#1", 53, LocalDateTime.of(2021, 1, 5, 12, 45));
 
 		Task task = Task.builder()
 				.id("#1")
@@ -92,8 +89,9 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskId("#1")
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
-				.realSpendTimeInMinutes(251)
 				.originalEstimateInMinutes(301)
+				.realSpendTimeInMinutes(251)
+				.timeSpentOnTaskByPeriodInMinutes(103)
 				.timeCoefficient(0)
 				.build();
 
@@ -101,8 +99,9 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskId("#1")
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
-				.realSpendTimeInMinutes(251)
 				.originalEstimateInMinutes(301)
+				.realSpendTimeInMinutes(251)
+				.timeSpentOnTaskByPeriodInMinutes(106)
 				.timeCoefficient(0)
 				.build();
 

@@ -73,7 +73,7 @@ public class TasksWorkingLogsForPersonsCalculator {
 	}
 
 	private boolean wasTimeSpentOnTaskByPeriod(TaskWorkingLogs value) {
-		return value.getTimeSpentOnTaskInMinutesByPeriod() > 0;
+		return value.getTimeSpentOnTaskByPeriodInMinutes() > 0;
 	}
 
 	private List<ValidatedValue<TimeSpentByDay>> calculateTimeSpentByDaysForAllTask(

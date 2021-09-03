@@ -7,8 +7,8 @@ import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.Vali
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PeopleView;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.metrics.TaskMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.metrics.TasksMetricsForPerson;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TasksWorkingLogsForPerson;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TaskWorkingLogs;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TasksWorkingLogsForPerson;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TimeSpentByDay;
 import ua.dp.dryzhyryk.big.brother.core.utils.TimeUtils;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.SheetWrapper;
@@ -87,7 +87,7 @@ public class ExcelReportGenerator {
                             .collect(Collectors.toMap(TimeSpentByDay::getDay, TimeSpentByDay::getTimeSpentMinutes));
                     daysWithoutFreeWeekends.forEach(day -> bodyDataRow.add(safeGetIntAsString(timeSpentByDays, day)));
 
-                    bodyDataRow.add(String.valueOf(convertMinutesToHour(dailyTaskLog.getTimeSpentOnTaskInMinutesByPeriod())));
+                    bodyDataRow.add(String.valueOf(convertMinutesToHour(dailyTaskLog.getTimeSpentOnTaskByPeriodInMinutes())));
                     bodyDataRow.add(String.valueOf(convertMinutesToHour(dailyTaskLog.getTimeSpentOnTaskInMinutes())));
 
                     bodyDataRow.add(dailyTaskLog.getTaskId());
@@ -141,12 +141,13 @@ public class ExcelReportGenerator {
             return;
         }
 
-        List<String> headerData = List.of("Real","Estimated","TC","-","Status","Task id","Task name");
+        List<String> headerData = List.of("Real", "Estimated", "TC", "-", "Status", "Task id", "Task name");
         List<List<String>> bodyData = taskMetrics.stream()
                 .map(taskMetric -> {
+
                     return List.of(
-                            String.valueOf(convertMinutesToHour(taskMetric.getRealSpendTimeByPersonInMinutes())),
-                            String.valueOf(convertMinutesToHour(taskMetric.getOriginalEstimateInMinutes())),
+                            String.valueOf(convertMinutesToHour(taskMetric.getTimeSpentOnTaskByPeriodInMinutes())),
+                            stringValueOrEmpty(convertMinutesToHour(taskMetric.getOriginalEstimateInMinutes())),
                             String.valueOf(taskMetric.getTimeCoefficient()),
                             "-",
                             taskMetric.getTaskExternalStatus(),
@@ -253,5 +254,12 @@ public class ExcelReportGenerator {
 
     private static Float convertMinutesToHour(Integer minutes) {
         return TimeUtils.convertMinutesToHour(minutes);
+    }
+
+    private String stringValueOrEmpty(Object data) {
+        return Optional.ofNullable(data)
+                .map(Object::toString)
+                .orElse("");
+
     }
 }

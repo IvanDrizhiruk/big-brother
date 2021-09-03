@@ -57,7 +57,7 @@ public class TaskWorkingLogsForPeopleCalculator {
 				.taskId(task.getId())
 				.taskName(task.getName())
 				.timeSpentByDays(timeSpentByDays)
-				.timeSpentOnTaskInMinutesByPeriod(timeSpentOnTaskInMinutesByPeriod)
+				.timeSpentOnTaskByPeriodInMinutes(timeSpentOnTaskInMinutesByPeriod)
 				.timeSpentOnTaskInMinutes(timeSpentOnTaskInMinutes)
 				.build();
 	}

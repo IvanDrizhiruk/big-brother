@@ -14,5 +14,5 @@ public class TaskWorkingLogs {
 
 	private final List<TimeSpentByDay> timeSpentByDays;
 	private final int timeSpentOnTaskInMinutes;
-	private final int timeSpentOnTaskInMinutesByPeriod;
+	private final int timeSpentOnTaskByPeriodInMinutes;
 }

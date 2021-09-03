@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class PeopleViewMetricsCalculatorTest {
+class TasksWorkingLogsForPersonsCalculatorTest {
 
     @Test
     public void taskWorkingLogMetricsShouldBeAggregatedByUser() {
@@ -336,7 +336,7 @@ class PeopleViewMetricsCalculatorTest {
             int timeSpentOnTaskInMinutesByPeriod,
             List<TimeSpentByDay> timeSpentByDays) {
         return newTaskWorkingLogMetrics(taskId, taskName, timeSpentByDays).toBuilder()
-                .timeSpentOnTaskInMinutesByPeriod(timeSpentOnTaskInMinutesByPeriod)
+                .timeSpentOnTaskByPeriodInMinutes(timeSpentOnTaskInMinutesByPeriod)
                 .timeSpentByDays(timeSpentByDays)
                 .build();
     }
