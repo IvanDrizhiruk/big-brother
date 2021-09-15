@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -33,6 +35,8 @@ public class JiraDataExtractor implements JiraResource {
 	private static final DateTimeFormatter DATA_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	private final JiraRestClientExtended jiraRestClient;
+	//TODO can be issue with memory. SHould be reworked to expandable cache
+	private final Map<String, Task> taskCache = new HashMap<>();
 
 	public JiraDataExtractor(JiraRestClientExtended jiraRestClient) {
 		this.jiraRestClient = jiraRestClient;
@@ -62,8 +66,7 @@ public class JiraDataExtractor implements JiraResource {
 		log.info("Root task has loaded {} ", issues);
 
 		return issues.stream()
-				.map(issue -> loadIssueFully(issue.getKey()))
-				.map(this::toTask)
+				.map(issue -> taskCache.computeIfAbsent(issue.getKey(), key -> toTask(loadIssueFully(key))))
 				.collect(Collectors.toList());
 	}
 
@@ -91,8 +94,6 @@ public class JiraDataExtractor implements JiraResource {
 	private Issue loadIssueFully(String issueKey) {
 
 		log.info("Load issue fully {} ", issueKey);
-
-		//TODO add cache for full loaded task
 
 		//TODO add retry on exception
 		Issue issue = jiraRestClient.getIssueClient().getIssue(issueKey).get();
