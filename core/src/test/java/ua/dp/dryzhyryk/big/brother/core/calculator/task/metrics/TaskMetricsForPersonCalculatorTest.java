@@ -46,7 +46,7 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
 				.originalEstimateInMinutes(301)
-				.realSpendTimeInMinutes(251)
+				.allTimeSpendOnTaskInMinutes(251)
 				.timeSpentOnTaskByPeriodInMinutes(159)
 				.timeCoefficient(0)
 				.build();
@@ -90,7 +90,7 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
 				.originalEstimateInMinutes(301)
-				.realSpendTimeInMinutes(251)
+				.allTimeSpendOnTaskInMinutes(251)
 				.timeSpentOnTaskByPeriodInMinutes(103)
 				.timeCoefficient(0)
 				.build();
@@ -100,7 +100,7 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
 				.originalEstimateInMinutes(301)
-				.realSpendTimeInMinutes(251)
+				.allTimeSpendOnTaskInMinutes(251)
 				.timeSpentOnTaskByPeriodInMinutes(106)
 				.timeCoefficient(0)
 				.build();

@@ -13,8 +13,9 @@ public class TaskMetrics {
     private final String taskExternalStatus;
 
     private final Integer originalEstimateInMinutes;
-    private final int realSpendTimeInMinutes;
     private final int timeSpentOnTaskByPeriodInMinutes;
+    private final int timeSpentOnTaskInMinutes;
+    private final int allTimeSpendOnTaskInMinutes;
 
     private final float timeCoefficient;
 }
