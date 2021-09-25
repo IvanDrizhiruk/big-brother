@@ -1,5 +1,8 @@
 package ua.dp.dryzhyryk.big.brother.report.generator.excel;
 
+import static ua.dp.dryzhyryk.big.brother.report.generator.utils.Formatter.convertMinutesToHour;
+import static ua.dp.dryzhyryk.big.brother.report.generator.utils.Formatter.stringValueOrEmpty;
+
 import java.io.File;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -23,7 +26,6 @@ import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.me
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TaskWorkingLogs;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TasksWorkingLogsForPerson;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TimeSpentByDay;
-import ua.dp.dryzhyryk.big.brother.core.utils.TimeUtils;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.SheetWrapper;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.TableBuilder;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.TableCell;
@@ -142,15 +144,28 @@ public class ExcelReportGenerator {
 			return;
 		}
 
-		List<String> headerData = List.of("Spent by period by person", "Spent by person", "Spent", "Spent from task", "Estimated", "TC", "-", "Status", "Task id", "Task name");
+		List<String> headerData = List.of(
+				"Spent by period by person",
+				"Spent by person",
+				"Spent by team",
+				"Spent totally",
+				"Estimated",
+				"Spent time by person",
+				"Spent time by team",
+				"-",
+				"Status",
+				"Task id",
+				"Task name");
 		List<List<String>> bodyData = taskMetrics.stream()
 				.map(taskMetric ->
 						List.of(
-								String.valueOf(convertMinutesToHour(taskMetric.getTimeSpentOnTaskByPeriodInMinutes())),
-                                String.valueOf(convertMinutesToHour(taskMetric.getTimeSpentOnTaskInMinutes())),
-                                String.valueOf(convertMinutesToHour(taskMetric.getAllTimeSpendOnTaskInMinutes())),
+								String.valueOf(convertMinutesToHour(taskMetric.getTimeSpentOnTaskPersonByPeriodInMinutes())),
+								String.valueOf(convertMinutesToHour(taskMetric.getTimeSpentOnTaskPersonInMinutes())),
+								String.valueOf(convertMinutesToHour(taskMetric.getTimeSpendOnTaskByTeamInMinutes())),
+								String.valueOf(convertMinutesToHour(taskMetric.getTimeSpendOnTaskInMinutes())),
 								stringValueOrEmpty(convertMinutesToHour(taskMetric.getOriginalEstimateInMinutes())),
-								String.valueOf(taskMetric.getTimeCoefficient()),
+								stringValueOrEmpty(taskMetric.getSpentTimePercentageForPerson()),
+								stringValueOrEmpty(taskMetric.getSpentTimePercentageForTeam()),
 								"-",
 								taskMetric.getTaskExternalStatus(),
 								taskMetric.getTaskId(),
@@ -251,16 +266,5 @@ public class ExcelReportGenerator {
 				.limit(numOfDaysBetween)
 				.mapToObj(startDate::plusDays)
 				.collect(Collectors.toList());
-	}
-
-	private static Float convertMinutesToHour(Integer minutes) {
-		return TimeUtils.convertMinutesToHour(minutes);
-	}
-
-	private String stringValueOrEmpty(Object data) {
-		return Optional.ofNullable(data)
-				.map(Object::toString)
-				.orElse("");
-
 	}
 }

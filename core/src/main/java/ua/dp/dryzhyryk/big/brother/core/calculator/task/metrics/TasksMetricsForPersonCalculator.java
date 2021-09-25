@@ -29,7 +29,8 @@ public class TasksMetricsForPersonCalculator {
 									.calculateTaskMetricsForPerson(
 											task,
 											peopleSearchConditions.getStartPeriod(),
-											peopleSearchConditions.getEndPeriod());
+											peopleSearchConditions.getEndPeriod(),
+											peopleSearchConditions.getPeopleNames());
 
 							return personTaskMetricsByPerson
 									.entrySet().stream();

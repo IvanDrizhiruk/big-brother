@@ -25,6 +25,8 @@ class TaskMetricsForPersonCalculatorTest {
 		LocalDate startPeriod = day3;
 		LocalDate endPeriod = day6;
 
+		List<String> teamMembers = List.of("person#1");
+
 		TaskWorkLog workLog1 = buildTaskWorkLog("person#1", 51, LocalDateTime.of(2021, 1, 2, 12, 45));
 		TaskWorkLog workLog2 = buildTaskWorkLog("person#1", 52, LocalDateTime.of(2021, 1, 3, 12, 45));
 		TaskWorkLog workLog3 = buildTaskWorkLog("person#1", 53, LocalDateTime.of(2021, 1, 4, 17, 00));
@@ -46,16 +48,16 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
 				.originalEstimateInMinutes(301)
-				.allTimeSpendOnTaskInMinutes(251)
-				.timeSpentOnTaskByPeriodInMinutes(159)
-				.timeCoefficient(0)
+				.timeSpendOnTaskInMinutes(251)
+				.timeSpentOnTaskPersonByPeriodInMinutes(159)
+				.spentTimePercentageForPerson(0f)
 				.build();
 
 		Map<String, TaskMetrics> expected = Map.of("person#1", taskMetrics);
 
 		//when
 		TaskMetricsForPersonCalculator calculator = new TaskMetricsForPersonCalculator();
-		Map<String, TaskMetrics> actual = calculator.calculateTaskMetricsForPerson(task, startPeriod, endPeriod);
+		Map<String, TaskMetrics> actual = calculator.calculateTaskMetricsForPerson(task, startPeriod, endPeriod, teamMembers);
 
 		//then
 		Assertions.assertThat(actual).isEqualTo(expected);
@@ -69,6 +71,8 @@ class TaskMetricsForPersonCalculatorTest {
 
 		LocalDate startPeriod = day3;
 		LocalDate endPeriod = day6;
+
+		List<String> teamMembers = List.of("person#1");
 
 		TaskWorkLog workLog1 = buildTaskWorkLog("person#1", 50, LocalDateTime.of(2021, 1, 3, 12, 45));
 		TaskWorkLog workLog2 = buildTaskWorkLog("person#2", 51, LocalDateTime.of(2021, 1, 3, 12, 45));
@@ -90,9 +94,9 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
 				.originalEstimateInMinutes(301)
-				.allTimeSpendOnTaskInMinutes(251)
-				.timeSpentOnTaskByPeriodInMinutes(103)
-				.timeCoefficient(0)
+				.timeSpendOnTaskInMinutes(251)
+				.timeSpentOnTaskPersonByPeriodInMinutes(103)
+				.spentTimePercentageForPerson(0f)
 				.build();
 
 		TaskMetrics taskMetrics2 = TaskMetrics.builder()
@@ -100,9 +104,9 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
 				.originalEstimateInMinutes(301)
-				.allTimeSpendOnTaskInMinutes(251)
-				.timeSpentOnTaskByPeriodInMinutes(106)
-				.timeCoefficient(0)
+				.timeSpendOnTaskInMinutes(251)
+				.timeSpentOnTaskPersonByPeriodInMinutes(106)
+				.spentTimePercentageForPerson(0f)
 				.build();
 
 		Map<String, TaskMetrics> expected = Map.of(
@@ -111,7 +115,7 @@ class TaskMetricsForPersonCalculatorTest {
 
 		//when
 		TaskMetricsForPersonCalculator calculator = new TaskMetricsForPersonCalculator();
-		Map<String, TaskMetrics> actual = calculator.calculateTaskMetricsForPerson(task, startPeriod, endPeriod);
+		Map<String, TaskMetrics> actual = calculator.calculateTaskMetricsForPerson(task, startPeriod, endPeriod, teamMembers);
 
 		//then
 		Assertions.assertThat(actual).isEqualTo(expected);

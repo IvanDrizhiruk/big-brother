@@ -7,15 +7,17 @@ import lombok.Value;
 @Builder(toBuilder = true)
 public class TaskMetrics {
 
-    private final String taskId;
-    private final String taskName;
+	private final String taskId;
+	private final String taskName;
 
-    private final String taskExternalStatus;
+	private final String taskExternalStatus;
 
-    private final Integer originalEstimateInMinutes;
-    private final int timeSpentOnTaskByPeriodInMinutes;
-    private final int timeSpentOnTaskInMinutes;
-    private final int allTimeSpendOnTaskInMinutes;
+	private final Integer originalEstimateInMinutes;
+	private final int timeSpentOnTaskPersonByPeriodInMinutes;
+	private final int timeSpentOnTaskPersonInMinutes;
+	private final int timeSpendOnTaskByTeamInMinutes;
+	private final int timeSpendOnTaskInMinutes;
 
-    private final float timeCoefficient;
+	private final Float spentTimePercentageForPerson;
+	private final Float spentTimePercentageForTeam;
 }
