@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.metrics.TaskMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TimeSpentByDay;
 
@@ -50,7 +51,9 @@ class TaskMetricsForPersonCalculatorTest {
 				.originalEstimateInMinutes(301)
 				.timeSpendOnTaskInMinutes(251)
 				.timeSpentOnTaskPersonByPeriodInMinutes(159)
-				.spentTimePercentageForPerson(0f)
+//				.spentTimePercentageForPerson(ValidatedValue.builder()
+//						.value(0f)
+//						.build())
 				.build();
 
 		Map<String, TaskMetrics> expected = Map.of("person#1", taskMetrics);
@@ -96,7 +99,7 @@ class TaskMetricsForPersonCalculatorTest {
 				.originalEstimateInMinutes(301)
 				.timeSpendOnTaskInMinutes(251)
 				.timeSpentOnTaskPersonByPeriodInMinutes(103)
-				.spentTimePercentageForPerson(0f)
+//				.spentTimePercentageForPerson(0f)
 				.build();
 
 		TaskMetrics taskMetrics2 = TaskMetrics.builder()
@@ -106,7 +109,7 @@ class TaskMetricsForPersonCalculatorTest {
 				.originalEstimateInMinutes(301)
 				.timeSpendOnTaskInMinutes(251)
 				.timeSpentOnTaskPersonByPeriodInMinutes(106)
-				.spentTimePercentageForPerson(0f)
+//				.spentTimePercentageForPerson(0f)
 				.build();
 
 		Map<String, TaskMetrics> expected = Map.of(

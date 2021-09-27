@@ -2,6 +2,7 @@ package ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.m
 
 import lombok.Builder;
 import lombok.Value;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
 
 @Value
 @Builder(toBuilder = true)
@@ -18,6 +19,6 @@ public class TaskMetrics {
 	private final int timeSpendOnTaskByTeamInMinutes;
 	private final int timeSpendOnTaskInMinutes;
 
-	private final Float spentTimePercentageForPerson;
-	private final Float spentTimePercentageForTeam;
+	private final ValidatedValue<Float> spentTimePercentageForPerson;
+	private final ValidatedValue<Float> spentTimePercentageForTeam;
 }

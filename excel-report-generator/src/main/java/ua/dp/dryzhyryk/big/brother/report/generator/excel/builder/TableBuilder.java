@@ -7,6 +7,8 @@ public interface TableBuilder {
 
 	TableBuilder body(List<List<String>> bodyData);
 
+	TableBuilder bodyCells(List<List<TableCell>> bodyData);
+
 	TableBuilder footer(List<String> footerData);
 
 	TableBuilder footerCells(List<TableCell> footerData);

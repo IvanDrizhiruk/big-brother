@@ -80,7 +80,7 @@ public class ExcelReportGenerator {
 		List<String> dateHeaders = daysWithoutFreeWeekends.stream()
 				.map(LocalDate::toString)
 				.collect(Collectors.toList());
-		List<String> headerData = ListUtils.union(dateHeaders, List.of("By period", "Total", "Task id", "Task name"));
+		List<String> headerData = ListUtils.union(dateHeaders, List.of("Spent by period by person", "Spent by person", "Task id", "Task name"));
 
 		List<List<String>> bodyData = dailyTaskLogs.stream()
 				.map(dailyTaskLog -> {
@@ -156,24 +156,83 @@ public class ExcelReportGenerator {
 				"Status",
 				"Task id",
 				"Task name");
-		List<List<String>> bodyData = taskMetrics.stream()
+		List<List<TableCell>> bodyData = taskMetrics.stream()
 				.map(taskMetric ->
 						List.of(
-								String.valueOf(convertMinutesToHour(taskMetric.getTimeSpentOnTaskPersonByPeriodInMinutes())),
-								String.valueOf(convertMinutesToHour(taskMetric.getTimeSpentOnTaskPersonInMinutes())),
-								String.valueOf(convertMinutesToHour(taskMetric.getTimeSpendOnTaskByTeamInMinutes())),
-								String.valueOf(convertMinutesToHour(taskMetric.getTimeSpendOnTaskInMinutes())),
-								stringValueOrEmpty(convertMinutesToHour(taskMetric.getOriginalEstimateInMinutes())),
-								stringValueOrEmpty(taskMetric.getSpentTimePercentageForPerson()),
-								stringValueOrEmpty(taskMetric.getSpentTimePercentageForTeam()),
-								"-",
-								taskMetric.getTaskExternalStatus(),
-								taskMetric.getTaskId(),
-								taskMetric.getTaskName()))
+								newTableCell(convertMinutesToHour(taskMetric.getTimeSpentOnTaskPersonByPeriodInMinutes())),
+								newTableCell(convertMinutesToHour(taskMetric.getTimeSpentOnTaskPersonInMinutes())),
+								newTableCell(convertMinutesToHour(taskMetric.getTimeSpendOnTaskByTeamInMinutes())),
+								newTableCell(convertMinutesToHour(taskMetric.getTimeSpendOnTaskInMinutes())),
+								newTableCell(convertMinutesToHour(taskMetric.getOriginalEstimateInMinutes())),
+								newTableCell(taskMetric.getSpentTimePercentageForPerson()),
+								newTableCell(taskMetric.getSpentTimePercentageForTeam()),
+								newTableCell("-"),
+								newTableCell(taskMetric.getTaskExternalStatus()),
+								newTableCell(taskMetric.getTaskId()),
+								newTableCell(taskMetric.getTaskName())))
 				.collect(Collectors.toList());
 		tableBuilder
 				.header(headerData)
-				.body(bodyData);
+				.bodyCells(bodyData);
+	}
+
+	private void metricsTable2(TableBuilder tableBuilder, TasksMetricsForPerson tasksMetricForPerson) {
+		List<TaskMetrics> taskMetrics = tasksMetricForPerson.getTaskMetrics();
+		if (taskMetrics.isEmpty()) {
+			return;
+		}
+
+		List<String> headerData = List.of(
+				"Spent by person",
+				"Spent by team",
+				"Estimated",
+				"Spent time by person",
+				"Spent time by team",
+				"-",
+				"Status",
+				"Task id",
+				"Task name");
+
+		List<List<TableCell>> bodyData = taskMetrics.stream()
+				.map(taskMetric ->
+						List.of(
+								newTableCell(convertMinutesToHour(taskMetric.getTimeSpentOnTaskPersonInMinutes())),
+								newTableCell(convertMinutesToHour(taskMetric.getTimeSpendOnTaskByTeamInMinutes())),
+								newTableCell(convertMinutesToHour(taskMetric.getOriginalEstimateInMinutes())),
+								newTableCell(taskMetric.getSpentTimePercentageForPerson()),
+								newTableCell(taskMetric.getSpentTimePercentageForTeam()),
+								newTableCell("-"),
+								newTableCell(taskMetric.getTaskExternalStatus()),
+								newTableCell(taskMetric.getTaskId()),
+								newTableCell(taskMetric.getTaskName())))
+				.collect(Collectors.toList());
+
+		tableBuilder
+				.header(headerData)
+				.bodyCells(bodyData);
+	}
+
+	private TableCell newTableCell(Object obj) {
+		return TableCell.builder()
+				.value(stringValueOrEmpty(obj))
+				.build();
+	}
+
+	private TableCell newTableCell(ValidatedValue<?> value) {
+
+		Style style = toStyle(value.getValidationStatus());
+
+		String notes = Optional.ofNullable(value.getValidationNotes())
+				.map(data -> data.stream()
+						.map(note -> note.getNoteType() + ": " + note.getNote())
+						.collect(Collectors.joining("\n")))
+				.orElse(null);
+
+		return TableCell.builder()
+				.value(stringValueOrEmpty(value.getValue()))
+				.style(style)
+				.cellComment(notes)
+				.build();
 	}
 
 	private Style toStyle(ValidationStatus status) {
@@ -237,6 +296,8 @@ public class ExcelReportGenerator {
 							.buildTable(builder -> weeklyTable(builder, days, personMetric))
 							.whiteLine()
 							.buildTable(builder -> metricsTable(builder, tasksMetricForPerson))
+							.whiteLine()
+							.buildTable(builder -> metricsTable2(builder, tasksMetricForPerson))
 							.whiteLine();
 				});
 

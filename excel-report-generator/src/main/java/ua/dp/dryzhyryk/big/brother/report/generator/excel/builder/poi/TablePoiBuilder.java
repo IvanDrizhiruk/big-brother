@@ -25,6 +25,21 @@ public class TablePoiBuilder implements TableBuilder {
 	}
 
 	@Override
+	public TableBuilder bodyCells(List<List<TableCell>> bodyData) {
+		bodyData.forEach(rowData -> {
+			RowWrapper row = sheetPoiWrapper.row();
+			rowData.forEach(data ->
+					row
+							.cell(data.getValue())
+							.withStyle(data.getStyle())
+							.withComment(data.getCellComment())
+							.buildCell());
+		});
+
+		return this;
+	}
+
+	@Override
 	public TableBuilder footer(List<String> footerData) {
 		this.row(footerData);
 		return this;

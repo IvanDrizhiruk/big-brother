@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.metrics.TaskMetrics;
 
 public class TaskMetricsForPersonCalculator {
@@ -48,8 +49,6 @@ public class TaskMetricsForPersonCalculator {
 				.mapToInt(i -> i)
 				.sum();
 
-
-
 		Float spentTimePercentageForPerson = null;
 		Float spentTimePercentageForTeam = null;
 
@@ -58,15 +57,27 @@ public class TaskMetricsForPersonCalculator {
 			spentTimePercentageForPerson = 100f * timeSpentOnTaskPersonInMinutes / estimation;
 			spentTimePercentageForTeam = 100f * timeSpendOnTaskByTeamInMinutes / estimation;
 		}
-//TODO support statuses and validation
-//
-//		if ("DONE".isEmpty()) {
-//			String status;
-//		} else if ("IN_PROGRESS".isEmpty()) {
-//			String status;
-//		} else if ("TODO".isEmpty()) {
-//			String status = "error or rework";
-//		}
+
+		//TODO validation
+		// work do on current period
+		// have estimation
+		// task made one person
+		// task made by team
+		//                       status - should take place
+
+
+		ValidatedValue<Float> spentTimePercentageForPersonWithStatus = ValidatedValue.valueWithOkStatus(spentTimePercentageForPerson);
+		ValidatedValue<Float> spentTimePercentageForTeamWithStatus = ValidatedValue.valueWithNotEvaluatedStatus(spentTimePercentageForTeam);
+
+		//TODO support statuses and validation
+		//
+		//		if ("DONE".isEmpty()) {
+		//			String status;
+		//		} else if ("IN_PROGRESS".isEmpty()) {
+		//			String status;
+		//		} else if ("TODO".isEmpty()) {
+		//			String status = "error or rework";
+		//		}
 
 		return TaskMetrics.builder()
 				.taskId(task.getId())
@@ -77,8 +88,8 @@ public class TaskMetricsForPersonCalculator {
 				.timeSpentOnTaskPersonInMinutes(timeSpentOnTaskPersonInMinutes)
 				.timeSpendOnTaskByTeamInMinutes(timeSpendOnTaskByTeamInMinutes)
 				.timeSpendOnTaskInMinutes(task.getTimeSpentMinutes())
-				.spentTimePercentageForPerson(spentTimePercentageForPerson)
-				.spentTimePercentageForTeam(spentTimePercentageForTeam)
+				.spentTimePercentageForPerson(spentTimePercentageForPersonWithStatus)
+				.spentTimePercentageForTeam(spentTimePercentageForTeamWithStatus)
 				.build();
 	}
 }
