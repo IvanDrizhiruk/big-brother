@@ -8,5 +8,6 @@ public enum Style {
 	@Deprecated ERROR_TOO_MUCH,
 	ERROR,
 	WARNING,
-	OK
+	OK,
+	NONE
 }

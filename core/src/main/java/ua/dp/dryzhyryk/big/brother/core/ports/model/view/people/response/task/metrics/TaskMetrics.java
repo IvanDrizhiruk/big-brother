@@ -13,9 +13,10 @@ public class TaskMetrics {
 
 	private final String taskExternalStatus;
 
-	private final Integer originalEstimateInMinutes;
+	private final ValidatedValue<Integer> estimationInMinutes;
+
 	private final int timeSpentOnTaskPersonByPeriodInMinutes;
-	private final int timeSpentOnTaskPersonInMinutes;
+	private final ValidatedValue<Integer> timeSpentOnTaskPersonInMinutes;
 	private final int timeSpendOnTaskByTeamInMinutes;
 	private final int timeSpendOnTaskInMinutes;
 

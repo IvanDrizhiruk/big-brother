@@ -30,6 +30,7 @@ import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.SheetWrapper;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.TableBuilder;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.TableCell;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.builder.WorkbookBuilder;
+import ua.dp.dryzhyryk.big.brother.report.generator.utils.Formatter;
 
 @Slf4j
 public class ExcelReportGenerator {
@@ -160,10 +161,10 @@ public class ExcelReportGenerator {
 				.map(taskMetric ->
 						List.of(
 								newTableCell(convertMinutesToHour(taskMetric.getTimeSpentOnTaskPersonByPeriodInMinutes())),
-								newTableCell(convertMinutesToHour(taskMetric.getTimeSpentOnTaskPersonInMinutes())),
+								newTableCell(taskMetric.getTimeSpentOnTaskPersonInMinutes(), Formatter::convertMinutesToHour),
 								newTableCell(convertMinutesToHour(taskMetric.getTimeSpendOnTaskByTeamInMinutes())),
 								newTableCell(convertMinutesToHour(taskMetric.getTimeSpendOnTaskInMinutes())),
-								newTableCell(convertMinutesToHour(taskMetric.getOriginalEstimateInMinutes())),
+								newTableCell(taskMetric.getEstimationInMinutes(), Formatter::convertMinutesToHour),
 								newTableCell(taskMetric.getSpentTimePercentageForPerson()),
 								newTableCell(taskMetric.getSpentTimePercentageForTeam()),
 								newTableCell("-"),
@@ -196,9 +197,9 @@ public class ExcelReportGenerator {
 		List<List<TableCell>> bodyData = taskMetrics.stream()
 				.map(taskMetric ->
 						List.of(
-								newTableCell(convertMinutesToHour(taskMetric.getTimeSpentOnTaskPersonInMinutes())),
+								newTableCell(taskMetric.getTimeSpentOnTaskPersonInMinutes(), Formatter::convertMinutesToHour),
 								newTableCell(convertMinutesToHour(taskMetric.getTimeSpendOnTaskByTeamInMinutes())),
-								newTableCell(convertMinutesToHour(taskMetric.getOriginalEstimateInMinutes())),
+								newTableCell(taskMetric.getEstimationInMinutes(), Formatter::convertMinutesToHour),
 								newTableCell(taskMetric.getSpentTimePercentageForPerson()),
 								newTableCell(taskMetric.getSpentTimePercentageForTeam()),
 								newTableCell("-"),
@@ -235,14 +236,37 @@ public class ExcelReportGenerator {
 				.build();
 	}
 
+	private <T> TableCell newTableCell(ValidatedValue<T> validatedValue, Function<T, ?> valueConverter) {
+
+		Style style = toStyle(validatedValue.getValidationStatus());
+
+		String notes = Optional.ofNullable(validatedValue.getValidationNotes())
+				.map(data -> data.stream()
+						.map(note -> note.getNoteType() + ": " + note.getNote())
+						.collect(Collectors.joining("\n")))
+				.orElse(null);
+
+		Object value = Optional.ofNullable(validatedValue.getValue())
+				.map(valueConverter)
+				.orElse(null);
+
+		return TableCell.builder()
+				.value(stringValueOrEmpty(value))
+				.style(style)
+				.cellComment(notes)
+				.build();
+	}
+
 	private Style toStyle(ValidationStatus status) {
 		switch (status) {
 			case ERROR:
 				return Style.ERROR;
 			case WARNING:
 				return Style.WARNING;
-			default:
+			case OK:
 				return Style.OK;
+			default:
+				return Style.NONE;
 		}
 	}
 

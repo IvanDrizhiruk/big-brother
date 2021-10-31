@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.metrics.TaskMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TimeSpentByDay;
 
@@ -48,7 +47,7 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskId("#1")
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
-				.originalEstimateInMinutes(301)
+//				.estimationInMinutes(301)
 				.timeSpendOnTaskInMinutes(251)
 				.timeSpentOnTaskPersonByPeriodInMinutes(159)
 //				.spentTimePercentageForPerson(ValidatedValue.builder()
@@ -96,7 +95,7 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskId("#1")
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
-				.originalEstimateInMinutes(301)
+//				.estimationInMinutes(301)
 				.timeSpendOnTaskInMinutes(251)
 				.timeSpentOnTaskPersonByPeriodInMinutes(103)
 //				.spentTimePercentageForPerson(0f)
@@ -106,7 +105,7 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskId("#1")
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
-				.originalEstimateInMinutes(301)
+//				.estimationInMinutes(301)
 				.timeSpendOnTaskInMinutes(251)
 				.timeSpentOnTaskPersonByPeriodInMinutes(106)
 //				.spentTimePercentageForPerson(0f)
