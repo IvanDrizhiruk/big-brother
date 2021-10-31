@@ -56,7 +56,7 @@ class TaskMetricsForPersonCalculatorTest {
 		Map<String, TaskMetrics> expected = Map.of("person#1", taskMetrics);
 
 		//when
-		TaskMetricsForPersonCalculator calculator = new TaskMetricsForPersonCalculator();
+		TaskMetricsForPersonCalculator calculator = new TaskMetricsForPersonCalculator(new SpendTimeValidator());
 		Map<String, TaskMetrics> actual = calculator.calculateTaskMetricsForPerson(task, startPeriod, endPeriod, teamMembers);
 
 		//then
@@ -110,7 +110,7 @@ class TaskMetricsForPersonCalculatorTest {
 				"person#2", taskMetrics2);
 
 		//when
-		TaskMetricsForPersonCalculator calculator = new TaskMetricsForPersonCalculator();
+		TaskMetricsForPersonCalculator calculator = new TaskMetricsForPersonCalculator(new SpendTimeValidator());
 		Map<String, TaskMetrics> actual = calculator.calculateTaskMetricsForPerson(task, startPeriod, endPeriod, teamMembers);
 
 		//then

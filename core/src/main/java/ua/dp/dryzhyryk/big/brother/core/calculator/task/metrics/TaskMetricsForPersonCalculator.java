@@ -11,6 +11,13 @@ import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.Vali
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.metrics.TaskMetrics;
 
 public class TaskMetricsForPersonCalculator {
+
+	private final SpendTimeValidator spendTimeValidator;
+
+	public TaskMetricsForPersonCalculator(SpendTimeValidator spendTimeValidator) {
+		this.spendTimeValidator = spendTimeValidator;
+	}
+
 	public Map<String, TaskMetrics> calculateTaskMetricsForPerson(Task task, LocalDate startPeriod, LocalDate endPeriod,
 			List<String> teamMembers) {
 		Map<String, Map<LocalDate, Integer>> spendTimeByDayForPerson = task.getWorkLogs().stream()
@@ -102,24 +109,9 @@ public class TaskMetricsForPersonCalculator {
 			timeSpentOnTaskPersonInMinutesWithStatus = ValidatedValue.valueWithNotEvaluatedStatus(timeSpentOnTaskPersonInMinutes);
 		}
 
-		ValidatedValue<Float> spentTimePercentageForPersonWithStatus;
-		if (spentTimePercentageForPerson == null) {
-			spentTimePercentageForPersonWithStatus = ValidatedValue.valueWithNotEvaluatedStatus(spentTimePercentageForPerson);
-		} else if (80 <= spentTimePercentageForPerson && spentTimePercentageForPerson <= 120) {
-			spentTimePercentageForPersonWithStatus = ValidatedValue.valueWithOkStatus(spentTimePercentageForPerson);
-		} else if (50 <= spentTimePercentageForPerson && spentTimePercentageForPerson <= 80) {
-			spentTimePercentageForPersonWithStatus = ValidatedValue.valueWithWarningStatus(spentTimePercentageForPerson, "Made too fast");
-		} else if (spentTimePercentageForPerson <= 50) {
-			spentTimePercentageForPersonWithStatus = ValidatedValue.valueWithErrorStatus(spentTimePercentageForPerson, "Made too fast");
-		} else if (120 <= spentTimePercentageForPerson && spentTimePercentageForPerson <= 200) {
-			spentTimePercentageForPersonWithStatus = ValidatedValue.valueWithWarningStatus(spentTimePercentageForPerson, "Made too slow");
-		} else if (spentTimePercentageForPerson >= 200) {
-			spentTimePercentageForPersonWithStatus = ValidatedValue.valueWithErrorStatus(spentTimePercentageForPerson, "Made too slow");
-		} else {
-			throw new IllegalStateException("Unexpected case " + spentTimePercentageForPerson);
-		}
+		ValidatedValue<Float> spentTimePercentageForPersonWithStatus = spendTimeValidator.validate(spentTimePercentageForPerson);
 
-		ValidatedValue<Float> spentTimePercentageForTeamWithStatus = ValidatedValue.valueWithNotEvaluatedStatus(spentTimePercentageForTeam);
+		ValidatedValue<Float> spentTimePercentageForTeamWithStatus = spendTimeValidator.validate(spentTimePercentageForTeam);
 
 		return TaskMetrics.builder()
 				.taskId(task.getId())

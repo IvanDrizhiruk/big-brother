@@ -6,6 +6,7 @@ import com.atlassian.jira.rest.client.internal.async.DisposableHttpClient;
 
 import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.metrics.SpendTimeValidator;
 import ua.dp.dryzhyryk.big.brother.core.calculator.task.metrics.TaskMetricsForPersonCalculator;
 import ua.dp.dryzhyryk.big.brother.core.calculator.task.metrics.TaskMetricsForPersonValidator;
 import ua.dp.dryzhyryk.big.brother.core.calculator.task.metrics.TasksMetricsForPersonCalculator;
@@ -63,7 +64,8 @@ public class BigBrotherConsoleApplication {
 
         DateTimeProvider dateTimeProvider = newDateTimeProvider();
 
-        TaskMetricsForPersonCalculator taskMetricsForPersonCalculator = new TaskMetricsForPersonCalculator();
+        SpendTimeValidator spendTimeValidator = new SpendTimeValidator();
+        TaskMetricsForPersonCalculator taskMetricsForPersonCalculator = new TaskMetricsForPersonCalculator(spendTimeValidator);
         TaskMetricsForPersonValidator taskMetricsForPersonValidator = new TaskMetricsForPersonValidator();
         TasksMetricsForPersonCalculator tasksMetricsForPersonCalculator = new TasksMetricsForPersonCalculator(
                 taskMetricsForPersonCalculator, taskMetricsForPersonValidator);
