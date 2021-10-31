@@ -48,8 +48,6 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
 //				.estimationInMinutes(301)
-				.timeSpendOnTaskInMinutes(251)
-				.timeSpentOnTaskPersonByPeriodInMinutes(159)
 //				.spentTimePercentageForPerson(ValidatedValue.builder()
 //						.value(0f)
 //						.build())
@@ -96,8 +94,6 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
 //				.estimationInMinutes(301)
-				.timeSpendOnTaskInMinutes(251)
-				.timeSpentOnTaskPersonByPeriodInMinutes(103)
 //				.spentTimePercentageForPerson(0f)
 				.build();
 
@@ -106,8 +102,6 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
 //				.estimationInMinutes(301)
-				.timeSpendOnTaskInMinutes(251)
-				.timeSpentOnTaskPersonByPeriodInMinutes(106)
 //				.spentTimePercentageForPerson(0f)
 				.build();
 

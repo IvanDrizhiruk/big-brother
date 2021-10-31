@@ -146,44 +146,6 @@ public class ExcelReportGenerator {
 		}
 
 		List<String> headerData = List.of(
-				"Spent by period by person",
-				"Spent by person",
-				"Spent by team",
-				"Spent totally",
-				"Estimated",
-				"Spent time by person",
-				"Spent time by team",
-				"-",
-				"Status",
-				"Task id",
-				"Task name");
-		List<List<TableCell>> bodyData = taskMetrics.stream()
-				.map(taskMetric ->
-						List.of(
-								newTableCell(convertMinutesToHour(taskMetric.getTimeSpentOnTaskPersonByPeriodInMinutes())),
-								newTableCell(taskMetric.getTimeSpentOnTaskPersonInMinutes(), Formatter::convertMinutesToHour),
-								newTableCell(convertMinutesToHour(taskMetric.getTimeSpendOnTaskByTeamInMinutes())),
-								newTableCell(convertMinutesToHour(taskMetric.getTimeSpendOnTaskInMinutes())),
-								newTableCell(taskMetric.getEstimationInMinutes(), Formatter::convertMinutesToHour),
-								newTableCell(taskMetric.getSpentTimePercentageForPerson()),
-								newTableCell(taskMetric.getSpentTimePercentageForTeam()),
-								newTableCell("-"),
-								newTableCell(taskMetric.getTaskExternalStatus()),
-								newTableCell(taskMetric.getTaskId()),
-								newTableCell(taskMetric.getTaskName())))
-				.collect(Collectors.toList());
-		tableBuilder
-				.header(headerData)
-				.bodyCells(bodyData);
-	}
-
-	private void metricsTable2(TableBuilder tableBuilder, TasksMetricsForPerson tasksMetricForPerson) {
-		List<TaskMetrics> taskMetrics = tasksMetricForPerson.getTaskMetrics();
-		if (taskMetrics.isEmpty()) {
-			return;
-		}
-
-		List<String> headerData = List.of(
 				"Spent by person",
 				"Spent by team",
 				"Estimated",
@@ -193,7 +155,6 @@ public class ExcelReportGenerator {
 				"Status",
 				"Task id",
 				"Task name");
-
 		List<List<TableCell>> bodyData = taskMetrics.stream()
 				.map(taskMetric ->
 						List.of(
@@ -207,7 +168,6 @@ public class ExcelReportGenerator {
 								newTableCell(taskMetric.getTaskId()),
 								newTableCell(taskMetric.getTaskName())))
 				.collect(Collectors.toList());
-
 		tableBuilder
 				.header(headerData)
 				.bodyCells(bodyData);
@@ -320,8 +280,6 @@ public class ExcelReportGenerator {
 							.buildTable(builder -> weeklyTable(builder, days, personMetric))
 							.whiteLine()
 							.buildTable(builder -> metricsTable(builder, tasksMetricForPerson))
-							.whiteLine()
-							.buildTable(builder -> metricsTable2(builder, tasksMetricForPerson))
 							.whiteLine();
 				});
 

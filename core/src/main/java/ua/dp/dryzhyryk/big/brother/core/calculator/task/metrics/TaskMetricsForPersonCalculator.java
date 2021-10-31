@@ -126,10 +126,8 @@ public class TaskMetricsForPersonCalculator {
 				.taskName(task.getName())
 				.taskExternalStatus(task.getStatus())
 				.estimationInMinutes(estimationMinutes)
-				.timeSpentOnTaskPersonByPeriodInMinutes(timeSpentOnTaskPersonByPeriodInMinutes)
 				.timeSpentOnTaskPersonInMinutes(timeSpentOnTaskPersonInMinutesWithStatus)
 				.timeSpendOnTaskByTeamInMinutes(timeSpendOnTaskByTeamInMinutes)
-				.timeSpendOnTaskInMinutes(task.getTimeSpentMinutes())
 				.spentTimePercentageForPerson(spentTimePercentageForPersonWithStatus)
 				.spentTimePercentageForTeam(spentTimePercentageForTeamWithStatus)
 				.build();

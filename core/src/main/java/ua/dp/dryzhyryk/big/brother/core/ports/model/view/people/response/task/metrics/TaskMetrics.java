@@ -15,10 +15,8 @@ public class TaskMetrics {
 
 	private final ValidatedValue<Integer> estimationInMinutes;
 
-	private final int timeSpentOnTaskPersonByPeriodInMinutes;
 	private final ValidatedValue<Integer> timeSpentOnTaskPersonInMinutes;
 	private final int timeSpendOnTaskByTeamInMinutes;
-	private final int timeSpendOnTaskInMinutes;
 
 	private final ValidatedValue<Float> spentTimePercentageForPerson;
 	private final ValidatedValue<Float> spentTimePercentageForTeam;
