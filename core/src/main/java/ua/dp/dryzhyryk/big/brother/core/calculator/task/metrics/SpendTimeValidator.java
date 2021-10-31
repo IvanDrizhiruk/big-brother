@@ -11,10 +11,7 @@ public class SpendTimeValidator {
 
 	public ValidatedValue<Float> validate(Float spentTimePercentageForPerson) {
 		ValidatedValue<Float> spentTimePercentageForPersonWithStatus;
-//		if (spentTimePercentageForPerson == null) {
-		//			spentTimePercentageForPersonWithStatus = ValidatedValue.valueWithNotEvaluatedStatus(spentTimePercentageForPerson);
-		//		} else
-			if (FAST_LIMIT <= spentTimePercentageForPerson && spentTimePercentageForPerson <= SLOW_LIMIT) {
+		if (FAST_LIMIT <= spentTimePercentageForPerson && spentTimePercentageForPerson <= SLOW_LIMIT) {
 			spentTimePercentageForPersonWithStatus = ValidatedValue.valueWithOkStatus(spentTimePercentageForPerson);
 		} else if (EXTREMELY_FAST_LIMIT <= spentTimePercentageForPerson && spentTimePercentageForPerson <= FAST_LIMIT) {
 			spentTimePercentageForPersonWithStatus =
