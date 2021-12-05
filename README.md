@@ -23,6 +23,8 @@ worklogAuthor = o_dkoval AND  worklogDate >=  2019-11-11 AND  worklogDate <= 201
 
 
 Sonar
+docker run -d --name sonarqube -p 9000:9000 sonarqube:7.5-community
+
 mvn clean verify -Dsonar.host.url=https://sonarcloud.io org.sonarsource.scanner.maven:sonar-maven-plugin:3.7.0.1746:sonar -Dsonar.organization=ivandrizhiruk -Dsonar.projectKey=IvanDrizhiruk_big-brother -Dsonar.token=big-brother-token
 
 mvn clean verify org.jacoco:jacoco-maven-plugin:prepare-agent -Dsonar.host.url=https://sonarcloud.io org.sonarsource.scanner.maven:sonar-maven-plugin:3.7.0.1746:sonar -Dsonar.organization=ivandrizhiruk -Dsonar.projectKey=IvanDrizhiruk_big-brother -Dsonar.token=big-brother-token
