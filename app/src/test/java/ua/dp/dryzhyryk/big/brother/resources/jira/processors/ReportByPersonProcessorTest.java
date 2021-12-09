@@ -1,5 +1,6 @@
 package ua.dp.dryzhyryk.big.brother.resources.jira.processors;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import static org.mockito.Mockito.*;
 
+@Disabled
 @ExtendWith(MockitoExtension.class)
 class ReportByPersonProcessorTest {
 

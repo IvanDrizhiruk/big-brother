@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
@@ -13,6 +14,7 @@ import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.metrics.TaskMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TimeSpentByDay;
 
+@Disabled
 class TaskMetricsForPersonCalculatorTest {
 
 	//TODO workLogs will be used on calculation of timeCoefficient
