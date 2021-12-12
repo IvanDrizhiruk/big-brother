@@ -136,8 +136,7 @@
                 <sonar.login>5e0cb0b0be93ded396b721d0296aabe045ddf5a2</sonar.login>
                 <!--local-->
                 <!--                <sonar.login>435375c0c39eaf23eff3073214ba4f28fc89c615</sonar.login>-->
-                <!--                <sonar.branch.name>branch-name</sonar.branch.name>-->
-                <!--                <sonar.report>target/site/jacoco-aggregate/jacoco.xml</sonar.report>-->
+                <!--                <sonar.branch.name>demo</sonar.branch.name>-->
             </properties>
             <activation>
                 <activeByDefault>false</activeByDefault>

@@ -46,7 +46,7 @@ public class BigJiraBrotherPeopleViewProvider {
 
         List<TasksWorkingLogsForPerson> personMetrics = tasksWorkingLogsForPersonsCalculator.calculateTasksWorkingLogsForPersons(tasks, peopleSearchConditions);
 
-        List<TasksMetricsForPerson> tasksMetricsForPersons = tasksMetricsForPersonCalculator.calculateTasksMetricsForPerson(tasks, peopleSearchConditions);;
+        List<TasksMetricsForPerson> tasksMetricsForPersons = tasksMetricsForPersonCalculator.calculateTasksMetricsForPerson(tasks, peopleSearchConditions);
 
         return PeopleView.builder()
                 .teamName(peopleSearchConditions.getTeamName())
