@@ -10,6 +10,10 @@ public class SpendTimeValidator {
 	private static final int EXTREMELY_SLOW_LIMIT = 200;
 
 	public ValidatedValue<Float> validate(Float spentTimePercentageForPerson) {
+		if(spentTimePercentageForPerson == null) {
+			return ValidatedValue.valueWithErrorStatus(null, "Unknown spent time");
+		}
+
 		ValidatedValue<Float> spentTimePercentageForPersonWithStatus;
 		if (FAST_LIMIT <= spentTimePercentageForPerson && spentTimePercentageForPerson <= SLOW_LIMIT) {
 			spentTimePercentageForPersonWithStatus = ValidatedValue.valueWithOkStatus(spentTimePercentageForPerson);
