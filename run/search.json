@@ -5,12 +5,21 @@
       "peopleNames": [
         "o_dkoval",
         "o_ssolov",
-        "o_okolom",
-        "o_ystepa",
-        "o_izhytn"
+        "o_okolom"
       ],
-      "beginOfTheTime": {"year":2019,"month":11,"day":11},
-      "periodDurationInDays": 7
+      "periodDurationInDays": 7,
+
+      "excludeTasksForTasksMetrics": {
+        "byFields": [
+          {
+            "name": "Additional field for ignoring",
+            "value": "for ignoring"
+          }
+        ]
+        "byStatus": [
+          "For ignoring"
+        ]
+      }
     }
   ],
   "sprintSearchConditions": [

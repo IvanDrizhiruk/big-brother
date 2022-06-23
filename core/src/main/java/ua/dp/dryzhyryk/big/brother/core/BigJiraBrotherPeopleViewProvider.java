@@ -10,6 +10,7 @@ import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PeopleV
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.metrics.TasksMetricsForPerson;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TasksWorkingLogsForPerson;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchTaskExcludeConditions;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,7 +32,9 @@ public class BigJiraBrotherPeopleViewProvider {
     }
 
 
-    public PeopleView preparePeopleView(PeopleSearchConditions peopleSearchConditions) {
+    public PeopleView preparePeopleView(
+            PeopleSearchConditions peopleSearchConditions,
+            PeopleSearchTaskExcludeConditions taskExcludeConditions) {
 
         List<Task> tasks = peopleSearchConditions.getPeopleNames().stream()
                 .map(personName -> JiraPersonSearchConditions.builder()
@@ -44,9 +47,11 @@ public class BigJiraBrotherPeopleViewProvider {
                 .distinct()
                 .collect(Collectors.toList());
 
-        List<TasksWorkingLogsForPerson> personMetrics = tasksWorkingLogsForPersonsCalculator.calculateTasksWorkingLogsForPersons(tasks, peopleSearchConditions);
+        List<TasksWorkingLogsForPerson> personMetrics = tasksWorkingLogsForPersonsCalculator
+                .calculateTasksWorkingLogsForPersons(tasks, peopleSearchConditions);
 
-        List<TasksMetricsForPerson> tasksMetricsForPersons = tasksMetricsForPersonCalculator.calculateTasksMetricsForPerson(tasks, peopleSearchConditions);
+        List<TasksMetricsForPerson> tasksMetricsForPersons = tasksMetricsForPersonCalculator
+                .calculateTasksMetricsForPerson(tasks, peopleSearchConditions, taskExcludeConditions);
 
         return PeopleView.builder()
                 .teamName(peopleSearchConditions.getTeamName())

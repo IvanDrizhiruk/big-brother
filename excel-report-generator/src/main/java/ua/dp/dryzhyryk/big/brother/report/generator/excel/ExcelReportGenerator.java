@@ -140,6 +140,9 @@ public class ExcelReportGenerator {
 	}
 
 	private void metricsTable(TableBuilder tableBuilder, TasksMetricsForPerson tasksMetricForPerson) {
+		if(tasksMetricForPerson == null) {
+			return;
+		}
 		List<TaskMetrics> taskMetrics = tasksMetricForPerson.getTaskMetrics();
 		if (taskMetrics.isEmpty()) {
 			return;
@@ -149,8 +152,8 @@ public class ExcelReportGenerator {
 				"Spent by person",
 				"Spent by team",
 				"Estimated",
-				"Spent time by person",
-				"Spent time by team",
+				"% Spent time by person",
+				"% Spent time by team",
 				"-",
 				"Status",
 				"Task id",

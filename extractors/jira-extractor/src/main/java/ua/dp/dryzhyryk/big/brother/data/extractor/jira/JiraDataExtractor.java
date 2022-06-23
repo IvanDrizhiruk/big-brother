@@ -7,10 +7,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
 import com.atlassian.jira.rest.client.api.domain.Issue;
+import com.atlassian.jira.rest.client.api.domain.IssueField;
 import com.atlassian.jira.rest.client.api.domain.SearchResult;
 import com.atlassian.jira.rest.client.api.domain.TimeTracking;
 import com.atlassian.jira.rest.client.api.domain.Worklog;
@@ -35,11 +40,13 @@ public class JiraDataExtractor implements JiraResource {
 	private static final DateTimeFormatter DATA_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	private final JiraRestClientExtended jiraRestClient;
-	//TODO can be issue with memory. SHould be reworked to expandable cache
+	private final JiraExtraConfiguration configuration;
+	//TODO can be issue with memory. Should be reworked to expandable cache
 	private final Map<String, Task> taskCache = new HashMap<>();
 
-	public JiraDataExtractor(JiraRestClientExtended jiraRestClient) {
+	public JiraDataExtractor(JiraRestClientExtended jiraRestClient, JiraExtraConfiguration configuration) {
 		this.jiraRestClient = jiraRestClient;
+		this.configuration = configuration;
 	}
 
 	@Override
@@ -114,11 +121,17 @@ public class JiraDataExtractor implements JiraResource {
 				.map(this::toTaskWorkLog)
 				.collect(Collectors.toList());
 
+		Map<String, String> additionalFieldValues = configuration.getFieldNamesForLoading().stream()
+				.collect(Collectors.toMap(
+						Function.identity(),
+						field -> extractFieldAsString(issue, field)));
+
 		return Task.builder()
 				.id(issue.getKey())
 				.name(issue.getSummary())
 				.type(issue.getIssueType().getName())
 				.isSubTask(issue.getIssueType().isSubtask())
+				.additionalFieldValues(additionalFieldValues)
 				.status(issue.getStatus().getName())
 				.originalEstimateMinutes(timeTracking.getOriginalEstimateMinutes())
 				.remainingEstimateMinutes(timeTracking.getRemainingEstimateMinutes())
@@ -126,6 +139,22 @@ public class JiraDataExtractor implements JiraResource {
 				.workLogs(taskWorkLogs)
 				.subTasks(new ArrayList<>())
 				.build();
+	}
+
+	private String extractFieldAsString(Issue issue, String fieldName) {
+		try {
+			IssueField field = issue.getFieldByName(fieldName);
+			if (null == field) {
+				log.warn("Unable find {} for task {}", fieldName, issue.getId());
+				return null;
+			}
+			JSONObject jsonObjectValue = (JSONObject) field.getValue();
+			return jsonObjectValue.getString("value");
+		}
+		catch (JSONException e) {
+			log.error("Unable extract additional field " + fieldName + ": ", e);
+			return null;
+		}
 	}
 
 	private TaskWorkLog toTaskWorkLog(Worklog worklog) {

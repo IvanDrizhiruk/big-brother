@@ -1,25 +1,28 @@
 package ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data;
 
+import java.util.List;
+import java.util.Map;
+
 import lombok.Builder;
 import lombok.Value;
-
-import java.util.List;
 
 @Value
 @Builder(toBuilder = true)
 public class Task {
 
-    private final String id;
-    private final String name;
-    private final String status;
-    private final String type;
-    private final boolean isSubTask;
+	String id;
+	String name;
+	String status;
+	String type;
+	boolean isSubTask;
 
-    private final Integer originalEstimateMinutes;
-    private final Integer remainingEstimateMinutes;
-    private final Integer timeSpentMinutes;
+	Map<String, String> additionalFieldValues;
 
-    private final List<TaskWorkLog> workLogs;
+	Integer originalEstimateMinutes;
+	Integer remainingEstimateMinutes;
+	Integer timeSpentMinutes;
 
-    private final List<Task> subTasks;
+	List<TaskWorkLog> workLogs;
+
+	List<Task> subTasks;
 }

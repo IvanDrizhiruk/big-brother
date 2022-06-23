@@ -1,13 +1,13 @@
 package ua.dp.dryzhyryk.big.brother.resources.jira.search;
 
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Value;
-
-import java.util.List;
 
 @Value
 @Builder
 public class SearchRequests {
-    private final List<PeopleSearchRequest> peopleSearchConditions;
-    private final List<SprintSearchRequest> sprintSearchConditions;
+	List<PeopleSearchRequest> peopleSearchConditions;
+	List<SprintSearchRequest> sprintSearchConditions;
 }

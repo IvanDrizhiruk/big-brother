@@ -21,6 +21,7 @@ import ua.dp.dryzhyryk.big.brother.core.ports.DataStorage;
 import ua.dp.dryzhyryk.big.brother.core.ports.JiraResource;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
 import ua.dp.dryzhyryk.big.brother.data.extractor.jira.JiraDataExtractor;
+import ua.dp.dryzhyryk.big.brother.data.extractor.jira.JiraExtraConfiguration;
 import ua.dp.dryzhyryk.big.brother.data.extractor.jira.extention.JiraRestClientExtended;
 import ua.dp.dryzhyryk.big.brother.data.extractor.jira.extention.JiraRestClientExtendedImpl;
 import ua.dp.dryzhyryk.big.brother.data.storage.jira.JiraFileDataStorage;
@@ -52,7 +53,11 @@ public class BigBrotherConsoleApplication {
 
         JiraRestClientExtended jiraRestClient = newJiraRestClient(config);
 
-        JiraResource jiraResource = new JiraDataExtractor(jiraRestClient);
+        JiraExtraConfiguration jiraExtraConfiguration = JiraExtraConfiguration.builder()
+                .fieldNamesForLoading(config.getFieldNamesForLoading())
+                .build();
+
+        JiraResource jiraResource = new JiraDataExtractor(jiraRestClient, jiraExtraConfiguration);
         DataStorage jiraDataStorage = new JiraFileDataStorage(storageRoot.getAbsolutePath());
         JiraInformationHolder jiraInformationHolder = newJiraInformationHolder(jiraResource, jiraDataStorage, config);
 
