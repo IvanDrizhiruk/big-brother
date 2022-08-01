@@ -10,7 +10,7 @@ import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.PeopleV
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.metrics.TasksMetricsForPerson;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.working.log.TasksWorkingLogsForPerson;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchTaskExcludeConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchUnfunctionalTasksConditions;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +34,7 @@ public class BigJiraBrotherPeopleViewProvider {
 
     public PeopleView preparePeopleView(
             PeopleSearchConditions peopleSearchConditions,
-            PeopleSearchTaskExcludeConditions taskExcludeConditions) {
+            PeopleSearchUnfunctionalTasksConditions taskExcludeConditions) {
 
         List<Task> tasks = peopleSearchConditions.getPeopleNames().stream()
                 .map(personName -> JiraPersonSearchConditions.builder()

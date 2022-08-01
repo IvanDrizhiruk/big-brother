@@ -9,7 +9,10 @@ import lombok.Value;
 @Builder(toBuilder = true)
 public class TasksMetricsForPerson {
 
-    private final String person;
+	String person;
+	List<TaskMetrics> finishedTaskMetrics;
 
-    private final List<TaskMetrics> taskMetrics;
+	List<TaskMetrics> unFunctionalTaskMetrics;
+	int timeSpentOnTasksPersonByPeriodForFunctionalTasksInMinutes;
+
 }

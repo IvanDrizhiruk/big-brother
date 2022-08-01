@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.metrics.validators.SpendTimeValidator;
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.metrics.validators.SpendTimeValidatorForFinishedTasks;
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.metrics.validators.SpendTimeValidatorForInProgressTasks;
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.metrics.validators.SpendTimeValidatorForNotFunctionalTasks;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.ValidatedValue;
@@ -12,14 +16,21 @@ import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.me
 
 public class TaskMetricsForPersonCalculator {
 
-	private final SpendTimeValidator spendTimeValidator;
+	private final Map<TaskMetaType, SpendTimeValidator> spendTimeValidatorsByTaskMetaType;
 
-	public TaskMetricsForPersonCalculator(SpendTimeValidator spendTimeValidator) {
-		this.spendTimeValidator = spendTimeValidator;
+	public TaskMetricsForPersonCalculator(
+			SpendTimeValidatorForInProgressTasks spendTimeValidatorForInProgressTasks,
+			SpendTimeValidatorForFinishedTasks spendTimeValidatorForFinishedTasks,
+			SpendTimeValidatorForNotFunctionalTasks spendTimeValidatorForNotFunctionalTasks) {
+
+		this.spendTimeValidatorsByTaskMetaType = Map.of(
+				TaskMetaType.IN_PROGRESS, spendTimeValidatorForInProgressTasks,
+				TaskMetaType.FINISHED, spendTimeValidatorForFinishedTasks,
+				TaskMetaType.UN_FUNCTIONAL, spendTimeValidatorForNotFunctionalTasks);
 	}
 
-	public Map<String, TaskMetrics> calculateTaskMetricsForPerson(Task task, LocalDate startPeriod, LocalDate endPeriod,
-			List<String> teamMembers) {
+	public Map<String, TaskMetrics> calculateTaskMetricsForPerson(
+			Task task, LocalDate startPeriod, LocalDate endPeriod, List<String> teamMembers, TaskMetaType taskMetaType) {
 		Map<String, Map<LocalDate, Integer>> spendTimeByDayForPerson = task.getWorkLogs().stream()
 				.collect(
 						Collectors.groupingBy(
@@ -50,7 +61,8 @@ public class TaskMetricsForPersonCalculator {
 										startPeriod,
 										endPeriod,
 										timeSpendOnTaskByTeamInMinutes,
-										timeSpendOnTaskByTeamByPeriodInMinutes)));
+										timeSpendOnTaskByTeamByPeriodInMinutes,
+										taskMetaType)));
 	}
 
 	private TaskMetrics toTaskMetrics(
@@ -59,7 +71,7 @@ public class TaskMetricsForPersonCalculator {
 			LocalDate startPeriod,
 			LocalDate endPeriod,
 			int timeSpendOnTaskByTeamInMinutes,
-			int timeSpendOnTaskByTeamByPeriodInMinutes) {
+			int timeSpendOnTaskByTeamByPeriodInMinutes, TaskMetaType taskMetaType) {
 
 		int timeSpentOnTaskPersonByPeriodInMinutes = spentMinutesForDay.entrySet().stream()
 				.filter(entry -> !entry.getKey().isBefore(startPeriod) && entry.getKey().isBefore(endPeriod))
@@ -79,39 +91,17 @@ public class TaskMetricsForPersonCalculator {
 			spentTimePercentageForTeam = 100f * timeSpendOnTaskByTeamInMinutes / estimation;
 		}
 
-		//TODO support statuses and validation
-		// validate spend time
-		//
-		//		if ("DONE".isEmpty()) {
-		//			String status;
-		//		} else if ("IN_PROGRESS".isEmpty()) {
-		//			String status;
-		//		} else if ("TODO".isEmpty()) {
-		//			String status = "error or rework";
-		//		}
+		final Integer originalEstimateMinutes = task.getOriginalEstimateMinutes();
 
-		boolean isEstimationPresent = task.getOriginalEstimateMinutes() == null;
+		SpendTimeValidator spendTimeValidatorForFinishedTasks = spendTimeValidatorsByTaskMetaType.get(taskMetaType);
 
-		ValidatedValue<Integer> estimationMinutes = isEstimationPresent
-				? ValidatedValue.valueWithErrorStatus(task.getOriginalEstimateMinutes(), "Task does not have an estimation")
-				: ValidatedValue.valueWithNotEvaluatedStatus(task.getOriginalEstimateMinutes());
-
-		boolean wasPersonWorkOnTaskAtPeriod = timeSpentOnTaskPersonByPeriodInMinutes != 0;
-		boolean wasTeamWorkOnTaskAtPeriod = timeSpendOnTaskByTeamByPeriodInMinutes != 0;
-
-		ValidatedValue<Integer> timeSpentOnTaskPersonInMinutesWithStatus;
-		if (!wasPersonWorkOnTaskAtPeriod) {
-			timeSpentOnTaskPersonInMinutesWithStatus = wasTeamWorkOnTaskAtPeriod
-					? ValidatedValue.valueWithErrorStatus(timeSpentOnTaskPersonInMinutes,
-					"No work was made by person on task by period. But team mates worked")
-					: ValidatedValue.valueWithWarningStatus(timeSpentOnTaskPersonInMinutes, "No work was made on task by period");
-		} else {
-			timeSpentOnTaskPersonInMinutesWithStatus = ValidatedValue.valueWithNotEvaluatedStatus(timeSpentOnTaskPersonInMinutes);
-		}
-
-		ValidatedValue<Float> spentTimePercentageForPersonWithStatus = spendTimeValidator.validate(spentTimePercentageForPerson);
-
-		ValidatedValue<Float> spentTimePercentageForTeamWithStatus = spendTimeValidator.validate(spentTimePercentageForTeam);
+		ValidatedValue<Integer> estimationMinutes = spendTimeValidatorForFinishedTasks.validatedEstimation(originalEstimateMinutes);
+		ValidatedValue<Integer> timeSpentOnTaskPersonInMinutesWithStatus = spendTimeValidatorForFinishedTasks
+						.validateTimeSpentOnTaskPersonInMinutesWithStatus(timeSpentOnTaskPersonInMinutes, timeSpendOnTaskByTeamByPeriodInMinutes, timeSpentOnTaskPersonByPeriodInMinutes);
+		ValidatedValue<Float> spentTimePercentageForPersonWithStatus =
+				spendTimeValidatorForFinishedTasks.validateSpentTimePercentage(spentTimePercentageForPerson);
+		ValidatedValue<Float> spentTimePercentageForTeamWithStatus =
+				spendTimeValidatorForFinishedTasks.validateSpentTimePercentage(spentTimePercentageForTeam);
 
 		return TaskMetrics.builder()
 				.taskId(task.getId())
@@ -119,6 +109,7 @@ public class TaskMetricsForPersonCalculator {
 				.taskExternalStatus(task.getStatus())
 				.estimationInMinutes(estimationMinutes)
 				.timeSpentOnTaskPersonInMinutes(timeSpentOnTaskPersonInMinutesWithStatus)
+				.timeSpentOnTaskPersonByPeriodInMinutes(timeSpentOnTaskPersonByPeriodInMinutes)
 				.timeSpendOnTaskByTeamInMinutes(timeSpendOnTaskByTeamInMinutes)
 				.spentTimePercentageForPerson(spentTimePercentageForPersonWithStatus)
 				.spentTimePercentageForTeam(spentTimePercentageForTeamWithStatus)

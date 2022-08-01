@@ -8,16 +8,17 @@ import ua.dp.dryzhyryk.big.brother.core.ports.model.shared.value.validation.Vali
 @Builder(toBuilder = true)
 public class TaskMetrics {
 
-	private final String taskId;
-	private final String taskName;
+	String taskId;
+	String taskName;
 
-	private final String taskExternalStatus;
+	String taskExternalStatus;
 
-	private final ValidatedValue<Integer> estimationInMinutes;
+	ValidatedValue<Integer> estimationInMinutes;
 
-	private final ValidatedValue<Integer> timeSpentOnTaskPersonInMinutes;
-	private final int timeSpendOnTaskByTeamInMinutes;
+	ValidatedValue<Integer> timeSpentOnTaskPersonInMinutes;
+	int timeSpentOnTaskPersonByPeriodInMinutes;
+	int timeSpendOnTaskByTeamInMinutes;
 
-	private final ValidatedValue<Float> spentTimePercentageForPerson;
-	private final ValidatedValue<Float> spentTimePercentageForTeam;
+	ValidatedValue<Float> spentTimePercentageForPerson;
+	ValidatedValue<Float> spentTimePercentageForTeam;
 }

@@ -50,7 +50,6 @@ class TasksMetricsForPersonCalculatorTest {
 //        when(taskMetricsForPersonCalculator.calculateTaskMetricsForPerson(eq(task2), any(), any()))
 //                .thenReturn(personsMetricsForPeopleFromTask2);
 
-        TaskMetricsForPersonValidator taskMetricsForPersonValidator = mockTaskMetricsForPersonValidator();
 
         List<TasksWorkingLogsForPerson> expected = List.of(
                 TasksWorkingLogsForPerson.builder()
@@ -301,14 +300,6 @@ class TasksMetricsForPersonCalculatorTest {
 //        Assertions.assertThat(actual)
 //                .containsExactlyInAnyOrderElementsOf(expected);
 //    }
-
-    private TaskMetricsForPersonValidator mockTaskMetricsForPersonValidator() {
-        TaskMetricsForPersonValidator taskMetricsForPeopleValidator = mock(TaskMetricsForPersonValidator.class);
-//        when(taskMetricsForPeopleValidator.validate(any(), any()))
-//                .then(invocation -> ValidatedValue.valueWithNotEvaluatedStatus(invocation.getArgument(0)));
-
-        return taskMetricsForPeopleValidator;
-    }
 
     private TaskWorkingLogs newTaskWorkingLogMetrics(String taskId, String taskName) {
         return newTaskWorkingLogMetrics(taskId, taskName, Collections.emptyList());

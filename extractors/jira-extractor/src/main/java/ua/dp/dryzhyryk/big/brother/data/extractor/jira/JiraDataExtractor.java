@@ -149,10 +149,13 @@ public class JiraDataExtractor implements JiraResource {
 				return null;
 			}
 			JSONObject jsonObjectValue = (JSONObject) field.getValue();
-			return jsonObjectValue.getString("value");
+			return jsonObjectValue == null
+					? ""
+					: jsonObjectValue.getString("value");
 		}
 		catch (JSONException e) {
-			log.error("Unable extract additional field " + fieldName + ": ", e);
+
+			log.error("Unable extract additional field " + fieldName + " for issue " + issue.getSummary() + " ", e);
 			return null;
 		}
 	}

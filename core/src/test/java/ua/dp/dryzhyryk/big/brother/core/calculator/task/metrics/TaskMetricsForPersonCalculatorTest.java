@@ -9,6 +9,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.metrics.validators.SpendTimeValidatorForFinishedTasks;
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.metrics.validators.SpendTimeValidatorForInProgressTasks;
+import ua.dp.dryzhyryk.big.brother.core.calculator.task.metrics.validators.SpendTimeValidatorForNotFunctionalTasks;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.TaskWorkLog;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.metrics.TaskMetrics;
@@ -49,17 +52,21 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskId("#1")
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
-//				.estimationInMinutes(301)
-//				.spentTimePercentageForPerson(ValidatedValue.builder()
-//						.value(0f)
-//						.build())
+				//				.estimationInMinutes(301)
+				//				.spentTimePercentageForPerson(ValidatedValue.builder()
+				//						.value(0f)
+				//						.build())
 				.build();
 
 		Map<String, TaskMetrics> expected = Map.of("person#1", taskMetrics);
 
 		//when
-		TaskMetricsForPersonCalculator calculator = new TaskMetricsForPersonCalculator(new SpendTimeValidator());
-		Map<String, TaskMetrics> actual = calculator.calculateTaskMetricsForPerson(task, startPeriod, endPeriod, teamMembers);
+		TaskMetricsForPersonCalculator calculator = new TaskMetricsForPersonCalculator(
+				new SpendTimeValidatorForInProgressTasks(),
+				new SpendTimeValidatorForFinishedTasks(),
+				new SpendTimeValidatorForNotFunctionalTasks());
+		Map<String, TaskMetrics> actual = calculator.calculateTaskMetricsForPerson(task, startPeriod, endPeriod, teamMembers,
+				TaskMetaType.FINISHED);
 
 		//then
 		Assertions.assertThat(actual).isEqualTo(expected);
@@ -95,16 +102,16 @@ class TaskMetricsForPersonCalculatorTest {
 				.taskId("#1")
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
-//				.estimationInMinutes(301)
-//				.spentTimePercentageForPerson(0f)
+				//				.estimationInMinutes(301)
+				//				.spentTimePercentageForPerson(0f)
 				.build();
 
 		TaskMetrics taskMetrics2 = TaskMetrics.builder()
 				.taskId("#1")
 				.taskName("Task name")
 				.taskExternalStatus("In progress")
-//				.estimationInMinutes(301)
-//				.spentTimePercentageForPerson(0f)
+				//				.estimationInMinutes(301)
+				//				.spentTimePercentageForPerson(0f)
 				.build();
 
 		Map<String, TaskMetrics> expected = Map.of(
@@ -112,8 +119,12 @@ class TaskMetricsForPersonCalculatorTest {
 				"person#2", taskMetrics2);
 
 		//when
-		TaskMetricsForPersonCalculator calculator = new TaskMetricsForPersonCalculator(new SpendTimeValidator());
-		Map<String, TaskMetrics> actual = calculator.calculateTaskMetricsForPerson(task, startPeriod, endPeriod, teamMembers);
+		TaskMetricsForPersonCalculator calculator = new TaskMetricsForPersonCalculator(
+				new SpendTimeValidatorForInProgressTasks(),
+				new SpendTimeValidatorForFinishedTasks(),
+				new SpendTimeValidatorForNotFunctionalTasks());
+		Map<String, TaskMetrics> actual =
+				calculator.calculateTaskMetricsForPerson(task, startPeriod, endPeriod, teamMembers, TaskMetaType.FINISHED);
 
 		//then
 		Assertions.assertThat(actual).isEqualTo(expected);

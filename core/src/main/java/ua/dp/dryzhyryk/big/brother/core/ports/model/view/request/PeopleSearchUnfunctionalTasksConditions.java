@@ -9,7 +9,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class PeopleSearchTaskExcludeConditions {
+public class PeopleSearchUnfunctionalTasksConditions {
 
 	@NonNull
 	List<ExcludedFieldNameAndValuePair> byFields;

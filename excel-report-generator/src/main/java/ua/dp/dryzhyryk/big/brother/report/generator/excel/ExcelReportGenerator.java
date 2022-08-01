@@ -140,10 +140,10 @@ public class ExcelReportGenerator {
 	}
 
 	private void metricsTable(TableBuilder tableBuilder, TasksMetricsForPerson tasksMetricForPerson) {
-		if(tasksMetricForPerson == null) {
+		if (tasksMetricForPerson == null) {
 			return;
 		}
-		List<TaskMetrics> taskMetrics = tasksMetricForPerson.getTaskMetrics();
+		List<TaskMetrics> taskMetrics = tasksMetricForPerson.getFinishedTaskMetrics();
 		if (taskMetrics.isEmpty()) {
 			return;
 		}
@@ -174,6 +174,46 @@ public class ExcelReportGenerator {
 		tableBuilder
 				.header(headerData)
 				.bodyCells(bodyData);
+	}
+
+	private void excludedTasksMetricsTable(TableBuilder tableBuilder, TasksMetricsForPerson tasksMetricForPerson) {
+		if (tasksMetricForPerson == null) {
+			return;
+		}
+		List<TaskMetrics> taskMetrics = tasksMetricForPerson.getUnFunctionalTaskMetrics();
+		if (taskMetrics.isEmpty()) {
+			return;
+		}
+
+		List<String> headerData = List.of(
+				"Spent by period by person",
+				"-",
+				"Status",
+				"Task id",
+				"Task name");
+		List<List<TableCell>> bodyData = taskMetrics.stream()
+				.filter(taskMetric -> taskMetric.getTimeSpentOnTaskPersonByPeriodInMinutes() != 0)
+				.map(taskMetric ->
+						List.of(
+								newTableCell(convertMinutesToHour(taskMetric.getTimeSpentOnTaskPersonByPeriodInMinutes())),
+								newTableCell("-"),
+								newTableCell(taskMetric.getTaskExternalStatus()),
+								newTableCell(taskMetric.getTaskId()),
+								newTableCell(taskMetric.getTaskName())))
+				.collect(Collectors.toList());
+		List<TableCell> footerCells = List.of(
+				newTableCell(
+						convertMinutesToHour(
+								tasksMetricForPerson.getTimeSpentOnTasksPersonByPeriodForFunctionalTasksInMinutes())),
+				newTableCell(""),
+				newTableCell(""),
+				newTableCell(""),
+				newTableCell(""));
+
+		tableBuilder
+				.header(headerData)
+				.bodyCells(bodyData)
+				.footerCells(footerCells);
 	}
 
 	private TableCell newTableCell(Object obj) {
@@ -282,7 +322,21 @@ public class ExcelReportGenerator {
 
 							.buildTable(builder -> weeklyTable(builder, days, personMetric))
 							.whiteLine()
+							.row()
+							//							.withStyle(Style.H4)
+							.withHeightInPoints(20)
+							.cell("Tasks metrics:")
+							.buildCell()
+							.buildRow()
 							.buildTable(builder -> metricsTable(builder, tasksMetricForPerson))
+							.whiteLine()
+							.row()
+							//							.withStyle(Style.H4)
+							.withHeightInPoints(20)
+							.cell("Excluded tasks:")
+							.buildCell()
+							.buildRow()
+							.buildTable(builder -> excludedTasksMetricsTable(builder, tasksMetricForPerson))
 							.whiteLine();
 				});
 

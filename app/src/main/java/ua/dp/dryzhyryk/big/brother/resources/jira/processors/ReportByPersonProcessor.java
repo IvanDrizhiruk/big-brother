@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchTaskExcludeConditions;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchTaskExcludeConditions.ExcludedFieldNameAndValuePair;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchUnfunctionalTasksConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchUnfunctionalTasksConditions.ExcludedFieldNameAndValuePair;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
 import ua.dp.dryzhyryk.big.brother.core.utils.PrintUtils;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
@@ -63,7 +63,7 @@ public class ReportByPersonProcessor {
 				.build();
 	}
 
-	private PeopleSearchTaskExcludeConditions toPeopleSearchTaskExcludeConditions(PeopleSearchRequest peopleSearchRequest) {
+	private PeopleSearchUnfunctionalTasksConditions toPeopleSearchTaskExcludeConditions(PeopleSearchRequest peopleSearchRequest) {
 		List<ExcludedFieldNameAndValue> byFields = peopleSearchRequest.getExcludeTasksForTasksMetrics().getByFields();
 		Set<String> byStatus = peopleSearchRequest.getExcludeTasksForTasksMetrics().getByStatus();
 
@@ -71,7 +71,7 @@ public class ReportByPersonProcessor {
 				.map(fieldAndValue -> new ExcludedFieldNameAndValuePair(fieldAndValue.getName(), fieldAndValue.getValue()))
 				.collect(Collectors.toList());
 
-		return PeopleSearchTaskExcludeConditions.builder()
+		return PeopleSearchUnfunctionalTasksConditions.builder()
 				.byFields(byFieldsCondition)
 				.byStatus(byStatus)
 				.build();

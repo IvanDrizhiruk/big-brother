@@ -1,53 +1,78 @@
 package ua.dp.dryzhyryk.big.brother.core.calculator.task.metrics;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import ua.dp.dryzhyryk.big.brother.core.ports.model.jira.data.Task;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.metrics.TaskMetrics;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.people.response.task.metrics.TasksMetricsForPerson;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchTaskExcludeConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchUnfunctionalTasksConditions;
 
 public class TasksMetricsForPersonCalculator {
 
 	private final TaskMetricsForPersonCalculator taskMetricsForPersonCalculator;
-	private final TaskMetricsForPersonValidator taskMetricsForPersonValidator;
 
-	public TasksMetricsForPersonCalculator(
-			TaskMetricsForPersonCalculator taskMetricsForPersonCalculator,
-			TaskMetricsForPersonValidator taskMetricsForPersonValidator) {
+	public TasksMetricsForPersonCalculator(TaskMetricsForPersonCalculator taskMetricsForPersonCalculator) {
 		this.taskMetricsForPersonCalculator = taskMetricsForPersonCalculator;
-		this.taskMetricsForPersonValidator = taskMetricsForPersonValidator;
 	}
 
 	public List<TasksMetricsForPerson> calculateTasksMetricsForPerson(
 			List<Task> tasks,
 			PeopleSearchConditions peopleSearchConditions,
-			PeopleSearchTaskExcludeConditions taskExcludeConditions) {
+			PeopleSearchUnfunctionalTasksConditions functionalTasksConditions) {
 
-		List<Task> tasksForProcessing = tasks.stream()
-				.filter(task -> {
-					if (taskExcludeConditions.getByStatus().contains(task.getStatus())) {
-						return false;
-					}
+		Map<TaskMetaType, List<Task>> tasksByMetaType = tasks.stream()
+				.collect(Collectors.groupingBy(task -> evaluateTaskMetaType(functionalTasksConditions, task)));
 
-					return taskExcludeConditions.getByFields().stream()
-							.noneMatch(entry ->
-									task.getAdditionalFieldValues().getOrDefault(entry.getName(), "").equals(entry.getValue()));
+		Map<String, List<TaskMetrics>> finishedTaskMetricsByUser =
+				prepareTaskMatrixByUser(tasksByMetaType, TaskMetaType.FINISHED, peopleSearchConditions);
+		Map<String, List<TaskMetrics>> unFunctionalTaskMetricsByUser =
+				prepareTaskMatrixByUser(tasksByMetaType, TaskMetaType.UN_FUNCTIONAL, peopleSearchConditions);
+
+		return Stream.of(
+						finishedTaskMetricsByUser.keySet(),
+						unFunctionalTaskMetricsByUser.keySet())
+				.flatMap(Set::stream)
+				.distinct()
+				.map(person -> {
+					List<TaskMetrics> finishedTaskMetrics = finishedTaskMetricsByUser.get(person);
+					List<TaskMetrics> unFunctionalTaskMetrics = unFunctionalTaskMetricsByUser.get(person);
+
+
+					int timeSpentOnTasksPersonByPeriodForFunctionalTasksInMinutes = unFunctionalTaskMetrics.stream()
+							.mapToInt(TaskMetrics::getTimeSpentOnTaskPersonByPeriodInMinutes)
+							.sum();
+
+
+					return TasksMetricsForPerson.builder()
+							.person(person)
+							.finishedTaskMetrics(finishedTaskMetrics)
+							.unFunctionalTaskMetrics(unFunctionalTaskMetrics)
+							//TODO add validation
+							.timeSpentOnTasksPersonByPeriodForFunctionalTasksInMinutes(timeSpentOnTasksPersonByPeriodForFunctionalTasksInMinutes)
+							.build();
 				})
+				.sorted(Comparator.comparing(TasksMetricsForPerson::getPerson))
 				.collect(Collectors.toList());
+	}
 
-		Map<String, List<TaskMetrics>> personTaskMetricsByUser = tasksForProcessing.stream()
+	private Map<String, List<TaskMetrics>> prepareTaskMatrixByUser(Map<TaskMetaType, List<Task>> grouped, TaskMetaType taskMetaType,
+			PeopleSearchConditions peopleSearchConditions) {
+		return grouped.getOrDefault(taskMetaType, Collections.emptyList()).stream()
 				.flatMap(task -> {
 							Map<String, TaskMetrics> personTaskMetricsByPerson = taskMetricsForPersonCalculator
 									.calculateTaskMetricsForPerson(
 											task,
 											peopleSearchConditions.getStartPeriod(),
 											peopleSearchConditions.getEndPeriod(),
-											peopleSearchConditions.getPeopleNames());
+											peopleSearchConditions.getPeopleNames(),
+											taskMetaType);
 
 							return personTaskMetricsByPerson
 									.entrySet().stream();
@@ -58,20 +83,19 @@ public class TasksMetricsForPersonCalculator {
 				.collect(Collectors.groupingBy(
 						Map.Entry::getKey,
 						Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+	}
 
-		return personTaskMetricsByUser.entrySet().stream()
-				.map(entry -> {
-					String person = entry.getKey();
+	private TaskMetaType evaluateTaskMetaType(PeopleSearchUnfunctionalTasksConditions functionalTasksConditions, Task task) {
+		if (functionalTasksConditions.getByStatus().contains(task.getStatus())) {
+			return TaskMetaType.UN_FUNCTIONAL;
+		}
+		if (functionalTasksConditions.getByFields().stream()
+				.anyMatch(entry ->
+						task.getAdditionalFieldValues().getOrDefault(entry.getName(), "").equals(entry.getValue()))) {
+			return TaskMetaType.UN_FUNCTIONAL;
+		}
 
-					List<TaskMetrics> taskMetrics = entry.getValue();
-
-					return TasksMetricsForPerson.builder()
-							.person(person)
-							.taskMetrics(taskMetrics)
-							.build();
-				})
-				.sorted(Comparator.comparing(TasksMetricsForPerson::getPerson))
-				.collect(Collectors.toList());
+		return TaskMetaType.FINISHED;
 	}
 
 	private boolean isExcludePersonFromPersonMetrics(String person, List<String> availablePersons) {
