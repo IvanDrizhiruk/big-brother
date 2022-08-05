@@ -8,16 +8,26 @@
         "o_okolom"
       ],
       "periodDurationInDays": 7,
-
-      "excludeTasksForTasksMetrics": {
+      "unFunctionalTasksGroupConditions": {
         "byFields": [
           {
             "name": "Additional field for ignoring",
-            "value": "for ignoring"
+            "value": "for grouping of un functional"
           }
         ]
         "byStatus": [
-          "For ignoring"
+          "for grouping of un functional"
+        ]
+      },
+      "inProgressTasksConditions": {
+        "byFields": [
+          {
+            "name": "Additional field for ignoring",
+            "value": "for grouping of un functional"
+          }
+        ]
+        "byStatus": [
+          "for grouping of un functional"
         ]
       }
     }

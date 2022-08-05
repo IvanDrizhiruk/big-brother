@@ -15,4 +15,6 @@ public class TasksMetricsForPerson {
 	List<TaskMetrics> unFunctionalTaskMetrics;
 	int timeSpentOnTasksPersonByPeriodForFunctionalTasksInMinutes;
 
+	List<TaskMetrics> inProgressTaskMetrics;
+
 }

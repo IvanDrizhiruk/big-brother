@@ -2,20 +2,24 @@ package ua.dp.dryzhyryk.big.brother.resources.jira.processors;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import ua.dp.dryzhyryk.big.brother.core.BigJiraBrotherPeopleViewProvider;
 import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchConditions;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchUnfunctionalTasksConditions;
-import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.PeopleSearchUnfunctionalTasksConditions.ExcludedFieldNameAndValuePair;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.TasksGroupConditions;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.TasksGroupConditions.FieldNameAndValuePair;
+import ua.dp.dryzhyryk.big.brother.core.ports.model.view.request.TasksGroupsConditions;
 import ua.dp.dryzhyryk.big.brother.core.utils.DateTimeProvider;
 import ua.dp.dryzhyryk.big.brother.core.utils.PrintUtils;
 import ua.dp.dryzhyryk.big.brother.report.generator.excel.ExcelReportGenerator;
-import ua.dp.dryzhyryk.big.brother.resources.jira.search.ExcludeTasksForTasksMetrics.ExcludedFieldNameAndValue;
 import ua.dp.dryzhyryk.big.brother.resources.jira.search.PeopleSearchRequest;
+import ua.dp.dryzhyryk.big.brother.resources.jira.search.TasksGroupingConditions;
+import ua.dp.dryzhyryk.big.brother.resources.jira.search.TasksGroupingConditions.FieldNameAndValue;
 
 //FIXME move to core
 @Slf4j
@@ -41,7 +45,7 @@ public class ReportByPersonProcessor {
 				.map(request ->
 						bigJiraBrotherPeopleViewProvider.preparePeopleView(
 								toPeopleSearchConditionsForLastFinishedWeek(request),
-								toPeopleSearchTaskExcludeConditions(request)))
+								toTasksGroupsConditions(request)))
 				.peek(peopleView -> PrintUtils.printPeopleView(peopleView, log))
 				.forEach(reportGenerator::generatePeopleReport);
 	}
@@ -63,15 +67,28 @@ public class ReportByPersonProcessor {
 				.build();
 	}
 
-	private PeopleSearchUnfunctionalTasksConditions toPeopleSearchTaskExcludeConditions(PeopleSearchRequest peopleSearchRequest) {
-		List<ExcludedFieldNameAndValue> byFields = peopleSearchRequest.getExcludeTasksForTasksMetrics().getByFields();
-		Set<String> byStatus = peopleSearchRequest.getExcludeTasksForTasksMetrics().getByStatus();
+	private TasksGroupsConditions toTasksGroupsConditions(PeopleSearchRequest peopleSearchRequest) {
 
-		List<ExcludedFieldNameAndValuePair> byFieldsCondition = byFields.stream()
-				.map(fieldAndValue -> new ExcludedFieldNameAndValuePair(fieldAndValue.getName(), fieldAndValue.getValue()))
+		TasksGroupConditions unFunctionalTasks = toTasksGroupConditions(peopleSearchRequest.getUnFunctionalTasksGroupConditions());
+		TasksGroupConditions inProgressTasks = toTasksGroupConditions(peopleSearchRequest.getInProgressTasksGroupConditions());
+
+		return TasksGroupsConditions.builder()
+				.unFunctionalTasksGroupConditions(unFunctionalTasks)
+				.inProgressTasksGroupConditions(inProgressTasks)
+				.build();
+	}
+
+	private TasksGroupConditions toTasksGroupConditions(TasksGroupingConditions tasksGroupingConditions) {
+		List<FieldNameAndValue> byFields = tasksGroupingConditions.getByFields();
+		Set<String> byStatus = tasksGroupingConditions.getByStatus();
+
+		List<FieldNameAndValuePair> byFieldsCondition = Optional.ofNullable(byFields)
+				.orElse(Collections.emptyList())
+				.stream()
+				.map(fieldAndValue -> new FieldNameAndValuePair(fieldAndValue.getName(), fieldAndValue.getValue()))
 				.collect(Collectors.toList());
 
-		return PeopleSearchUnfunctionalTasksConditions.builder()
+		return TasksGroupConditions.builder()
 				.byFields(byFieldsCondition)
 				.byStatus(byStatus)
 				.build();

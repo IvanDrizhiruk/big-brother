@@ -8,13 +8,13 @@ import lombok.Value;
 
 @Value
 @Builder
-public class ExcludeTasksForTasksMetrics {
+public class TasksGroupingConditions {
 
-	List<ExcludedFieldNameAndValue> byFields;
+	List<FieldNameAndValue> byFields;
 	Set<String> byStatus;
 
 	@Value
-	public static class ExcludedFieldNameAndValue {
+	public static class FieldNameAndValue {
 		String name;
 		String value;
 	}

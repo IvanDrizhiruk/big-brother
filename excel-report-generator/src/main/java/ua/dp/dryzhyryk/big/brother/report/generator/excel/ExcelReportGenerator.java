@@ -139,7 +139,7 @@ public class ExcelReportGenerator {
 				.footerCells(footerData);
 	}
 
-	private void metricsTable(TableBuilder tableBuilder, TasksMetricsForPerson tasksMetricForPerson) {
+	private void finishedTasksMetricsTable(TableBuilder tableBuilder, TasksMetricsForPerson tasksMetricForPerson) {
 		if (tasksMetricForPerson == null) {
 			return;
 		}
@@ -176,7 +176,44 @@ public class ExcelReportGenerator {
 				.bodyCells(bodyData);
 	}
 
-	private void excludedTasksMetricsTable(TableBuilder tableBuilder, TasksMetricsForPerson tasksMetricForPerson) {
+	private void inProgressMetricsTable(TableBuilder tableBuilder, TasksMetricsForPerson tasksMetricForPerson) {
+		if (tasksMetricForPerson == null) {
+			return;
+		}
+		List<TaskMetrics> taskMetrics = tasksMetricForPerson.getInProgressTaskMetrics();
+		if (taskMetrics.isEmpty()) {
+			return;
+		}
+
+		List<String> headerData = List.of(
+				"Spent by person",
+				"Spent by team",
+				"Estimated",
+				"% Spent time by person",
+				"% Spent time by team",
+				"-",
+				"Status",
+				"Task id",
+				"Task name");
+		List<List<TableCell>> bodyData = taskMetrics.stream()
+				.map(taskMetric ->
+						List.of(
+								newTableCell(taskMetric.getTimeSpentOnTaskPersonInMinutes(), Formatter::convertMinutesToHour),
+								newTableCell(convertMinutesToHour(taskMetric.getTimeSpendOnTaskByTeamInMinutes())),
+								newTableCell(taskMetric.getEstimationInMinutes(), Formatter::convertMinutesToHour),
+								newTableCell(taskMetric.getSpentTimePercentageForPerson()),
+								newTableCell(taskMetric.getSpentTimePercentageForTeam()),
+								newTableCell("-"),
+								newTableCell(taskMetric.getTaskExternalStatus()),
+								newTableCell(taskMetric.getTaskId()),
+								newTableCell(taskMetric.getTaskName())))
+				.collect(Collectors.toList());
+		tableBuilder
+				.header(headerData)
+				.bodyCells(bodyData);
+	}
+
+	private void unFunctionalTasksMetricsTable(TableBuilder tableBuilder, TasksMetricsForPerson tasksMetricForPerson) {
 		if (tasksMetricForPerson == null) {
 			return;
 		}
@@ -325,18 +362,26 @@ public class ExcelReportGenerator {
 							.row()
 							//							.withStyle(Style.H4)
 							.withHeightInPoints(20)
-							.cell("Tasks metrics:")
+							.cell("Finished tasks:")
 							.buildCell()
 							.buildRow()
-							.buildTable(builder -> metricsTable(builder, tasksMetricForPerson))
+							.buildTable(builder -> finishedTasksMetricsTable(builder, tasksMetricForPerson))
 							.whiteLine()
 							.row()
 							//							.withStyle(Style.H4)
 							.withHeightInPoints(20)
-							.cell("Excluded tasks:")
+							.cell("In progress tasks:")
 							.buildCell()
 							.buildRow()
-							.buildTable(builder -> excludedTasksMetricsTable(builder, tasksMetricForPerson))
+							.buildTable(builder -> inProgressMetricsTable(builder, tasksMetricForPerson))
+							.whiteLine()
+							.row()
+							//							.withStyle(Style.H4)
+							.withHeightInPoints(20)
+							.cell("Un functional tasks:")
+							.buildCell()
+							.buildRow()
+							.buildTable(builder -> unFunctionalTasksMetricsTable(builder, tasksMetricForPerson))
 							.whiteLine();
 				});
 

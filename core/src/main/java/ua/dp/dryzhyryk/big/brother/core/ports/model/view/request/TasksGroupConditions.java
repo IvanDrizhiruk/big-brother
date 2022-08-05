@@ -9,15 +9,13 @@ import lombok.Value;
 
 @Value
 @Builder
-public class PeopleSearchUnfunctionalTasksConditions {
+public class TasksGroupConditions {
 
-	@NonNull
-	List<ExcludedFieldNameAndValuePair> byFields;
-	@NonNull
+	List<FieldNameAndValuePair> byFields;
 	Set<String> byStatus;
 
 	@Value
-	public static class ExcludedFieldNameAndValuePair {
+	public static class FieldNameAndValuePair {
 		@NonNull
 		String name;
 		@NonNull
