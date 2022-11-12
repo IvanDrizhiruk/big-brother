@@ -71,7 +71,8 @@ public class TaskMetricsForPersonCalculator {
 			LocalDate startPeriod,
 			LocalDate endPeriod,
 			int timeSpendOnTaskByTeamInMinutes,
-			int timeSpendOnTaskByTeamByPeriodInMinutes, TaskMetaType taskMetaType) {
+			int timeSpendOnTaskByTeamByPeriodInMinutes,
+			TaskMetaType taskMetaType) {
 
 		int timeSpentOnTaskPersonByPeriodInMinutes = spentMinutesForDay.entrySet().stream()
 				.filter(entry -> !entry.getKey().isBefore(startPeriod) && entry.getKey().isBefore(endPeriod))
