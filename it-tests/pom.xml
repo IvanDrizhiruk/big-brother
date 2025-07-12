@@ -16,7 +16,7 @@
         <junit4.version>4.12</junit4.version>
         <jbehave-core.version>4.8.3</jbehave-core.version>
         <logback.version>1.0.1</logback.version>
-        <commons-lang3.version>3.12.0</commons-lang3.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
     </properties>
 
     <build>
